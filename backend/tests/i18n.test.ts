@@ -38,13 +38,14 @@ describe('i18n Cards Translations', () => {
   };
 
   const mockLanguages: LanguageStat[] = [
-    { name: 'TypeScript', percentage: 70, color: '#3178c6' },
-    { name: 'JavaScript', percentage: 30, color: '#f1e05a' }
+    { name: 'TypeScript', count: 7, size: 700, percentage: 70, color: '#3178c6' },
+    { name: 'JavaScript', count: 3, size: 300, percentage: 30, color: '#f1e05a' }
   ];
 
   const mockRepos: RepoStats[] = [
     {
       name: 'hello-world',
+      owner: 'testuser',
       description: 'A simple hello world project',
       stars: 50,
       forks: 5,

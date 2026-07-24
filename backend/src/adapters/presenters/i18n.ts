@@ -37,83 +37,50 @@ export interface TranslationSet {
   };
 }
 
+function buildTranslationSet(isEnglish: boolean): TranslationSet {
+  return {
+    stats: {
+      commits: 'Commits:',
+      stars: isEnglish ? 'Stars:' : 'Estrellas:',
+      followers: isEnglish ? 'Followers:' : 'Seguidores:',
+      prs: 'PRs:',
+      issues: 'Issues:',
+      forks: 'Forks:'
+    },
+    languages: {
+      title: isEnglish ? 'Most Used Languages' : 'Lenguajes Más Usados'
+    },
+    rank: {
+      title: isEnglish ? 'Developer Rank' : 'Rango de Desarrollador',
+      collab: isEnglish ? 'Collaboration Index' : 'Índice de Colaboración',
+      rankLegendary: isEnglish ? 'Legendary Developer / Elite Contributor' : 'Desarrollador Legendario / Contribuidor Elite',
+      rankOutstanding: isEnglish ? 'Outstanding Developer / Very Active' : 'Desarrollador Sobresaliente / Muy Activo',
+      rankActive: isEnglish ? 'Active & Collaborative Developer' : 'Desarrollador Activo y Colaborativo',
+      rankGrowing: isEnglish ? 'Growing Developer' : 'Desarrollador en crecimiento'
+    },
+    streak: {
+      title: isEnglish ? 'Contribution Streak' : 'Racha de Contribuciones',
+      current: isEnglish ? 'Current Streak' : 'Racha Actual',
+      max: isEnglish ? 'Longest Streak' : 'Racha Máxima',
+      total: isEnglish ? 'Total Contributions' : 'Total Contribuciones',
+      days: isEnglish ? 'days' : 'días',
+      noStreak: isEnglish ? 'No active streak' : 'Sin racha activa',
+      present: isEnglish ? 'Present' : 'Presente'
+    },
+    trophies: {
+      title: isEnglish ? 'GitHub Trophies' : 'Trofeos de GitHub'
+    },
+    topRepos: {
+      title: isEnglish ? 'Top Repositories' : 'Top Repositorios',
+      stars: isEnglish ? 'by stars' : 'por estrellas',
+      noLicense: isEnglish ? 'No License' : 'Sin Licencia'
+    }
+  };
+}
+
 export const TRANSLATIONS: Record<'es' | 'en', TranslationSet> = {
-  es: {
-    stats: {
-      commits: 'Commits:',
-      stars: 'Estrellas:',
-      followers: 'Seguidores:',
-      prs: 'PRs:',
-      issues: 'Issues:',
-      forks: 'Forks:'
-    },
-    languages: {
-      title: 'Lenguajes Más Usados'
-    },
-    rank: {
-      title: 'Rango de Desarrollador',
-      collab: 'Índice de Colaboración',
-      rankLegendary: 'Desarrollador Legendario / Contribuidor Elite',
-      rankOutstanding: 'Desarrollador Sobresaliente / Muy Activo',
-      rankActive: 'Desarrollador Activo y Colaborativo',
-      rankGrowing: 'Desarrollador en crecimiento'
-    },
-    streak: {
-      title: 'Racha de Contribuciones',
-      current: 'Racha Actual',
-      max: 'Racha Máxima',
-      total: 'Total Contribuciones',
-      days: 'días',
-      noStreak: 'Sin racha activa',
-      present: 'Presente'
-    },
-    trophies: {
-      title: 'Trofeos de GitHub'
-    },
-    topRepos: {
-      title: 'Top Repositorios',
-      stars: 'por estrellas',
-      noLicense: 'Sin Licencia'
-    }
-  },
-  en: {
-    stats: {
-      commits: 'Commits:',
-      stars: 'Stars:',
-      followers: 'Followers:',
-      prs: 'PRs:',
-      issues: 'Issues:',
-      forks: 'Forks:'
-    },
-    languages: {
-      title: 'Most Used Languages'
-    },
-    rank: {
-      title: 'Developer Rank',
-      collab: 'Collaboration Index',
-      rankLegendary: 'Legendary Developer / Elite Contributor',
-      rankOutstanding: 'Outstanding Developer / Very Active',
-      rankActive: 'Active & Collaborative Developer',
-      rankGrowing: 'Growing Developer'
-    },
-    streak: {
-      title: 'Contribution Streak',
-      current: 'Current Streak',
-      max: 'Longest Streak',
-      total: 'Total Contributions',
-      days: 'days',
-      noStreak: 'No active streak',
-      present: 'Present'
-    },
-    trophies: {
-      title: 'GitHub Trophies'
-    },
-    topRepos: {
-      title: 'Top Repositories',
-      stars: 'by stars',
-      noLicense: 'No License'
-    }
-  }
+  es: buildTranslationSet(false),
+  en: buildTranslationSet(true)
 };
 
 export function getTranslations(locale?: string): TranslationSet {

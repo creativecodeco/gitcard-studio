@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { logger, requestLoggerMiddleware } from '../src/infrastructure/logging/logger';
-import type { Request, Response } from 'express';
 
 describe('Logger Module', () => {
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;
@@ -47,14 +46,14 @@ describe('Logger Module', () => {
       originalUrl: '/api/stats',
       method: 'GET',
       get: () => 'TestAgent'
-    } as unknown as Request;
+    } as any;
 
     const res = {
       statusCode: 200,
       on: (event: string, cb: () => void) => {
         listeners[event] = cb;
       }
-    } as unknown as Response;
+    } as any;
 
     const next = vi.fn();
 

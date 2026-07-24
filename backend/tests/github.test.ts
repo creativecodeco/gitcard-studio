@@ -121,6 +121,32 @@ describe('github.ts integration tests (Mocked)', () => {
     expect(langs[1].percentage).toBe(40);
   });
 
+  it('should ignore prototype pollution keys in language stats', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => [{ name: 'r1', fork: false }]
+    });
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => []
+    });
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        __proto__: 102400,
+        constructor: 102400,
+        prototype: 102400,
+        TypeScript: 102400
+      })
+    });
+
+    const langs = await githubRepo.getUserLanguages('proto-user');
+    expect(langs).toHaveLength(1);
+    expect(langs[0].name).toBe('TypeScript');
+    expect((Object.prototype as any).count).toBeUndefined();
+  });
+
   it('should fetch a specific repository for getFeaturedRepo', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,

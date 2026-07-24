@@ -4,7 +4,7 @@
     "module": "node16",
     "moduleResolution": "node16",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -18,17 +18,14 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": [
     "node_modules",
     "dist",
-    "tests",
     "scripts",
     "public",
     ".agents",
     "data",
-    "**/*.test.ts",
-    "**/*.spec.ts",
     "vitest.config.*"
   ]
 }

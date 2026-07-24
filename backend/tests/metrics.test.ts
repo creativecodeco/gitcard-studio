@@ -18,7 +18,6 @@ describe('TypeORM Metrics Tracker', () => {
   });
 
   afterAll(async () => {
-    const { AppDataSource } = await import('@/infrastructure/database/database');
     if (AppDataSource.isInitialized) {
       await AppDataSource.destroy();
     }

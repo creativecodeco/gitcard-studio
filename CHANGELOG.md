@@ -2,6 +2,12 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.4.7] - 2026-07-24
+
+### 🛠️ Correcciones de Configuración y Resolución de Módulos TypeScript
+- **Resolución de alias de módulos en tests (`@/*`)**: Actualizado `backend/tsconfig.json` para incluir `"tests/**/*"` en la propiedad `"include"` y establecer `"rootDir": "./"`. Esto resuelve los errores de importación de módulos (como `Cannot find module '@/...'`) en el entorno de desarrollo y servidor de lenguaje TypeScript (IDE) al trabajar con archivos dentro de `backend/tests/`.
+- **Aislamiento de compilación para producción**: `pnpm build` continúa utilizando `tsconfig.build.json` para compilar exclusivamente `src/` hacia `dist/`, manteniendo el bundle libre de artefactos de prueba.
+
 ## [1.4.6] - 2026-07-24
 
 ### 🐛 Corrección de Contadores Globales del Dashboard
@@ -247,4 +253,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.4.6
+**Versión actualmente expuesta / en producción:** v1.4.7

@@ -1,13 +1,14 @@
 {
   "name": "github-helpers-backend",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "Backend API server for GitHub Helpers",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc && tsc-alias",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "start": "node dist/server.js",
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:typecheck": "tsc -p tsconfig.spec.json --noEmit"
   },
   "dependencies": {
     "@fastify/cors": "11.3.0",

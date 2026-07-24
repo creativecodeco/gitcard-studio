@@ -155,7 +155,10 @@ export class ApiGitHubRepository implements IGitHubRepository {
     }
   }
 
-  private async getUserStatsViaGraphQL(username: string, userToken?: string): Promise<UserStats | null> {
+  private async getUserStatsViaGraphQL(
+    username: string,
+    userToken?: string
+  ): Promise<UserStats | null> {
     const query = `
       query GetUserStats($username: String!) {
         user(login: $username) {
@@ -181,30 +184,27 @@ export class ApiGitHubRepository implements IGitHubRepository {
     `;
 
     const data = await this.fetchGraphQL<{ user: any }>(query, { username }, userToken);
-    if (!data || !data.user) return null;
+    if (!data?.user) return null;
 
     const u = data.user;
-    const repos = u.repositories?.nodes || [];
+    const repos = u.repositories?.nodes ?? [];
     let totalStars = 0;
     let forksReceived = 0;
 
     for (const r of repos) {
-      totalStars += r.stargazerCount || 0;
-      forksReceived += r.forkCount || 0;
+      totalStars += r.stargazerCount ?? 0;
+      forksReceived += r.forkCount ?? 0;
     }
 
-    const cc = u.contributionsCollection || {};
-    const totalCommits = (cc.totalCommitContributions || 0) + (cc.restrictedContributionsCount || 0);
-    const totalPRs = cc.totalPullRequestContributions || 0;
-    const totalIssues = cc.totalIssueContributions || 0;
-    const followers = u.followers?.totalCount || 0;
+    const cc = u.contributionsCollection ?? {};
+    const totalCommits =
+      (cc.totalCommitContributions ?? 0) + (cc.restrictedContributionsCount ?? 0);
+    const totalPRs = cc.totalPullRequestContributions ?? 0;
+    const totalIssues = cc.totalIssueContributions ?? 0;
+    const followers = u.followers?.totalCount ?? 0;
 
     const score =
-      totalCommits * 1 +
-      totalPRs * 3 +
-      totalIssues * 1 +
-      totalStars * 5 +
-      followers * 8;
+      totalCommits * 1 + totalPRs * 3 + totalIssues * 1 + totalStars * 5 + followers * 8;
 
     const rank = this.calculateDeveloperRank(score);
     const collaborationIndex = Math.min(
@@ -315,7 +315,7 @@ export class ApiGitHubRepository implements IGitHubRepository {
     username: string,
     userToken?: string
   ): Promise<Record<string, { count: number; size: number }>> {
-    const languageMap: Record<string, { count: number; size: number }> = {};
+    const languageMap: Record<string, { count: number; size: number }> = Object.create(null);
     const CONCURRENCY_LIMIT = 15;
 
     for (let i = 0; i < repos.length; i += CONCURRENCY_LIMIT) {
@@ -329,15 +329,22 @@ export class ApiGitHubRepository implements IGitHubRepository {
               userToken
             );
             for (const [lang, bytes] of Object.entries(repoLangs)) {
+              if (!lang || lang === '__proto__' || lang === 'constructor' || lang === 'prototype') {
+                continue;
+              }
               const sizeInKB = (bytes as number) / 1024;
-              if (!languageMap[lang]) {
+              if (!Object.hasOwn(languageMap, lang)) {
                 languageMap[lang] = { count: 0, size: 0 };
               }
               languageMap[lang].count += 1;
               languageMap[lang].size += sizeInKB;
             }
           } catch (err) {
-            logger.warn(`Could not fetch languages for repo ${username}/${repo.name}`, { username, repo: repo.name, error: err });
+            logger.warn(`Could not fetch languages for repo ${username}/${repo.name}`, {
+              username,
+              repo: repo.name,
+              error: err
+            });
           }
         })
       );
@@ -346,7 +353,10 @@ export class ApiGitHubRepository implements IGitHubRepository {
     return languageMap;
   }
 
-  private async getUserLanguagesViaGraphQL(username: string, userToken?: string): Promise<LanguageStat[] | null> {
+  private async getUserLanguagesViaGraphQL(
+    username: string,
+    userToken?: string
+  ): Promise<LanguageStat[] | null> {
     const query = `
       query GetUserLanguages($username: String!) {
         user(login: $username) {
@@ -368,38 +378,54 @@ export class ApiGitHubRepository implements IGitHubRepository {
     `;
 
     const data = await this.fetchGraphQL<{ user: any }>(query, { username }, userToken);
-    if (!data || !data.user) return null;
+    if (!data?.user) return null;
 
-    const repos = data.user.repositories?.nodes || [];
-    const languageMap: Record<string, { count: number; size: number; color?: string }> = {};
-    let totalSize = 0;
+    const repos = data.user.repositories?.nodes ?? [];
+    const languageMap: Record<string, { count: number; size: number; color?: string }> =
+      Object.create(null);
 
     for (const r of repos) {
-      const edges = r.languages?.edges || [];
+      const edges = r.languages?.edges ?? [];
       for (const edge of edges) {
-        const langName = edge.node.name;
-        const sizeInKB = edge.size / 1024;
-        if (!languageMap[langName]) {
+        const langName = edge.node?.name;
+        if (
+          !langName ||
+          langName === '__proto__' ||
+          langName === 'constructor' ||
+          langName === 'prototype'
+        ) {
+          continue;
+        }
+        const sizeInKB = (edge.size ?? 0) / 1024;
+        if (!Object.prototype.hasOwnProperty.call(languageMap, langName)) {
           languageMap[langName] = {
             count: 0,
             size: 0,
-            color: edge.node.color || LANGUAGE_COLORS[langName] || DEFAULT_COLOR
+            color: edge.node?.color ?? LANGUAGE_COLORS[langName] ?? DEFAULT_COLOR
           };
         }
         languageMap[langName].count += 1;
         languageMap[langName].size += sizeInKB;
-        totalSize += sizeInKB;
       }
     }
 
+    return this.buildLanguageStats(languageMap);
+  }
+
+  private buildLanguageStats(
+    languageMap: Record<string, { count: number; size: number; color?: string }>
+  ): LanguageStat[] {
     const statsArray: LanguageStat[] = [];
+    let totalSize = 0;
+
     for (const [name, info] of Object.entries(languageMap)) {
+      totalSize += info.size;
       statsArray.push({
         name,
         count: info.count,
         size: info.size,
         percentage: 0,
-        color: info.color || LANGUAGE_COLORS[name] || DEFAULT_COLOR
+        color: info.color ?? LANGUAGE_COLORS[name] ?? DEFAULT_COLOR
       });
     }
 
@@ -413,11 +439,11 @@ export class ApiGitHubRepository implements IGitHubRepository {
     const topLanguages = result.slice(0, 6);
     if (result.length > 6) {
       const otherLanguages = result.slice(6);
-      const otherSize = otherLanguages.reduce((acc, curr) => acc + curr.size, 0);
-      const otherCount = otherLanguages.reduce((acc, curr) => acc + curr.count, 0);
+      const otherSize = otherLanguages.reduce((sum, item) => sum + item.size, 0);
+      const otherCount = otherLanguages.reduce((sum, item) => sum + item.count, 0);
       const otherPercentage = Number.parseFloat(((otherSize / totalSize) * 100).toFixed(1));
 
-      if (otherPercentage > 0) {
+      if (otherSize > 0 && otherPercentage > 0) {
         topLanguages.push({
           name: 'Otros',
           count: otherCount,
@@ -438,48 +464,7 @@ export class ApiGitHubRepository implements IGitHubRepository {
     const nonForkRepos = await this.fetchNonForkRepos(username, userToken);
     const languageMap = await this.aggregateRepoLanguages(nonForkRepos, username, userToken);
 
-    const statsArray: LanguageStat[] = [];
-    let totalSize = 0;
-
-    for (const [name, data] of Object.entries(languageMap)) {
-      totalSize += data.size;
-      statsArray.push({
-        name,
-        count: data.count,
-        size: data.size,
-        percentage: 0,
-        color: LANGUAGE_COLORS[name] || DEFAULT_COLOR
-      });
-    }
-
-    statsArray.sort((a, b) => b.size - a.size);
-
-    const result = statsArray.map((stat) => ({
-      ...stat,
-      percentage: totalSize > 0 ? Number.parseFloat(((stat.size / totalSize) * 100).toFixed(1)) : 0
-    }));
-
-    const topLanguages = result.slice(0, 6);
-    if (result.length > 6) {
-      const otherLanguages = result.slice(6);
-      const otherSize = otherLanguages.reduce((sum, item) => sum + item.size, 0);
-      const otherCount = otherLanguages.reduce((sum, item) => sum + item.count, 0);
-      const otherPercentage = Number.parseFloat(
-        otherLanguages.reduce((sum, item) => sum + item.percentage, 0).toFixed(1)
-      );
-
-      if (otherSize > 0) {
-        topLanguages.push({
-          name: 'Otros',
-          count: otherCount,
-          size: otherSize,
-          percentage: otherPercentage,
-          color: DEFAULT_COLOR
-        });
-      }
-    }
-
-    return topLanguages;
+    return this.buildLanguageStats(languageMap);
   }
 
   private updateBestRepo(repos: any[], currentBest: any): any {
@@ -564,9 +549,11 @@ export class ApiGitHubRepository implements IGitHubRepository {
     return contributions;
   }
 
-  private calculateStreakStats(
-    contributions: { date: string; level: number }[]
-  ): { longestStreak: number; longestStreakStart: string; longestStreakEnd: string } {
+  private calculateStreakStats(contributions: { date: string; level: number }[]): {
+    longestStreak: number;
+    longestStreakStart: string;
+    longestStreakEnd: string;
+  } {
     let longestStreak = 0;
     let longestStreakStart = '';
     let longestStreakEnd = '';
@@ -630,7 +617,10 @@ export class ApiGitHubRepository implements IGitHubRepository {
     return { currentStreak, currentStreakStart, currentStreakEnd };
   }
 
-  private async getUserStreakViaGraphQL(username: string, userToken?: string): Promise<StreakStats | null> {
+  private async getUserStreakViaGraphQL(
+    username: string,
+    userToken?: string
+  ): Promise<StreakStats | null> {
     const query = `
       query GetStreakStats($username: String!) {
         user(login: $username) {
@@ -650,36 +640,50 @@ export class ApiGitHubRepository implements IGitHubRepository {
     `;
 
     const data = await this.fetchGraphQL<{ user: any }>(query, { username }, userToken);
-    if (!data || !data.user) return null;
+    if (!data?.user) return null;
 
     const cal = data.user.contributionsCollection?.contributionCalendar;
     if (!cal) return null;
 
     const contributions: { date: string; level: number }[] = [];
-    for (const week of cal.weeks || []) {
-      for (const day of week.contributionDays || []) {
+    for (const week of cal.weeks ?? []) {
+      for (const day of week.contributionDays ?? []) {
         contributions.push({
           date: day.date,
-          level: day.contributionCount > 0 ? 1 : 0
+          level: (day.contributionCount ?? 0) > 0 ? 1 : 0
         });
       }
     }
 
     if (contributions.length === 0) return null;
 
-    const totalContributions = cal.totalContributions || 0;
+    const totalContributions = cal.totalContributions ?? 0;
+    return this.buildStreakStats(username, contributions, totalContributions);
+  }
+
+  private buildStreakStats(
+    username: string,
+    contributions: { date: string; level: number }[],
+    overrideTotal?: number
+  ): StreakStats {
+    const totalContributions = overrideTotal ?? contributions.filter((c) => c.level > 0).length;
+
     const firstContribEntry = contributions.find((c) => c.level > 0);
     const firstContributionDate = firstContribEntry
       ? firstContribEntry.date
       : contributions[0].date;
 
     const activeDays = new Set(contributions.filter((c) => c.level > 0).map((c) => c.date));
-    const { longestStreak, longestStreakStart, longestStreakEnd } = this.calculateStreakStats(contributions);
+    const { longestStreak, longestStreakStart, longestStreakEnd } =
+      this.calculateStreakStats(contributions);
 
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
-    const { currentStreak, currentStreakStart, currentStreakEnd } = this.calculateCurrentStreak(activeDays, today);
+    const { currentStreak, currentStreakStart, currentStreakEnd } = this.calculateCurrentStreak(
+      activeDays,
+      today
+    );
 
     return {
       username,
@@ -720,39 +724,18 @@ export class ApiGitHubRepository implements IGitHubRepository {
       throw new Error(`No contribution data found for user: ${username}`);
     }
 
-    const totalContributions = contributions.filter((c) => c.level > 0).length;
-
-    const firstContribEntry = contributions.find((c) => c.level > 0);
-    const firstContributionDate = firstContribEntry
-      ? firstContribEntry.date
-      : contributions[0].date;
-
-    const activeDays = new Set(contributions.filter((c) => c.level > 0).map((c) => c.date));
-    const { longestStreak, longestStreakStart, longestStreakEnd } = this.calculateStreakStats(contributions);
-
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-
-    const { currentStreak, currentStreakStart, currentStreakEnd } = this.calculateCurrentStreak(activeDays, today);
-
-    return {
-      username,
-      totalContributions,
-      currentStreak,
-      longestStreak,
-      currentStreakStart,
-      currentStreakEnd,
-      longestStreakStart,
-      longestStreakEnd,
-      firstContributionDate
-    };
+    return this.buildStreakStats(username, contributions);
   }
 
   clearCache(_username: string): void {
     // No-op for the raw API client
   }
 
-  private async getUserTopReposViaGraphQL(username: string, limit: number = 4, userToken?: string): Promise<RepoStats[] | null> {
+  private async getUserTopReposViaGraphQL(
+    username: string,
+    limit: number = 4,
+    userToken?: string
+  ): Promise<RepoStats[] | null> {
     const query = `
       query GetUserTopRepos($username: String!) {
         user(login: $username) {
@@ -778,27 +761,31 @@ export class ApiGitHubRepository implements IGitHubRepository {
     `;
 
     const data = await this.fetchGraphQL<{ user: any }>(query, { username }, userToken);
-    if (!data || !data.user) return null;
+    if (!data?.user) return null;
 
-    const repos = data.user.repositories?.nodes || [];
+    const repos = data.user.repositories?.nodes ?? [];
     const topRepos = repos.slice(0, limit);
 
     return topRepos.map((r: any) => {
-      const langName = r.primaryLanguage?.name || 'Markdown';
+      const langName = r.primaryLanguage?.name ?? 'Markdown';
       return {
         name: r.name,
-        owner: r.owner?.login || username,
-        description: r.description || 'Sin descripción disponible.',
-        stars: r.stargazerCount || 0,
-        forks: r.forkCount || 0,
+        owner: r.owner?.login ?? username,
+        description: r.description ?? 'Sin descripción disponible.',
+        stars: r.stargazerCount ?? 0,
+        forks: r.forkCount ?? 0,
         language: langName,
-        languageColor: r.primaryLanguage?.color || LANGUAGE_COLORS[langName] || DEFAULT_COLOR,
-        license: r.licenseInfo ? r.licenseInfo.spdxId || r.licenseInfo.name : 'No License'
+        languageColor: r.primaryLanguage?.color ?? LANGUAGE_COLORS[langName] ?? DEFAULT_COLOR,
+        license: r.licenseInfo?.spdxId ?? r.licenseInfo?.name ?? 'No License'
       };
     });
   }
 
-  async getUserTopRepos(username: string, limit: number = 4, userToken?: string): Promise<RepoStats[]> {
+  async getUserTopRepos(
+    username: string,
+    limit: number = 4,
+    userToken?: string
+  ): Promise<RepoStats[]> {
     const gqlTopRepos = await this.getUserTopReposViaGraphQL(username, limit, userToken);
     if (gqlTopRepos && gqlTopRepos.length > 0) return gqlTopRepos;
 
