@@ -3,6 +3,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { initDatabase, AppDataSource } from '@/infrastructure/database/database';
 import { UserMetric } from '@/infrastructure/database/entities/UserMetric';
 import { TypeORMMetricsRepository } from '@/adapters/repositories/TypeORMMetricsRepository';
+import { RequestLog } from '@/infrastructure/database/entities/RequestLog';
 import { renderViewsBadge } from '@/adapters/presenters/viewsBadge';
 
 describe('Profile Views Counter Badge', () => {
@@ -19,9 +20,11 @@ describe('Profile Views Counter Badge', () => {
 
   afterAll(async () => {
     if (AppDataSource.isInitialized) {
-      // Clean up test user metrics
+      // Clean up test user metrics and logs
       const userMetricRepo = AppDataSource.getRepository(UserMetric);
+      const requestLogRepo = AppDataSource.getRepository(RequestLog);
       await userMetricRepo.delete({ username: testUser });
+      await requestLogRepo.delete({ username: testUser });
       await AppDataSource.destroy();
     }
   });
@@ -35,17 +38,31 @@ describe('Profile Views Counter Badge', () => {
     expect(secondCallViews).toBe(0);
   });
 
-  it('should increment profile_views atomic count by 1 when increment is true', async () => {
+  it('should increment profile_views atomic count by 1 and save request_log when increment is true', async () => {
+    const hitContext = {
+      username: testUser,
+      userAgent: 'GitHub-Camo/1.0 (camo-proxy)',
+      referer: 'https://camo.githubusercontent.com',
+      ip: '127.0.0.1'
+    };
+
     // Call with increment: true
-    const viewsAfterIncrement = await metricsRepo.getOrIncrementProfileViews(testUser, true);
+    const viewsAfterIncrement = await metricsRepo.getOrIncrementProfileViews(testUser, true, hitContext);
     expect(viewsAfterIncrement).toBe(1);
 
     // Call again with increment: true
-    const viewsAfterSecondIncrement = await metricsRepo.getOrIncrementProfileViews(testUser, true);
+    const viewsAfterSecondIncrement = await metricsRepo.getOrIncrementProfileViews(testUser, true, hitContext);
     expect(viewsAfterSecondIncrement).toBe(2);
 
+    // Verify request_log entries were created in database
+    const requestLogRepo = AppDataSource.getRepository(RequestLog);
+    const logs = await requestLogRepo.findBy({ username: testUser });
+    expect(logs.length).toBe(2);
+    expect(logs[0].card_type).toBe('views');
+    expect(logs[0].source).toBe('github');
+
     // Call with increment: false, should retrieve the current value (2) without modifying it
-    const currentViews = await metricsRepo.getOrIncrementProfileViews(testUser, false);
+    const currentViews = await metricsRepo.getOrIncrementProfileViews(testUser, false, hitContext);
     expect(currentViews).toBe(2);
   });
 

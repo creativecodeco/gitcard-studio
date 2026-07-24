@@ -60,8 +60,8 @@ import { RecordProfileViewUseCase } from '@/use-cases/metrics/RecordProfileViewU
     },
     {
       provide: GetUserTopReposCardUseCase,
-      useFactory: (gh, token) => new GetUserTopReposCardUseCase(gh, token),
-      inject: ['IGitHubRepository', 'ITokenRepository']
+      useFactory: (gh, token, metrics) => new GetUserTopReposCardUseCase(gh, token, metrics),
+      inject: ['IGitHubRepository', 'ITokenRepository', 'IMetricsRepository']
     },
     {
       provide: RecordProfileViewUseCase,
