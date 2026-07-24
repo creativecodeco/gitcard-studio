@@ -23,13 +23,21 @@ describe('RecordProfileViewUseCase', () => {
 
   it('should increment profile views when isPreview is false or undefined', async () => {
     const result = await useCase.execute('validuser', 'GitHub-Camo/1.0', undefined, false);
-    expect(mockMetricsRepo.getOrIncrementProfileViews).toHaveBeenCalledWith('validuser', true);
+    expect(mockMetricsRepo.getOrIncrementProfileViews).toHaveBeenCalledWith(
+      'validuser',
+      true,
+      expect.objectContaining({ username: 'validuser', userAgent: 'GitHub-Camo/1.0' })
+    );
     expect(result).toBe(10);
   });
 
   it('should not increment profile views when isPreview is true', async () => {
     const result = await useCase.execute('validuser', 'Mozilla/5.0', 'http://localhost:3000', true);
-    expect(mockMetricsRepo.getOrIncrementProfileViews).toHaveBeenCalledWith('validuser', false);
+    expect(mockMetricsRepo.getOrIncrementProfileViews).toHaveBeenCalledWith(
+      'validuser',
+      false,
+      expect.objectContaining({ username: 'validuser', userAgent: 'Mozilla/5.0', referer: 'http://localhost:3000' })
+    );
     expect(result).toBe(10);
   });
 

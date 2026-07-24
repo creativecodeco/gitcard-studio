@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { FastifyReply } from 'fastify';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import path from 'node:path';
 import fs from 'node:fs';
 
@@ -19,21 +18,13 @@ export class HtmlFileService {
   }
 
   /**
-   * Sends a public HTML file as an HTTP response.
-   * Responds with 404 plain text if the file does not exist.
+   * Reads a public HTML file or throws a NotFoundException.
    */
-  serveFile(relativePath: string, res: FastifyReply): void {
+  getPublicFileOrThrow(relativePath: string, notFoundMessage = 'Page not found.'): string {
     const content = this.readPublicFile(relativePath);
-
     if (content === null) {
-      res.status(404).header('Content-Type', 'text/plain').send('Page not found.');
-      return;
+      throw new NotFoundException(notFoundMessage);
     }
-
-    res
-      .status(200)
-      .header('Content-Type', 'text/html; charset=utf-8')
-      .header('Cache-Control', 'no-cache, must-revalidate')
-      .send(content);
+    return content;
   }
 }

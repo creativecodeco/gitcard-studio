@@ -162,15 +162,20 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
     }
   }
 
-  async getOrIncrementProfileViews(username: string, increment: boolean): Promise<number> {
+  async getOrIncrementProfileViews(
+    username: string,
+    increment: boolean,
+    context?: HitContext
+  ): Promise<number> {
     try {
       const userMetricRepo = AppDataSource.getRepository(UserMetric);
+      const userLower = username.toLowerCase();
 
       // Ensure user row exists in user_metrics
       await AppDataSource.createQueryBuilder()
         .insert()
         .into(UserMetric)
-        .values({ username: username.toLowerCase() })
+        .values({ username: userLower })
         .orIgnore()
         .execute();
 
@@ -195,16 +200,51 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
             profile_views: () => 'profile_views + 1',
             last_updated: new Date()
           })
-          .where('username = :username', { username: username.toLowerCase() })
+          .where('username = :username', { username: userLower })
           .execute();
 
         // Update local cache
         this.globalMetricsCache.totalRenders += 1;
         this.globalMetricsCache.viewsRenders += 1;
+
+        // Log the request to request_log table
+        if (context) {
+          const userAgent = context.userAgent || '';
+          const referer = context.referer || '';
+          const ip = context.ip || '';
+          const uaLower = userAgent.toLowerCase();
+          let isGitHub = /github|camo/i.test(uaLower);
+          if (!isGitHub && referer) {
+            try {
+              const parsed = new URL(referer);
+              const host = parsed.hostname.toLowerCase();
+              isGitHub =
+                host === 'github.com' ||
+                host.endsWith('.github.com') ||
+                host === 'camo.githubusercontent.com' ||
+                host.endsWith('.githubusercontent.com');
+            } catch {
+              isGitHub = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)*(github\.com|githubusercontent\.com)(\/|$)/i.test(referer);
+            }
+          }
+          const source = isGitHub ? 'github' : 'web';
+
+          const requestLogRepo = AppDataSource.getRepository(RequestLog);
+          const log = new RequestLog();
+          log.username = userLower.slice(0, 39);
+          log.card_type = 'views';
+          log.source = source;
+          log.user_agent = userAgent.slice(0, 500);
+          log.referer = referer.slice(0, 500);
+          log.ip_address = ip.slice(0, 45);
+          await requestLogRepo.save(log).catch((err) => {
+            logger.error('Error saving request log for profile views:', { error: err });
+          });
+        }
       }
 
       // Fetch current views
-      const row = await userMetricRepo.findOneBy({ username: username.toLowerCase() });
+      const row = await userMetricRepo.findOneBy({ username: userLower });
       return row ? row.profile_views : 0;
     } catch (err) {
       logger.error(`Error in getOrIncrementProfileViews for user ${username}`, { username, error: err });
