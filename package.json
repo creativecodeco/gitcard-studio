@@ -2,6 +2,22 @@
   "name": "github-helpers",
   "version": "1.4.4",
   "description": "API server and interactive web frontend to generate beautiful GitHub readme stats cards and metrics",
+  "keywords": [
+    "github-readme-stats",
+    "github-stats",
+    "github-api",
+    "readme-generator",
+    "stats-card",
+    "svg-generator",
+    "github-profile",
+    "nestjs",
+    "astro",
+    "typescript",
+    "clean-architecture",
+    "typeorm",
+    "metrics",
+    "fastify"
+  ],
   "packageManager": "pnpm@11.17.0",
   "scripts": {
     "build": "pnpm --filter github-helpers-frontend build && pnpm --filter github-helpers-backend build",
