@@ -14,7 +14,6 @@ describe('TypeORM Metrics Tracker', () => {
     AppDataSource.setOptions({ synchronize: true });
     await initDatabase();
     metricsRepo = new TypeORMMetricsRepository();
-    await metricsRepo.loadGlobalMetricsCache();
     tokenRepo = new TypeORMTokenRepository();
   });
 
@@ -26,7 +25,7 @@ describe('TypeORM Metrics Tracker', () => {
   });
 
   it('should initialize and record global hits correctly', async () => {
-    const initialMetrics = metricsRepo.getMetrics();
+    const initialMetrics = await metricsRepo.getMetrics();
     expect(initialMetrics).toBeDefined();
     expect(initialMetrics.totalRenders).toBeGreaterThanOrEqual(0);
 
@@ -47,10 +46,35 @@ describe('TypeORM Metrics Tracker', () => {
     // Wait a brief moment for async writes to finish
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const updatedMetrics = metricsRepo.getMetrics();
+    const updatedMetrics = await metricsRepo.getMetrics();
     expect(updatedMetrics.totalRenders).toBe(initialMetrics.totalRenders + 2);
     expect(updatedMetrics.statsRenders).toBe(initialMetrics.statsRenders + 1);
     expect(updatedMetrics.languagesRenders).toBe(initialMetrics.languagesRenders + 1);
+  });
+
+  it('should reflect recorded hits when read from a SEPARATE repository instance (dashboard scenario)', async () => {
+    // Reproduces the production wiring: the card-render flow (CardsModule) and
+    // the dashboard (MetricsModule) are DIFFERENT provider instances. Only the
+    // first records hits; the dashboard instance must still report them because
+    // getMetrics() now reads the DB source of truth rather than a local cache.
+    const recordingRepo = new TypeORMMetricsRepository();
+    const dashboardRepo = new TypeORMMetricsRepository();
+
+    const before = await dashboardRepo.getMetrics();
+
+    const hitUser = `dash_${Math.random().toString(36).substring(7)}`;
+    recordingRepo.recordHit('repo', {
+      username: hitUser,
+      userAgent: 'Mozilla/5.0 Normal Browser',
+      referer: 'http://localhost:3000'
+    });
+
+    // Wait for the fire-and-forget background transaction to commit
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const after = await dashboardRepo.getMetrics();
+    expect(after.totalRenders).toBe(before.totalRenders + 1);
+    expect(after.repoRenders).toBe(before.repoRenders + 1);
   });
 
   it('should distinguish web vs github traffic per user in TypeORM', async () => {

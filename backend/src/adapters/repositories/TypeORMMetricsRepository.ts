@@ -7,31 +7,6 @@ import { RequestLog } from '@/infrastructure/database/entities/RequestLog';
 import { logger } from '@/infrastructure/logging/logger';
 
 export class TypeORMMetricsRepository implements IMetricsRepository {
-  private globalMetricsCache: Metrics = {
-    totalRenders: 0,
-    statsRenders: 0,
-    languagesRenders: 0,
-    repoRenders: 0,
-    rankRenders: 0,
-    streakRenders: 0,
-    trophiesRenders: 0,
-    viewsRenders: 0
-  };
-
-  async loadGlobalMetricsCache() {
-    try {
-      const globalMetricRepo = AppDataSource.getRepository(GlobalMetric);
-      const rows = await globalMetricRepo.find();
-      rows.forEach((row) => {
-        if (row.metric_key in this.globalMetricsCache) {
-          this.globalMetricsCache[row.metric_key as keyof Metrics] = row.metric_value;
-        }
-      });
-    } catch (err) {
-      logger.error('Error loading global metrics cache:', { error: err });
-    }
-  }
-
   recordHit(
     type: 'stats' | 'languages' | 'repo' | 'rank' | 'streak' | 'trophies',
     context?: HitContext
@@ -94,20 +69,43 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       log.referer = referer.slice(0, 500);
       log.ip_address = ip.slice(0, 45);
       await requestLogRepo.save(log);
-    })
-      .then(() => {
-        // Update in-memory cache on success
-        this.globalMetricsCache.totalRenders += 1;
-        const key = `${type}Renders` as keyof Metrics;
-        this.globalMetricsCache[key] += 1;
-      })
-      .catch((err) => {
-        logger.error('Failed to record metrics hit in TypeORM:', { error: err });
-      });
+    }).catch((err) => {
+      logger.error('Failed to record metrics hit in TypeORM:', { error: err });
+    });
   }
 
-  getMetrics(): Metrics {
-    return { ...this.globalMetricsCache };
+  /**
+   * Returns the global render counters read directly from the global_metrics
+   * table — the source of truth that recordHit() persists to. Reading from the
+   * DB (instead of a per-instance in-memory cache) guarantees the dashboard
+   * reports correct totals regardless of which repository instance serves the
+   * request or how many replicas are running.
+   */
+  async getMetrics(): Promise<Metrics> {
+    const metrics: Metrics = {
+      totalRenders: 0,
+      statsRenders: 0,
+      languagesRenders: 0,
+      repoRenders: 0,
+      rankRenders: 0,
+      streakRenders: 0,
+      trophiesRenders: 0,
+      viewsRenders: 0
+    };
+
+    try {
+      const globalMetricRepo = AppDataSource.getRepository(GlobalMetric);
+      const rows = await globalMetricRepo.find();
+      rows.forEach((row) => {
+        if (row.metric_key in metrics) {
+          metrics[row.metric_key as keyof Metrics] = row.metric_value;
+        }
+      });
+    } catch (err) {
+      logger.error('Error fetching global metrics:', { error: err });
+    }
+
+    return metrics;
   }
 
   async getUserMetrics(username: string): Promise<any> {
@@ -162,6 +160,7 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
 
       if (increment) {
         await this.incrementProfileViewCounters(userLower);
+
         if (context) {
           await this.logProfileViewRequest(userLower, context);
         }
@@ -257,9 +256,6 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       })
       .where('username = :username', { username: userLower })
       .execute();
-
-    this.globalMetricsCache.totalRenders += 1;
-    this.globalMetricsCache.viewsRenders += 1;
   }
 
   private async logProfileViewRequest(username: string, context: HitContext): Promise<void> {

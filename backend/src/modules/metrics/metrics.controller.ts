@@ -36,12 +36,12 @@ export class MetricsController {
   }
 
   @Get('metrics')
-  getMetrics(
+  async getMetrics(
     @Query() query: MetricsKeyQueryDto,
     @Headers('x-api-key') headerKey?: string
-  ): unknown {
+  ): Promise<unknown> {
     this.validateMetricsKey(query.key, headerKey, query.locale);
-    return this.metricsRepo.getMetrics();
+    return await this.metricsRepo.getMetrics();
   }
 
   @Get('metrics/history')

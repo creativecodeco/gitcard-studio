@@ -15,7 +15,6 @@ describe('Profile Views Counter Badge', () => {
     AppDataSource.setOptions({ synchronize: true });
     await initDatabase();
     metricsRepo = new TypeORMMetricsRepository();
-    await metricsRepo.loadGlobalMetricsCache();
   });
 
   afterAll(async () => {
