@@ -231,7 +231,7 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
         host.endsWith('.githubusercontent.com');
       return isGitHub ? 'github' : 'web';
     } catch {
-      const isGitHub = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)*(github\.com|githubusercontent\.com)(\/|$)/i.test(referer);
+      const isGitHub = /^(https?:\/\/)?([a-z0-9-]+\.)*(github\.com|githubusercontent\.com)(\/|$)/i.test(referer);
       return isGitHub ? 'github' : 'web';
     }
   }

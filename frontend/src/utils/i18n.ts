@@ -224,7 +224,7 @@ export function t(
 
   if (params) {
     Object.entries(params).forEach(([paramKey, paramVal]) => {
-      text = text.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), paramVal);
+      text = text.replaceAll(`{${paramKey}}`, paramVal);
     });
   }
 
@@ -240,17 +240,19 @@ export function updateDomTranslations(locale: string = 'es'): void {
 
   // 1. Text elements
   document.querySelectorAll('[data-i18n]').forEach((el) => {
-    const key = el.getAttribute('data-i18n');
+    const htmlEl = el as HTMLElement;
+    const key = htmlEl.dataset.i18n;
     if (key && key in dict) {
-      el.textContent = dict[key as TranslationKey];
+      htmlEl.textContent = dict[key as TranslationKey];
     }
   });
 
   // 2. Placeholders
   document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
-    const key = el.getAttribute('data-i18n-placeholder');
+    const htmlEl = el as HTMLElement;
+    const key = htmlEl.dataset.i18nPlaceholder;
     if (key && key in dict) {
-      (el as HTMLInputElement).placeholder = dict[key as TranslationKey];
+      (htmlEl as HTMLInputElement).placeholder = dict[key as TranslationKey];
     }
   });
 }

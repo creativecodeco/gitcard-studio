@@ -36,7 +36,7 @@ export class SaveUserStatsHistoryUseCase {
     newEntry.issues = stats?.totalIssues ?? lastEntry?.issues ?? 0;
     newEntry.followers = stats?.followers ?? lastEntry?.followers ?? 0;
 
-    const lastLanguages = lastEntry?.languages || {};
+    const lastLanguages = lastEntry?.languages ?? {};
     newEntry.languages = languages ? { ...lastLanguages, ...languages } : lastLanguages;
 
     return newEntry;
@@ -49,7 +49,7 @@ export class SaveUserStatsHistoryUseCase {
   ): Promise<void> {
     try {
       const historyRepo = AppDataSource.getRepository(UserStatsHistory);
-      const frequencyHours = Number.parseInt(process.env.STATS_HISTORY_FREQUENCY_HOURS || '12', 10);
+      const frequencyHours = Number.parseInt(process.env.STATS_HISTORY_FREQUENCY_HOURS ?? '12', 10);
       const cutoffTime = new Date(Date.now() - frequencyHours * 60 * 60 * 1000);
 
       // Find the last recorded history entry for the user

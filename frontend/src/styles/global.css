@@ -800,8 +800,8 @@ body.light-mode .readme-layout-btn:hover {
 
 body.light-mode .readme-layout-btn.active {
   background: rgba(56, 189, 248, 0.15) !important;
-  color: #0284c7 !important;
-  border-color: #38bdf8 !important;
+  color: #0369a1 !important;
+  border-color: #0284c7 !important;
 }
 
 body.light-mode .readme-tab-btn {

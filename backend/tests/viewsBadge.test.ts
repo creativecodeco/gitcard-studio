@@ -57,7 +57,7 @@ describe('Profile Views Counter Badge', () => {
     // Verify request_log entries were created in database
     const requestLogRepo = AppDataSource.getRepository(RequestLog);
     const logs = await requestLogRepo.findBy({ username: testUser });
-    expect(logs.length).toBe(2);
+    expect(logs).toHaveLength(2);
     expect(logs[0].card_type).toBe('views');
     expect(logs[0].source).toBe('github');
 

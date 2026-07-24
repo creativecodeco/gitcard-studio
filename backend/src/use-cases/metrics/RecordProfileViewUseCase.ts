@@ -17,12 +17,12 @@ export class RecordProfileViewUseCase {
     // If request is explicitly a preview (e.g. from web app UI), do not increment count
     const shouldIncrement = !isPreview;
 
-    const context: HitContext = hitContext || {
+    const context: HitContext = hitContext ?? {
       username,
       userAgent,
       referer
     };
 
-    return await this.metricsRepo.getOrIncrementProfileViews(username, shouldIncrement, context);
+    return this.metricsRepo.getOrIncrementProfileViews(username, shouldIncrement, context);
   }
 }

@@ -2,6 +2,18 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.4.5] - 2026-07-24
+
+### 🛠️ Correcciones de Calidad SonarCloud & Refactorización Clean Code
+- **Correcciones SonarCloud**:
+  - Removidas redundancias de caracteres en expresiones regulares (`[a-z0-9-]`) en `TypeORMMetricsRepository`.
+  - Aplicado el operador de coalescencia nula (`??`) en `RecordProfileViewUseCase` y `SaveUserStatsHistoryUseCase`.
+  - Migrado el reemplazo de cadenas a `String.prototype.replaceAll` y lectura de data-attributes a `.dataset` en `frontend/src/utils/i18n.ts`.
+  - Mejorada la aserción de longitud en pruebas unitarias (`toHaveLength`) en `viewsBadge.test.ts`.
+- **Accesibilidad y Metadatos**:
+  - Ajustado el contraste de color WCAG para botones en modo claro (`global.css`).
+  - Agregada la lista oficial de `keywords` del proyecto en el `package.json` raíz.
+
 ## [1.4.4] - 2026-07-24
 
 ### 🛠️ Refactorización y Calidad de Código (Sonar & Clean Code)
@@ -222,4 +234,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.4.4
+**Versión actualmente expuesta / en producción:** v1.4.5
