@@ -128,7 +128,7 @@ export class CardsController {
   @Get('views')
   async getProfileViews(@Req() req: FastifyRequest, @Res() res: FastifyReply): Promise<void> {
     const query = (req.query as Record<string, unknown>) ?? {};
-    const { username, theme, color, label, style } = query;
+    const { username, theme, color, label, style, preview } = query;
 
     if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
       res.type('image/svg+xml').status(400).send(renderErrorCard('Usuario de GitHub inválido'));
@@ -138,8 +138,9 @@ export class CardsController {
     try {
       const userAgent = req.headers['user-agent'] as string | undefined;
       const referer = req.headers['referer'] as string | undefined;
+      const isPreview = preview === 'true' || preview === '1';
 
-      const viewsCount = await this.recordProfileViewUseCase.execute(username, userAgent, referer);
+      const viewsCount = await this.recordProfileViewUseCase.execute(username, userAgent, referer, isPreview);
 
       const cleanLabel = typeof label === 'string' ? label : undefined;
       const cleanColor = typeof color === 'string' ? color : undefined;
@@ -150,7 +151,7 @@ export class CardsController {
 
       res
         .type('image/svg+xml')
-        .header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
         .header('Pragma', 'no-cache')
         .header('Expires', '0')
         .status(200)

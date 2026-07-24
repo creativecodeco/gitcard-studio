@@ -1093,7 +1093,7 @@ import Footer from '@/components/Footer.astro';
       topReposImg.alt = `Top repositorios de GitHub para el usuario @${currentUsername}`;
     }
     if (viewsImg) {
-      viewsImg.src = viewsUrl + cacheBuster;
+      viewsImg.src = viewsUrl + '&preview=true' + cacheBuster;
       viewsImg.alt = `Contador de visitas de GitHub para el usuario @${currentUsername}`;
     }
 
@@ -1137,7 +1137,7 @@ import Footer from '@/components/Footer.astro';
 
     if (viewsImg) {
       const cacheBuster = `&t=${Date.now()}`;
-      viewsImg.src = viewsUrl + cacheBuster;
+      viewsImg.src = viewsUrl + '&preview=true' + cacheBuster;
     }
 
     const markdownViews = `![Visitas de Perfil](${viewsUrl})`;

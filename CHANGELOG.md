@@ -2,6 +2,14 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.4.3] - 2026-07-24
+
+### 🐛 Correcciones en el Contador de Visitas de GitHub (`/api/views`)
+- **Persistencia e Incremento de Visitas**: Refactorizada la clase `RecordProfileViewUseCase` para garantizar que las solicitudes del badge de visitas desde GitHub (Camo proxy) y sitios externos incrementen correctamente el contador en la base de datos PostgreSQL/TypeORM.
+- **Cabeceras Anti-Caché para GitHub Camo**: Configurado el encabezado de respuesta HTTP `Cache-Control: max-age=0, s-maxage=0, no-cache, no-store, must-revalidate` en `getProfileViews` de `CardsController` para cumplir la especificación de GitHub Camo y evitar que la imagen SVG quede congelada en el proxy CDN de GitHub.
+- **Soporte de Previsualización Web (`preview=true`)**: Integrado el parámetro de consulta `preview=true` en la app web de Astro (`index.astro`) para omitir el autoincremento en el dashboard de vista previa sin interferir en la URL del badge copiado para GitHub.
+- **Pruebas Unitarias**: Añadidos 3 tests unitarios en `recordProfileView.spec.ts` que validan el comportamiento de incremento y el manejo de parámetros de vista previa.
+
 ## [1.4.2] - 2026-07-24
 
 ### ♻️ Arquitectura NestJS — Controladores Estándar, DI e i18n Backend
@@ -208,4 +216,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.4.2
+**Versión actualmente expuesta / en producción:** v1.4.3
