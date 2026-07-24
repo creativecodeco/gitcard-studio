@@ -5,7 +5,7 @@ export interface IMetricsRepository {
     type: 'stats' | 'languages' | 'repo' | 'rank' | 'streak' | 'trophies' | 'views',
     context?: HitContext
   ): void;
-  getMetrics(): Metrics;
+  getMetrics(): Promise<Metrics>;
   getUserMetrics(username: string): Promise<any>;
   getAllUserMetrics(): Promise<any[]>;
   getUniqueUsersCount(): Promise<number>;

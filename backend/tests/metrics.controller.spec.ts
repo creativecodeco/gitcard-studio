@@ -13,7 +13,7 @@ describe('MetricsController', () => {
 
   const mockMetricsRepo: IMetricsRepository = {
     recordHit: vi.fn(),
-    getMetrics: vi.fn().mockReturnValue({ totalRenders: 42 }),
+    getMetrics: vi.fn().mockResolvedValue({ totalRenders: 42 }),
     getUserMetrics: vi.fn(),
     getAllUserMetrics: vi.fn().mockResolvedValue([]),
     getUniqueUsersCount: vi.fn().mockResolvedValue(5),
@@ -36,46 +36,46 @@ describe('MetricsController', () => {
   });
 
   describe('validateMetricsKey (via getMetrics)', () => {
-    it('should throw ForbiddenException when METRICS_KEY env is not set', () => {
+    it('should throw ForbiddenException when METRICS_KEY env is not set', async () => {
       delete process.env.METRICS_KEY;
       const query: MetricsKeyQueryDto = { key: 'any-key' };
 
-      expect(() => controller.getMetrics(query)).toThrow(ForbiddenException);
+      await expect(controller.getMetrics(query)).rejects.toThrow(ForbiddenException);
     });
 
-    it('should throw UnauthorizedException when key is missing', () => {
+    it('should throw UnauthorizedException when key is missing', async () => {
       const query: MetricsKeyQueryDto = {};
 
-      expect(() => controller.getMetrics(query)).toThrow(UnauthorizedException);
+      await expect(controller.getMetrics(query)).rejects.toThrow(UnauthorizedException);
     });
 
-    it('should throw UnauthorizedException when key is incorrect', () => {
+    it('should throw UnauthorizedException when key is incorrect', async () => {
       const query: MetricsKeyQueryDto = { key: 'wrong-key' };
 
-      expect(() => controller.getMetrics(query)).toThrow(UnauthorizedException);
+      await expect(controller.getMetrics(query)).rejects.toThrow(UnauthorizedException);
     });
 
-    it('should accept key from x-api-key header', () => {
+    it('should accept key from x-api-key header', async () => {
       const query: MetricsKeyQueryDto = {};
 
-      const result = controller.getMetrics(query, VALID_KEY);
+      const result = await controller.getMetrics(query, VALID_KEY);
 
       expect(result).toEqual({ totalRenders: 42 });
     });
 
-    it('should accept key from query parameter', () => {
+    it('should accept key from query parameter', async () => {
       const query: MetricsKeyQueryDto = { key: VALID_KEY };
 
-      const result = controller.getMetrics(query);
+      const result = await controller.getMetrics(query);
 
       expect(result).toEqual({ totalRenders: 42 });
     });
 
-    it('should prefer x-api-key header over query key', () => {
+    it('should prefer x-api-key header over query key', async () => {
       const query: MetricsKeyQueryDto = { key: 'wrong-key' };
 
       // Header has priority — wrong query key should be ignored
-      const result = controller.getMetrics(query, VALID_KEY);
+      const result = await controller.getMetrics(query, VALID_KEY);
       expect(result).toEqual({ totalRenders: 42 });
     });
   });

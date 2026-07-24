@@ -2,6 +2,19 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.4.6] - 2026-07-24
+
+### 🐛 Corrección de Contadores Globales del Dashboard
+- **Métricas globales leídas desde la base de datos** (`TypeORMMetricsRepository`): `getMetrics()` devolvía un caché en memoria por instancia (`globalMetricsCache`) que nunca se poblaba en la instancia del `MetricsModule`, por lo que los KPIs globales del panel admin (`Total Renders`, `Views` y el gráfico por tipo de tarjeta) mostraban siempre cero. Ahora `getMetrics()` es `async` y consulta directamente la tabla `global_metrics`, que es la fuente de verdad que `recordHit()` persiste.
+- **Eliminación del caché en memoria**: Removidos `globalMetricsCache`, `loadGlobalMetricsCache()` y las rutas que lo actualizaban (el `.then()` de `recordHit()` y los incrementos dentro de `incrementProfileViewCounters()`). Un caché por proceso resultaba incorrecto además con más de una réplica.
+- **Instancia huérfana de bootstrap**: Eliminada la instancia de `TypeORMMetricsRepository` creada y descartada en `main.ts` (nunca se inyectaba en el contenedor de NestJS).
+- **Contrato actualizado**: `IMetricsRepository.getMetrics` pasa a `Promise<Metrics>` y `MetricsController.getMetrics` a `async`.
+
+### 🧪 Tests
+- Nuevo `backend/tests/metricsRepository.getMetrics.spec.ts`: verifica con `AppDataSource` mockeado que `getMetrics()` lee los contadores de `global_metrics` y que los valores ausentes caen a `0`.
+- Nuevo caso en `backend/tests/metrics.test.ts`: una instancia separada del repositorio (escenario del dashboard) refleja los hits registrados por otra instancia.
+- Specs de `MetricsController` adaptados al `getMetrics` asíncrono y removido el mock obsoleto `loadGlobalMetricsCache` en `recordProfileView.spec.ts`.
+
 ## [1.4.5] - 2026-07-24
 
 ### 🛠️ Correcciones de Calidad SonarCloud & Refactorización Clean Code
@@ -234,4 +247,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.4.5
+**Versión actualmente expuesta / en producción:** v1.4.6

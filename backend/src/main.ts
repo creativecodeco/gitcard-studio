@@ -10,7 +10,6 @@ import dotenv from 'dotenv';
 import { AppModule } from './app.module';
 import { initDatabase } from '@/infrastructure/database/database';
 import { logger } from '@/infrastructure/logging/logger';
-import { TypeORMMetricsRepository } from '@/adapters/repositories/TypeORMMetricsRepository';
 import { validateEnvConfig } from '@/infrastructure/config/env.config';
 import { AllExceptionsFilter } from '@/infrastructure/filters/all-exceptions.filter';
 
@@ -21,8 +20,6 @@ const PORT = process.env.PORT || 3000;
 
 export async function bootstrap(): Promise<NestFastifyApplication> {
   await initDatabase();
-  const metricsRepo = new TypeORMMetricsRepository();
-  await metricsRepo.loadGlobalMetricsCache();
 
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
