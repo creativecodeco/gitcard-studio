@@ -2,6 +2,12 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.4.4] - 2026-07-24
+
+### 🛠️ Refactorización y Calidad de Código (Sonar & Clean Code)
+- **Reducción de Complejidad Cognitiva**: Refactorizado el método `getOrIncrementProfileViews` en `TypeORMMetricsRepository` para reducir su complejidad cognitiva por debajo del umbral de 15.
+- **Parámetros por Defecto de ES6 (`prefer-default-parameters`)**: Refactorizado el método `determineTrafficSource` en `TypeORMMetricsRepository` para usar valores por defecto en la firma del método (`userAgent: string = ''`, `referer: string = ''`), eliminando la reasignación/fallback manual de variables en el cuerpo del método.
+
 ## [1.4.3] - 2026-07-24
 
 ### 🐛 Correcciones en el Contador de Visitas de GitHub (`/api/views`)
@@ -216,4 +222,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.4.3
+**Versión actualmente expuesta / en producción:** v1.4.4
