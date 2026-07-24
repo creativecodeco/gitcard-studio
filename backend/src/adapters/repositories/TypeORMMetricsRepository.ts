@@ -43,7 +43,7 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
 
     let source = 'web';
     const uaLower = userAgent.toLowerCase();
-    let isGitHub = uaLower.includes('github-camo');
+    let isGitHub = /github|camo/i.test(uaLower);
     if (!isGitHub && referer) {
       try {
         const parsed = new URL(referer);
