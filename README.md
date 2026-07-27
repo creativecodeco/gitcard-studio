@@ -1,11 +1,15 @@
 # GitHub Helpers - Stats Generator & Live API
 
-Este proyecto es un microservicio y cliente web desarrollado en **Node.js con TypeScript** que permite consultar las estadísticas y los lenguajes de programación más utilizados por cualquier usuario de GitHub en tiempo real, devolviendo imágenes en formato **SVG** listas para ser incrustadas directamente en el archivo `README.md` de tus proyectos.
+> **Genera tarjetas SVG dinámicas y personalizables con tus estadísticas de GitHub para destacar tu perfil y tus proyectos.**
+
+**GitHub Helpers** es un microservicio y cliente web desarrollado en **Node.js con TypeScript**. Permite consultar en tiempo real las estadísticas generales y la distribución de lenguajes de cualquier usuario de GitHub, generando tarjetas vectoriales (**SVG**) listas para incrustar directamente en tu archivo `README.md`.
 
 Desarrollado y mantenido por **[CreativeCode.com.co](https://creativecode.com.co)**.
 
-### 🌐 ¡Úsalo en producción!
-Accede a la herramienta lista para usar y genera tus tarjetas personalizadas en:  
+---
+
+### 🌐 Generador Web en Vivo
+Diseña y personaliza tus tarjetas interactivamente en:  
 👉 **[https://github-helpers.creativecode.com.co/](https://github-helpers.creativecode.com.co/)**
 
 ---
