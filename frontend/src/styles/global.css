@@ -819,8 +819,8 @@ body.light-mode .readme-layout-btn:hover {
 }
 
 body.light-mode .readme-layout-btn.active {
-  background: rgba(56, 189, 248, 0.15) !important;
-  color: #075985 !important;
+  background: #e0f2fe !important;
+  color: #0c4a6e !important;
   border-color: #0284c7 !important;
 }
 

@@ -398,7 +398,7 @@ export class ApiGitHubRepository implements IGitHubRepository {
           continue;
         }
         const sizeInKB = (edge.size ?? 0) / 1024;
-        if (!Object.prototype.hasOwnProperty.call(languageMap, langName)) {
+        if (!Object.hasOwn(languageMap, langName)) {
           languageMap[langName] = {
             count: 0,
             size: 0,

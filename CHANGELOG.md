@@ -2,6 +2,16 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.5.2] - 2026-07-27
+
+### 🧹 Calidad de Código y Limpieza de Incidencias Sonar
+- **Resolución de Code Smells y Reducción de Complejidad**:
+  - Removido import sin uso `getTranslations` en `repoCard.ts`.
+  - Refactorizado `TRANSLATIONS` en `backend/src/adapters/presenters/i18n.ts` y `frontend/src/utils/i18n.ts` a diccionarios estáticos, reduciendo la complejidad cognitiva de 27 y 82 a 0 y eliminando ramas ternarias duplicadas (`total: 'Total Sponsors:'` y `title_sponsors`).
+  - Reemplazado `Object.prototype.hasOwnProperty.call()` por `Object.hasOwn()` en `ApiGitHubRepository.ts`.
+  - Mejorado el contraste de texto e indicador activo en `global.css` (`body.light-mode .readme-layout-btn.active`) logrando un ratio de contraste 8.3:1 acorde a normas WCAG AA/AAA.
+  - Actualizado `combined_issues.json` resolviendo y cerrando las 8 incidencias abiertas (`CLOSED / FIXED`).
+
 ## [1.5.1] - 2026-07-27
 
 ### 🔒 Mitigación de Vulnerabilidades de Seguridad (CodeQL Alerts #73, #74, #75)
@@ -278,4 +288,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.5.1
+**Versión actualmente expuesta / en producción:** v1.5.2
