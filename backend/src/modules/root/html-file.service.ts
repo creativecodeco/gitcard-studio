@@ -16,8 +16,20 @@ export class HtmlFileService {
       return null;
     }
 
-    const safePath = path.resolve(PUBLIC_DIR, relativePath);
+    // Sanitize and validate input path to prevent path traversal
+    const normalizedPath = path.normalize(relativePath);
+    if (normalizedPath.startsWith('..') || path.isAbsolute(normalizedPath)) {
+      return null;
+    }
+
     const normalizedPublicDir = path.resolve(PUBLIC_DIR);
+    const safePath = path.resolve(normalizedPublicDir, normalizedPath);
+
+    // Verify resolved path is strictly inside PUBLIC_DIR
+    const relativeResult = path.relative(normalizedPublicDir, safePath);
+    if (relativeResult.startsWith('..') || path.isAbsolute(relativeResult)) {
+      return null;
+    }
 
     if (!safePath.startsWith(normalizedPublicDir + path.sep) && safePath !== normalizedPublicDir) {
       return null;

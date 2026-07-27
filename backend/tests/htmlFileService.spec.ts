@@ -14,6 +14,8 @@ describe('HtmlFileService', () => {
     it('should prevent path traversal outside public directory', () => {
       expect(service.readPublicFile('../package.json')).toBeNull();
       expect(service.readPublicFile('../../../etc/passwd')).toBeNull();
+      expect(service.readPublicFile('/etc/passwd')).toBeNull();
+      expect(service.readPublicFile('sub/../../etc/passwd')).toBeNull();
     });
 
     it('should return null for non-existent files within public directory', () => {
