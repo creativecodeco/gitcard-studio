@@ -1,3 +1,5 @@
+import { escapeXml } from '../../utils/escape';
+
 export interface Theme {
   bg: string;
   text: string;
@@ -171,11 +173,12 @@ export function renderBrandHeader(
   y: number = 25
 ): string {
   const currentTheme = theme || THEMES.dark;
-  const path = target || 'github.com';
-  const displayUrl = path.startsWith('github.com')
-    ? path
-    : path.includes('/')
-      ? `github.com/${path}`
-      : `github.com/${path}`;
-  return `<text x="${x}" y="${y}" text-anchor="end" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="600" font-size="9px" fill="${currentTheme.secondary}" opacity="0.6">${displayUrl}</text>`;
+  const cleanTarget = (target || '')
+    .trim()
+    .replace(/^(?:https?:\/\/)?(?:github\.com\/?)?/i, '')
+    .replace(/^\/+/, '');
+
+  const displayPath = cleanTarget ? `github.com/${cleanTarget}` : 'github.com';
+  const safeDisplayUrl = escapeXml(displayPath);
+  return `<text x="${x}" y="${y}" text-anchor="end" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="600" font-size="9px" fill="${currentTheme.secondary}" opacity="0.6">${safeDisplayUrl}</text>`;
 }

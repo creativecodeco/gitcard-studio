@@ -12,9 +12,19 @@ export class HtmlFileService {
    * Returns null if the file does not exist.
    */
   readPublicFile(relativePath: string): string | null {
-    const filePath = path.resolve(PUBLIC_DIR, relativePath);
-    if (!fs.existsSync(filePath)) return null;
-    return fs.readFileSync(filePath, 'utf-8');
+    if (typeof relativePath !== 'string' || relativePath.includes('\0')) {
+      return null;
+    }
+
+    const safePath = path.resolve(PUBLIC_DIR, relativePath);
+    const normalizedPublicDir = path.resolve(PUBLIC_DIR);
+
+    if (!safePath.startsWith(normalizedPublicDir + path.sep) && safePath !== normalizedPublicDir) {
+      return null;
+    }
+
+    if (!fs.existsSync(safePath)) return null;
+    return fs.readFileSync(safePath, 'utf-8');
   }
 
   /**

@@ -2,6 +2,13 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.5.1] - 2026-07-27
+
+### 🔒 Mitigación de Vulnerabilidades de Seguridad (CodeQL Alerts #73, #74, #75)
+- **Corrección de Sanitización de URL (`renderBrandHeader`)**: Sustituido el chequeo por subcadena `path.startsWith('github.com')` en `theme.ts` por una expresión regular estricta para desinfectar prefijos de dominio y aplicado escape XML (`escapeXml`) para evitar inyecciones en el marcado SVG.
+- **Protección contra Path Traversal (`HtmlFileService`)**: Implementada validación rigurosa de límites de directorio en `readPublicFile()` (`html-file.service.ts`), asegurando que las rutas solicitadas no puedan salir de la carpeta `PUBLIC_DIR` (rechazando caracteres nulos y secuencias `../`).
+- **Nuevas Suites de Pruebas**: Añadidos tests unitarios en `backend/tests/theme.spec.ts` y `backend/tests/htmlFileService.spec.ts` para verificar la prevención de inyecciones, sanitización de marca y bloqueo de traversals.
+
 ## [1.5.0] - 2026-07-27
 
 ### ✨ Nueva Tarjeta de GitHub Sponsors (`/api/sponsors`)
@@ -271,4 +278,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.5.0
+**Versión actualmente expuesta / en producción:** v1.5.1
