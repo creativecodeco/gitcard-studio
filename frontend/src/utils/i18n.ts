@@ -53,6 +53,8 @@ export function createFrontendTranslations(isEnglish: boolean) {
     code_label_trophies: isEnglish ? "GitHub Trophies" : "Trofeos de GitHub",
     title_top_repos: isEnglish ? "Top Repositories" : "Top Repositorios",
     code_label_top_repos: isEnglish ? "Top Repositories" : "Top Repositorios",
+    title_sponsors: isEnglish ? "GitHub Sponsors" : "GitHub Sponsors",
+    code_label_sponsors: isEnglish ? "GitHub Sponsors" : "GitHub Sponsors",
     title_rank: isEnglish ? "Developer Rank" : "Rango de Desarrollador",
     title_repo: isEnglish ? "Featured Repository" : "Repositorio Destacado",
     placeholder_msg: isEnglish

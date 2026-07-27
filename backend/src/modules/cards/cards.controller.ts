@@ -7,6 +7,7 @@ import { GetUserRankCardUseCase } from '@/use-cases/cards/GetUserRankCardUseCase
 import { GetUserStreakCardUseCase } from '@/use-cases/cards/GetUserStreakCardUseCase';
 import { GetUserTrophiesCardUseCase } from '@/use-cases/cards/GetUserTrophiesCardUseCase';
 import { GetUserTopReposCardUseCase } from '@/use-cases/cards/GetUserTopReposCardUseCase';
+import { GetUserSponsorsCardUseCase } from '@/use-cases/cards/GetUserSponsorsCardUseCase';
 import { RecordProfileViewUseCase } from '@/use-cases/metrics/RecordProfileViewUseCase';
 import { renderViewsBadge } from '@/adapters/presenters/viewsBadge';
 import { renderErrorCard } from '@/adapters/presenters/errorCard';
@@ -25,7 +26,8 @@ export class CardsController {
     private readonly streakCardUseCase: GetUserStreakCardUseCase,
     private readonly trophiesCardUseCase: GetUserTrophiesCardUseCase,
     private readonly recordProfileViewUseCase: RecordProfileViewUseCase,
-    private readonly topReposCardUseCase: GetUserTopReposCardUseCase
+    private readonly topReposCardUseCase: GetUserTopReposCardUseCase,
+    private readonly sponsorsCardUseCase: GetUserSponsorsCardUseCase
   ) {}
 
   private async handleCardRequest(
@@ -218,6 +220,19 @@ export class CardsController {
   ): Promise<string> {
     return this.handleCardRequest(query, userAgent, referer, ip, res, 'TopRepos', (u, t, o) =>
       this.topReposCardUseCase.execute(u, t, o)
+    );
+  }
+
+  @Get('sponsors')
+  async getSponsors(
+    @Query() query: Record<string, unknown>,
+    @Headers('user-agent') userAgent: string | undefined,
+    @Headers('referer') referer: string | undefined,
+    @Ip() ip: string,
+    @Res({ passthrough: true }) res: FastifyReply
+  ): Promise<string> {
+    return this.handleCardRequest(query, userAgent, referer, ip, res, 'Sponsors', (u, t, o, h) =>
+      this.sponsorsCardUseCase.execute(u, t, o, h)
     );
   }
 }

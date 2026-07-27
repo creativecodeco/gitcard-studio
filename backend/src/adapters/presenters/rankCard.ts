@@ -1,5 +1,5 @@
 import { UserStats } from '@/domain/entities/UserStats';
-import { getTheme, getBackgroundDef } from './theme';
+import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 import { getTranslations } from './i18n';
 
 export function renderRankCard(
@@ -73,9 +73,7 @@ export function renderRankCard(
       </g>
 
       <!-- Brand Logo / Subtitle -->
-      <text x="470" y="25" text-anchor="end" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="600" font-size="9px" fill="${theme.secondary}" opacity="0.6">
-        github.com/${stats.username}
-      </text>
+      ${renderBrandHeader(stats.username, theme)}
     </svg>
   `.trim();
 }

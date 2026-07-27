@@ -35,6 +35,15 @@ export interface TranslationSet {
     stars: string;
     noLicense: string;
   };
+  sponsors: {
+    title: string;
+    total: string;
+    monthly: string;
+    oneTime: string;
+    estMonthly: string;
+    noSponsors: string;
+    becomeSponsor: string;
+  };
 }
 
 function buildTranslationSet(isEnglish: boolean): TranslationSet {
@@ -74,6 +83,15 @@ function buildTranslationSet(isEnglish: boolean): TranslationSet {
       title: isEnglish ? 'Top Repositories' : 'Top Repositorios',
       stars: isEnglish ? 'by stars' : 'por estrellas',
       noLicense: isEnglish ? 'No License' : 'Sin Licencia'
+    },
+    sponsors: {
+      title: isEnglish ? 'GitHub Sponsors' : 'Sponsors de GitHub',
+      total: isEnglish ? 'Total Sponsors:' : 'Total Sponsors:',
+      monthly: isEnglish ? 'Monthly:' : 'Mensuales:',
+      oneTime: isEnglish ? 'One-time:' : 'Pago Único:',
+      estMonthly: isEnglish ? 'Est. Monthly:' : 'Est. Mensual:',
+      noSponsors: isEnglish ? 'No public sponsors yet' : 'Aún sin sponsors públicos',
+      becomeSponsor: isEnglish ? 'Become a Sponsor' : 'Sé un Sponsor'
     }
   };
 }

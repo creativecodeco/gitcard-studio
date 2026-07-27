@@ -1,11 +1,12 @@
 import { RepoStats } from '@/domain/entities/RepoStats';
-import { getTheme, getBackgroundDef } from './theme';
+import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 import { getTranslations } from './i18n';
 
 export function renderTopReposCard(
   repos: RepoStats[],
   themeName?: string,
-  overrides?: Record<string, string>
+  overrides?: Record<string, string>,
+  username?: string
 ): string {
   const theme = getTheme(themeName, overrides);
   const t = getTranslations(overrides?.locale);
@@ -23,23 +24,19 @@ export function renderTopReposCard(
   const repoRows = top4
     .map((repo, i) => {
       const y = HEADER_HEIGHT + i * ROW_HEIGHT;
-      const desc =
-        repo.description.length > 52 ? repo.description.slice(0, 49) + '…' : repo.description;
-      const repoName = repo.name.length > 28 ? repo.name.slice(0, 25) + '…' : repo.name;
+      const desc = repo.description.length > 55 ? `${repo.description.slice(0, 52)}…` : repo.description;
 
       return `
       <g transform="translate(0, ${y})">
-        <rect x="20" y="4" width="455" height="52" rx="8"
-          fill="${theme.secondary}" fill-opacity="0.07"
-          stroke="${theme.border}" stroke-width="0.8" stroke-opacity="0.5" />
+        <!-- Accent indicator bar -->
+        <rect x="20" y="10" width="3" height="36" rx="1.5" fill="${theme.accent}" />
 
-        <!-- Repo name -->
-        <circle cx="40" cy="20" r="5" fill="${repo.languageColor}" />
-        <text x="52" y="24" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="700"
-          font-size="13" fill="${theme.title}">${escXml(repoName)}</text>
+        <!-- Repo Name -->
+        <text x="32" y="24" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="700"
+          font-size="13.5" fill="${theme.title}">${escXml(repo.name)}</text>
 
         <!-- Description -->
-        <text x="22" y="42" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="400"
+        <text x="32" y="40" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="400"
           font-size="11" fill="${theme.text}">${escXml(desc)}</text>
 
         <!-- Stars -->
@@ -58,10 +55,12 @@ export function renderTopReposCard(
             font-size="11" fill="${theme.secondary}">${formatCount(repo.forks)}</text>
         </g>
 
-        <!-- Language -->
-        <text x="440" y="24" text-anchor="end" font-family="'Segoe UI', Ubuntu, sans-serif"
-          font-size="10" fill="${repo.languageColor}" font-weight="600">${escXml(repo.language)}</text>
-      </g>`;
+        <!-- Language Dot & Name -->
+        <g transform="translate(440, 13)">
+          <circle cx="4" cy="5" r="4" fill="${repo.languageColor}" />
+        </g>
+      </g>
+    `;
     })
     .join('');
 
@@ -71,7 +70,6 @@ export function renderTopReposCard(
         ${backgroundDef}
         <style>
           .tr-title { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 700; font-size: 15px; fill: ${theme.title}; }
-          .tr-brand { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 600; font-size: 9px; fill: ${theme.secondary}; opacity: 0.6; }
         </style>
       </defs>
 
@@ -85,7 +83,9 @@ export function renderTopReposCard(
           fill="${theme.accent}" transform="scale(0.82)" />
       </g>
       <text x="44" y="26" class="tr-title">${t.topRepos.title}</text>
-      <text x="473" y="22" text-anchor="end" class="tr-brand">CreativeCode.com.co</text>
+      
+      <!-- Brand Logo / Subtitle -->
+      ${renderBrandHeader(username || '', theme)}
 
       <!-- Divider -->
       <line x1="20" y1="38" x2="475" y2="38" stroke="${theme.border}" stroke-width="0.8" stroke-opacity="0.5"/>

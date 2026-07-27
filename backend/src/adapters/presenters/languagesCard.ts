@@ -1,5 +1,5 @@
 import { LanguageStat } from '@/domain/entities/LanguageStat';
-import { getTheme, getBackgroundDef } from './theme';
+import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 import { getTranslations } from './i18n';
 
 export function renderLanguagesCard(
@@ -82,9 +82,7 @@ export function renderLanguagesCard(
       </g>
 
       <!-- Brand Logo / Subtitle -->
-      <text x="470" y="25" text-anchor="end" font-family="'Segoe UI', Ubuntu, Sans-Serif" font-weight="600" font-size="9px" fill="${theme.secondary}" opacity="0.6">
-        ${username ? `github.com/${username}` : ''}
-      </text>
+      ${renderBrandHeader(username || '', theme)}
     </svg>
   `.trim();
 }

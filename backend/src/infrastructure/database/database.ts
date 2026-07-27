@@ -40,7 +40,8 @@ export async function initDatabase(): Promise<void> {
       'rankRenders',
       'streakRenders',
       'trophiesRenders',
-      'viewsRenders'
+      'viewsRenders',
+      'sponsorsRenders'
     ];
 
     for (const key of keys) {

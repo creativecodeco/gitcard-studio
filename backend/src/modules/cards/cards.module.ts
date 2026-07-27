@@ -11,6 +11,7 @@ import { GetUserRankCardUseCase } from '@/use-cases/cards/GetUserRankCardUseCase
 import { GetUserStreakCardUseCase } from '@/use-cases/cards/GetUserStreakCardUseCase';
 import { GetUserTrophiesCardUseCase } from '@/use-cases/cards/GetUserTrophiesCardUseCase';
 import { GetUserTopReposCardUseCase } from '@/use-cases/cards/GetUserTopReposCardUseCase';
+import { GetUserSponsorsCardUseCase } from '@/use-cases/cards/GetUserSponsorsCardUseCase';
 import { RecordProfileViewUseCase } from '@/use-cases/metrics/RecordProfileViewUseCase';
 
 @Module({
@@ -61,6 +62,11 @@ import { RecordProfileViewUseCase } from '@/use-cases/metrics/RecordProfileViewU
     {
       provide: GetUserTopReposCardUseCase,
       useFactory: (gh, token, metrics) => new GetUserTopReposCardUseCase(gh, token, metrics),
+      inject: ['IGitHubRepository', 'ITokenRepository', 'IMetricsRepository']
+    },
+    {
+      provide: GetUserSponsorsCardUseCase,
+      useFactory: (gh, token, metrics) => new GetUserSponsorsCardUseCase(gh, token, metrics),
       inject: ['IGitHubRepository', 'ITokenRepository', 'IMetricsRepository']
     },
     {

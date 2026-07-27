@@ -3,6 +3,7 @@ import { UserStats } from '@/domain/entities/UserStats';
 import { LanguageStat } from '@/domain/entities/LanguageStat';
 import { RepoStats } from '@/domain/entities/RepoStats';
 import { StreakStats } from '@/domain/entities/StreakStats';
+import { SponsorStats, SponsorItem } from '@/domain/entities/SponsorStats';
 import { logger } from '@/infrastructure/logging/logger';
 
 const LANGUAGE_COLORS: Record<string, string> = {
@@ -813,5 +814,156 @@ export class ApiGitHubRepository implements IGitHubRepository {
         license: repo.license ? repo.license.spdx_id || repo.license.name : 'No License'
       };
     });
+  }
+
+  private async getUserSponsorsViaGraphQL(
+    username: string,
+    userToken?: string
+  ): Promise<SponsorStats | null> {
+    const query = `
+      query GetSponsors($username: String!) {
+        user(login: $username) {
+          login
+          name
+          avatarUrl
+          sponsorshipsAsMaintainer(first: 100, activeOnly: true) {
+            totalCount
+            nodes {
+              sponsorEntity {
+                ... on User {
+                  login
+                  name
+                  avatarUrl
+                }
+                ... on Organization {
+                  login
+                  name
+                  avatarUrl
+                }
+              }
+              tier {
+                name
+                monthlyPriceInCents
+                monthlyPriceInDollars
+                isOneTime
+              }
+              createdAt
+            }
+          }
+          sponsorshipsAsSponsor(first: 10) {
+            totalCount
+          }
+        }
+        organization(login: $username) {
+          login
+          name
+          avatarUrl
+          sponsorshipsAsMaintainer(first: 100, activeOnly: true) {
+            totalCount
+            nodes {
+              sponsorEntity {
+                ... on User {
+                  login
+                  name
+                  avatarUrl
+                }
+                ... on Organization {
+                  login
+                  name
+                  avatarUrl
+                }
+              }
+              tier {
+                name
+                monthlyPriceInCents
+                monthlyPriceInDollars
+                isOneTime
+              }
+              createdAt
+            }
+          }
+        }
+      }
+    `;
+
+    const data = await this.fetchGraphQL<{ user?: any; organization?: any }>(
+      query,
+      { username },
+      userToken
+    );
+
+    const entity = data?.user || data?.organization;
+    if (!entity) return null;
+
+    const sponsorships = entity.sponsorshipsAsMaintainer;
+    const totalSponsorsCount = sponsorships?.totalCount ?? 0;
+    const rawNodes = sponsorships?.nodes ?? [];
+    const sponsorsGivenCount = data?.user?.sponsorshipsAsSponsor?.totalCount ?? 0;
+
+    let monthlySponsorsCount = 0;
+    let oneTimeSponsorsCount = 0;
+    let totalMonthlyEstimatedDollars = 0;
+
+    const sponsors: SponsorItem[] = [];
+
+    for (const node of rawNodes) {
+      if (!node) continue;
+      const sponsorEntity = node.sponsorEntity;
+      if (!sponsorEntity) continue;
+
+      const tier = node.tier;
+      const dollars = tier?.monthlyPriceInDollars ?? Math.round((tier?.monthlyPriceInCents ?? 0) / 100);
+      const isOneTime = Boolean(tier?.isOneTime);
+
+      if (isOneTime) {
+        oneTimeSponsorsCount++;
+      } else {
+        monthlySponsorsCount++;
+        totalMonthlyEstimatedDollars += dollars;
+      }
+
+      sponsors.push({
+        login: sponsorEntity.login ?? '',
+        name: sponsorEntity.name || sponsorEntity.login || '',
+        avatarUrl: sponsorEntity.avatarUrl ?? '',
+        monthlyPriceInDollars: dollars,
+        isOneTime,
+        tierName: tier?.name ?? '',
+        createdAt: node.createdAt ?? ''
+      });
+    }
+
+    return {
+      username: entity.login || username,
+      name: entity.name || entity.login || username,
+      avatarUrl: entity.avatarUrl || `https://github.com/${username}.png`,
+      totalSponsorsCount,
+      totalMonthlyEstimatedDollars,
+      monthlySponsorsCount,
+      oneTimeSponsorsCount,
+      sponsorsGivenCount,
+      sponsors
+    };
+  }
+
+  async getUserSponsors(username: string, userToken?: string): Promise<SponsorStats> {
+    const gqlSponsors = await this.getUserSponsorsViaGraphQL(username, userToken);
+    if (gqlSponsors) return gqlSponsors;
+
+    const userProfile = userToken
+      ? await this.fetchGitHub('https://api.github.com/user', userToken)
+      : await this.fetchGitHub(`https://api.github.com/users/${username}`);
+
+    return {
+      username: userProfile.login || username,
+      name: userProfile.name || userProfile.login || username,
+      avatarUrl: userProfile.avatar_url || `https://github.com/${username}.png`,
+      totalSponsorsCount: 0,
+      totalMonthlyEstimatedDollars: 0,
+      monthlySponsorsCount: 0,
+      oneTimeSponsorsCount: 0,
+      sponsorsGivenCount: 0,
+      sponsors: []
+    };
   }
 }

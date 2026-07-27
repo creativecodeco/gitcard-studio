@@ -42,6 +42,12 @@ export class UserMetric {
   trophies_github!: number;
 
   @Column({ type: 'integer', default: 0 })
+  sponsors_web!: number;
+
+  @Column({ type: 'integer', default: 0 })
+  sponsors_github!: number;
+
+  @Column({ type: 'integer', default: 0 })
   profile_views!: number;
 
   @Column({ type: 'timestamp with time zone', nullable: true })

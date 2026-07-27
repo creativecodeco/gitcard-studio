@@ -2,7 +2,7 @@ import { Metrics, HitContext } from '../entities/Metrics';
 
 export interface IMetricsRepository {
   recordHit(
-    type: 'stats' | 'languages' | 'repo' | 'rank' | 'streak' | 'trophies' | 'views',
+    type: 'stats' | 'languages' | 'repo' | 'rank' | 'streak' | 'trophies' | 'views' | 'sponsors',
     context?: HitContext
   ): void;
   getMetrics(): Promise<Metrics>;

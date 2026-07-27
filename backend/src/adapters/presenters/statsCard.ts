@@ -1,5 +1,5 @@
 import { UserStats } from '@/domain/entities/UserStats';
-import { getTheme, getBackgroundDef } from './theme';
+import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 import { getTranslations } from './i18n';
 import { logger } from '@/infrastructure/logging/logger';
 
@@ -142,9 +142,7 @@ export async function renderStatsCard(
       </g>
       
       <!-- Brand Logo / Subtitle -->
-      <text x="470" y="25" text-anchor="end" font-family="'Segoe UI', Ubuntu, Sans-Serif" font-weight="600" font-size="9px" fill="${theme.secondary}" opacity="0.6">
-        github.com/${stats.username}
-      </text>
+      ${renderBrandHeader(stats.username, theme)}
     </svg>
   `.trim();
 }

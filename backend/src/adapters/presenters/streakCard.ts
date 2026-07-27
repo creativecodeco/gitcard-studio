@@ -1,5 +1,5 @@
 import { StreakStats } from '@/domain/entities/StreakStats';
-import { getTheme, getBackgroundDef } from './theme';
+import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 import { getTranslations } from './i18n';
 
 // Friendly month abbreviations
@@ -81,47 +81,48 @@ export function renderStreakCard(
   <!-- Card Background -->
   <rect width="${cardWidth}" height="${cardHeight}" rx="12" fill="url(#bg-streak)" stroke="${theme.border}" stroke-width="1.5"/>
 
+  <!-- Header Title -->
+  <text x="20" y="26" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="14px" fill="${theme.title}">${t.streak.title}</text>
+
+  <!-- Brand Logo / Subtitle -->
+  ${renderBrandHeader(stats.username, theme)}
+
   <!-- Divider 1 -->
-  <line x1="164" y1="28" x2="164" y2="168" stroke="${theme.border}" stroke-width="1.5" opacity="0.8"/>
+  <line x1="164" y1="42" x2="164" y2="175" stroke="${theme.border}" stroke-width="1.5" opacity="0.8"/>
   <!-- Divider 2 -->
-  <line x1="330" y1="28" x2="330" y2="168" stroke="${theme.border}" stroke-width="1.5" opacity="0.8"/>
+  <line x1="330" y1="42" x2="330" y2="175" stroke="${theme.border}" stroke-width="1.5" opacity="0.8"/>
 
    <!-- ── Column 1: Total Contributions ── -->
   <!-- Big number -->
-  <text x="${col1}" y="100" text-anchor="middle" class="streak-big" fill="${theme.accent}">${stats.totalContributions}</text>
+  <text x="${col1}" y="105" text-anchor="middle" class="streak-big" fill="${theme.accent}">${stats.totalContributions}</text>
   <!-- Label -->
-  <text x="${col1}" y="124" text-anchor="middle" class="streak-label" fill="${theme.text}">${t.streak.total}</text>
+  <text x="${col1}" y="129" text-anchor="middle" class="streak-label" fill="${theme.text}">${t.streak.total}</text>
   <!-- Date sub-label -->
-  <text x="${col1}" y="143" text-anchor="middle" class="streak-sub" fill="${theme.secondary}">${totalRange}</text>
+  <text x="${col1}" y="148" text-anchor="middle" class="streak-sub" fill="${theme.secondary}">${totalRange}</text>
 
   <!-- ── Column 2: Current Streak ── -->
   <!-- Ring (circle outline) -->
-  <circle cx="${col2}" cy="84" r="40" fill="none" stroke="${ringColor}" stroke-width="4" opacity="0.25"/>
-  <circle cx="${col2}" cy="84" r="40" fill="none" stroke="${ringColor}" stroke-width="4"
+  <circle cx="${col2}" cy="88" r="38" fill="none" stroke="${ringColor}" stroke-width="4" opacity="0.25"/>
+  <circle cx="${col2}" cy="88" r="38" fill="none" stroke="${ringColor}" stroke-width="4"
     stroke-dasharray="188" stroke-dashoffset="${stats.currentStreak > 0 ? 0 : 188}"
-    stroke-linecap="round" transform="rotate(-90 ${col2} 84)"/>
+    stroke-linecap="round" transform="rotate(-90 ${col2} 88)"/>
 
   <!-- Fire emoji / icon inside ring -->
-  <text x="${col2}" y="78" text-anchor="middle" font-size="22">${stats.currentStreak > 0 ? '🔥' : '💤'}</text>
+  <text x="${col2}" y="82" text-anchor="middle" font-size="20">${stats.currentStreak > 0 ? '🔥' : '💤'}</text>
   <!-- Streak number -->
-  <text x="${col2}" y="99" text-anchor="middle" class="streak-big" fill="${ringColor}">${stats.currentStreak}</text>
+  <text x="${col2}" y="102" text-anchor="middle" class="streak-big" fill="${ringColor}">${stats.currentStreak}</text>
 
   <!-- Label below ring -->
-  <text x="${col2}" y="143" text-anchor="middle" class="streak-label" fill="${theme.title}">${t.streak.current}</text>
+  <text x="${col2}" y="144" text-anchor="middle" class="streak-label" fill="${theme.title}">${t.streak.current}</text>
   <!-- Date sub-label -->
-  <text x="${col2}" y="159" text-anchor="middle" class="streak-sub" fill="${theme.secondary}">${currentStreakRange}</text>
+  <text x="${col2}" y="160" text-anchor="middle" class="streak-sub" fill="${theme.secondary}">${currentStreakRange}</text>
 
   <!-- ── Column 3: Longest Streak ── -->
   <!-- Big number -->
-  <text x="${col3}" y="100" text-anchor="middle" class="streak-big" fill="${theme.accent}">${stats.longestStreak}</text>
+  <text x="${col3}" y="105" text-anchor="middle" class="streak-big" fill="${theme.accent}">${stats.longestStreak}</text>
   <!-- Label -->
-  <text x="${col3}" y="124" text-anchor="middle" class="streak-label" fill="${theme.text}">${t.streak.max}</text>
+  <text x="${col3}" y="129" text-anchor="middle" class="streak-label" fill="${theme.text}">${t.streak.max}</text>
   <!-- Date sub-label -->
-  <text x="${col3}" y="143" text-anchor="middle" class="streak-sub" fill="${theme.secondary}">${longestStreakRange}</text>
-
-  <!-- Brand Logo / Subtitle -->
-  <text x="470" y="25" text-anchor="end" font-family="'Segoe UI', Ubuntu, Sans-Serif" font-weight="600" font-size="9px" fill="${theme.secondary}" opacity="0.6">
-    github.com/${stats.username}
-  </text>
+  <text x="${col3}" y="148" text-anchor="middle" class="streak-sub" fill="${theme.secondary}">${longestStreakRange}</text>
 </svg>`.trim();
 }

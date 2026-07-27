@@ -1,6 +1,7 @@
 import { UserStats } from '@/domain/entities/UserStats';
 import { LanguageStat } from '@/domain/entities/LanguageStat';
-import { getTheme, getBackgroundDef } from './theme';
+import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
+import { getTranslations } from './i18n';
 
 type TrophyRank = 'S' | 'A' | 'B' | 'C';
 
@@ -41,6 +42,7 @@ export function renderTrophiesCard(
   overrides?: Record<string, string>
 ): string {
   const theme = getTheme(themeName, overrides);
+  const t = getTranslations(overrides?.locale);
   const isEn = overrides?.locale === 'en';
 
   // 1. Commits Trophy
@@ -132,7 +134,7 @@ export function renderTrophiesCard(
   ];
 
   const cardWidth = 495;
-  const cardHeight = 195;
+  const cardHeight = 210;
   const widthAttr = overrides?.cardWidth || `${cardWidth}`;
 
   const backgroundDef = getBackgroundDef(theme, 'bg');
@@ -144,7 +146,7 @@ export function renderTrophiesCard(
   const colGap = 10;
   const rowGap = 10;
   const paddingX = 20;
-  const paddingY = 25;
+  const paddingY = 42;
 
   trophies.forEach((trophy, index) => {
     const col = index % 3;
@@ -190,6 +192,12 @@ export function renderTrophiesCard(
 
       <!-- Card Background -->
       <rect width="${cardWidth}" height="${cardHeight}" rx="12" fill="url(#bg)" stroke="${theme.border}" stroke-width="1.5" />
+
+      <!-- Header Title -->
+      <text x="20" y="27" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="14px" fill="${theme.title}">${t.trophies.title}</text>
+
+      <!-- Brand Logo / Subtitle -->
+      ${renderBrandHeader(stats.username, theme)}
 
       <!-- Trophies Grid -->
       ${boxesSvg}

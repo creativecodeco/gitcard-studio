@@ -160,3 +160,22 @@ export function getBackgroundDef(theme: Theme, gradientId: string = 'bg'): strin
          <stop offset="100%" stop-color="${theme.bg}" />
        </linearGradient>`;
 }
+
+/**
+ * Renders the standardized top-right brand header subtitle for SVG cards.
+ */
+export function renderBrandHeader(
+  target?: string,
+  theme?: Theme,
+  x: number = 470,
+  y: number = 25
+): string {
+  const currentTheme = theme || THEMES.dark;
+  const path = target || 'github.com';
+  const displayUrl = path.startsWith('github.com')
+    ? path
+    : path.includes('/')
+      ? `github.com/${path}`
+      : `github.com/${path}`;
+  return `<text x="${x}" y="${y}" text-anchor="end" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="600" font-size="9px" fill="${currentTheme.secondary}" opacity="0.6">${displayUrl}</text>`;
+}

@@ -7,6 +7,7 @@ export interface Metrics {
   streakRenders: number;
   trophiesRenders: number;
   viewsRenders: number;
+  sponsorsRenders?: number;
 }
 
 export interface HitContext {

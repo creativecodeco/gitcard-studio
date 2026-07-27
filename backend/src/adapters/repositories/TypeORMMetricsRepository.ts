@@ -8,7 +8,7 @@ import { logger } from '@/infrastructure/logging/logger';
 
 export class TypeORMMetricsRepository implements IMetricsRepository {
   recordHit(
-    type: 'stats' | 'languages' | 'repo' | 'rank' | 'streak' | 'trophies',
+    type: 'stats' | 'languages' | 'repo' | 'rank' | 'streak' | 'trophies' | 'views' | 'sponsors',
     context?: HitContext
   ): void {
     const username = context?.username || 'unknown';

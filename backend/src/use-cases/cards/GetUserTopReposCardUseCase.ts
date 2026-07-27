@@ -23,6 +23,6 @@ export class GetUserTopReposCardUseCase {
     }
     const userToken = this.tokenRepo ? await getDecryptedToken(username, this.tokenRepo) : undefined;
     const repos = await this.githubRepo.getUserTopRepos(username, 4, userToken);
-    return renderTopReposCard(repos, theme, overrides);
+    return renderTopReposCard(repos, theme, overrides, username);
   }
 }

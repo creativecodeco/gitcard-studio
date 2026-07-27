@@ -2,6 +2,24 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.5.0] - 2026-07-27
+
+### ✨ Nueva Tarjeta de GitHub Sponsors (`/api/sponsors`)
+- **Métricas y Grid de Patrocinadores**: Implementada la nueva tarjeta `/api/sponsors` para renderizar información completa de patrocinios tanto de mantenimiento como de aportes a terceros (cuentas de usuario u organización). Incluye desglose de patrocinadores mensuales y de pago único, cálculo estimado de ingresos mensuales, avatar grid interactivo y tarjeta de invitación cuando no existen patrocinadores activos.
+- **Caso de Uso y Persistencia**: Creados `SponsorStats` domain entity, `GetUserSponsorsCardUseCase`, adaptador GraphQL en `ApiGitHubRepository`, caché de 2 horas en `CachedGitHubRepository` y contador global de renders `sponsorsRenders` en TypeORM metrics.
+- **Soporte Frontend & i18n**: Integrado componente de vista previa, internacionalización bilingüe (`es`/`en`) y soporte en el generador de README de la aplicación web.
+
+### 🎨 Refactorización DRY y Estandarización de Layout en Presentadores SVG
+- **Función Reutilizable `renderBrandHeader`**: Centralizado el subtítulo/marca superior derecho `github.com/...` en `theme.ts` y consumido de forma DRY en todas las tarjetas SVG (`statsCard`, `languagesCard`, `rankCard`, `repoCard`, `streakCard`, `topReposCard`, `trophiesCard`, `sponsorsCard`).
+- **Encabezados e Iconografía**: Integrado el título traducido (`${t.trophies.title}`) e iconografía en `trophiesCard` y el título (`${t.streak.title}`) en `streakCard` con márgenes adaptativos (`paddingY = 42`) para evitar cualquier superposición visual.
+
+### 🖥️ Optimización de Layout Responsivo Frontend (`.app-container`)
+- **Ampliación de Ancho Máximo**: Aumentado `.app-container` a `1440px` centrado con padding adaptativo `clamp(20px, 3vw, 40px)` para un óptimo aprovechamiento del espacio en monitores de escritorio (FHD, 2K, 4K).
+- **Sticky Configuration Sidebar**: Panel de controles `.config-panel` fijado (`position: sticky; top: 24px;`) en resoluciones de escritorio.
+- **Grid Responsivo de 2 Columnas**: La vista previa `.cards-preview-container` evoluciona a un grid adaptativo de 2 columnas en monitores `≥ 1150px`.
+- **Límite de Ancho Estándar (`505px`)**: Delimitado el ancho máximo de wrappers para evitar deformaciones cuando la opción Estándar (495px) se encuentra activa, manteniendo las tarjetas en su proporción óptima.
+- **Snippets Markdown en Tiempo Real**: Actualización instantánea de los bloques de código Markdown del README al interactuar con selectores de ancho, temas e idioma.
+
 ## [1.4.7] - 2026-07-24
 
 ### 🛠️ Correcciones de Configuración y Resolución de Módulos TypeScript
@@ -253,4 +271,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.4.7
+**Versión actualmente expuesta / en producción:** v1.5.0

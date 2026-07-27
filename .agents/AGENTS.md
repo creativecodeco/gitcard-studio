@@ -43,6 +43,7 @@ This file documents workspace-specific rules, patterns, and guidelines that all 
 ## Code Quality & Sonar Guidelines
 
 - **Avoid Code Duplication**: Do not duplicate common utility functions, helper methods, or business logic (e.g. XML/HTML escaping, URL parsing, custom rate limiting). Consolidate them into reusable modules or helper classes where possible.
+- **Reusable SVG Presenters & Card Header**: Avoid duplicating SVG layout elements across presenters (such as top-right brand headers). Always use centralized helper functions like `renderBrandHeader(target, theme)` from `theme.ts` across all card presenters to maintain DRY and Clean Code standards.
 - **TypeScript Best Practices**:
   - **No Unused Variables or Imports**: Never leave unused variables, parameters, types, functions, or imports (`@typescript-eslint/no-unused-vars`). Clean up all unused symbols before finishing any task.
   - **Readonly Members**: Mark all class properties, private fields, and methods that are initialized and never reassigned as `readonly` (e.g. `private readonly handleCardRequest`).

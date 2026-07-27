@@ -52,7 +52,7 @@ describe('topReposCard renderer', () => {
     expect(svg).toContain('<svg');
     expect(svg).toContain('</svg>');
     expect(svg).toContain('Top Repositorios');
-    expect(svg).toContain('CreativeCode.com.co');
+    expect(svg).toContain('github.com');
   });
 
   it('should contain repo names in output', () => {

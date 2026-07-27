@@ -527,6 +527,24 @@ import Footer from '@/components/Footer.astro';
               ></path>
             </svg>
           </CardPreview>
+
+          <!-- GitHub Sponsors Card Preview -->
+          <CardPreview id="sponsors" title="GitHub Sponsors" codeLabel="GitHub Sponsors">
+            <svg
+              slot="placeholder-icon"
+              class="placeholder-svg"
+              viewBox="0 0 24 24"
+              width="48"
+              height="48"
+              fill="none"
+              stroke="#ea4aaa"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </CardPreview>
         </div>
       </div>
 
@@ -644,7 +662,7 @@ import Footer from '@/components/Footer.astro';
 
 <script>
   import { generateSampleReadme, type CardItem } from '@/utils/readmeGenerator';
-  import { t, updateDomTranslations } from '@/utils/i18n';
+  import { t, updateDomTranslations, type TranslationKey } from '@/utils/i18n';
 
   // Elements
   const usernameInput = document.getElementById('username-input') as HTMLInputElement | null;
@@ -674,6 +692,9 @@ import Footer from '@/components/Footer.astro';
   const topReposImg = document.getElementById('top-repos-img') as HTMLImageElement | null;
   const topReposPlaceholder = document.getElementById('top-repos-placeholder');
 
+  const sponsorsImg = document.getElementById('sponsors-img') as HTMLImageElement | null;
+  const sponsorsPlaceholder = document.getElementById('sponsors-placeholder');
+
   const viewsImg = document.getElementById('views-img') as HTMLImageElement | null;
   const viewsPlaceholder = document.getElementById('views-placeholder');
 
@@ -685,6 +706,7 @@ import Footer from '@/components/Footer.astro';
   const markdownStreakCode = document.getElementById('markdown-streak-code');
   const markdownTrophiesCode = document.getElementById('markdown-trophies-code');
   const markdownTopReposCode = document.getElementById('markdown-top-repos-code');
+  const markdownSponsorsCode = document.getElementById('markdown-sponsors-code');
   const markdownViewsCode = document.getElementById('markdown-views-code');
 
   const btnCopyStats = document.getElementById('btn-copy-stats');
@@ -694,6 +716,7 @@ import Footer from '@/components/Footer.astro';
   const btnCopyStreak = document.getElementById('btn-copy-streak');
   const btnCopyTrophies = document.getElementById('btn-copy-trophies');
   const btnCopyTopRepos = document.getElementById('btn-copy-top-repos');
+  const btnCopySponsors = document.getElementById('btn-copy-sponsors');
   const btnCopyViews = document.getElementById('btn-copy-views');
 
   const viewsLabel = document.getElementById('views-label') as HTMLInputElement | null;
@@ -736,6 +759,21 @@ import Footer from '@/components/Footer.astro';
   const customWidthInput = document.getElementById('custom-width-input') as HTMLInputElement | null;
   const btnApplyWidth = document.getElementById('btn-apply-width');
 
+  function applyPreviewWidth() {
+    const wrappers = document.querySelectorAll('.card-preview-wrapper');
+    wrappers.forEach((w) => {
+      const htmlW = w as HTMLElement;
+      if (currentCardWidth === '100%') {
+        htmlW.style.maxWidth = '100%';
+      } else if (currentCardWidth && !Number.isNaN(Number.parseInt(currentCardWidth, 10))) {
+        const pxVal = Number.parseInt(currentCardWidth, 10);
+        htmlW.style.maxWidth = `${pxVal + 10}px`;
+      } else {
+        htmlW.style.maxWidth = '505px';
+      }
+    });
+  }
+
   widthOptions.forEach((btn) => {
     btn.addEventListener('click', () => {
       widthOptions.forEach((b) => {
@@ -749,6 +787,7 @@ import Footer from '@/components/Footer.astro';
       const w = btn.dataset.width || '';
       currentCardWidth = w === 'default' ? '' : w;
       if (customWidthInput) customWidthInput.value = '';
+      applyPreviewWidth();
       if (currentUsername) updateCards();
     });
   });
@@ -762,6 +801,7 @@ import Footer from '@/components/Footer.astro';
         b.style.color = 'var(--text-secondary)';
         b.classList.remove('active');
       });
+      applyPreviewWidth();
       if (currentUsername) updateCards();
     }
   });
@@ -866,7 +906,7 @@ import Footer from '@/components/Footer.astro';
   }
 
   let completedImagesCount = 0;
-  const totalImagesToLoad = 8; // stats, languages, repo, rank, streak, trophies, top-repos, views
+  const totalImagesToLoad = 9; // stats, languages, repo, rank, streak, trophies, top-repos, sponsors, views
   let isGeneratingAllCards = false;
 
   function sortCardsByStatus() {
@@ -975,6 +1015,7 @@ import Footer from '@/components/Footer.astro';
       { id: 'rank', titleKey: 'title_rank' as TranslationKey, getUrl: () => rankImg?.src },
       { id: 'trophies', titleKey: 'title_trophies' as TranslationKey, getUrl: () => trophiesImg?.src },
       { id: 'top-repos', titleKey: 'title_top_repos' as TranslationKey, getUrl: () => topReposImg?.src },
+      { id: 'sponsors', titleKey: 'title_sponsors' as TranslationKey, getUrl: () => sponsorsImg?.src },
       { id: 'repo', titleKey: 'title_repo' as TranslationKey, getUrl: () => repoImg?.src },
     ];
 
@@ -1019,6 +1060,7 @@ import Footer from '@/components/Footer.astro';
   function updateCards() {
     if (!currentUsername) return;
 
+    applyPreviewWidth();
     isGeneratingAllCards = true;
     completedImagesCount = 0;
     if (globalLoading) {
@@ -1037,6 +1079,7 @@ import Footer from '@/components/Footer.astro';
     const streakUrl = `${origin}/api/streak?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
     const trophiesUrl = `${origin}/api/trophies?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
     const topReposUrl = `${origin}/api/top-repos?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
+    const sponsorsUrl = `${origin}/api/sponsors?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
 
     let repoUrl = `${origin}/api/repo?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
     if (currentRepo) {
@@ -1060,6 +1103,7 @@ import Footer from '@/components/Footer.astro';
     showImageLoading(streakImg, streakPlaceholder);
     showImageLoading(trophiesImg, trophiesPlaceholder);
     showImageLoading(topReposImg, topReposPlaceholder);
+    showImageLoading(sponsorsImg, sponsorsPlaceholder);
     showImageLoading(viewsImg, viewsPlaceholder);
 
     // 2. Set image sources with cache buster to force rendering updates in preview
@@ -1092,6 +1136,10 @@ import Footer from '@/components/Footer.astro';
       topReposImg.src = topReposUrl + cacheBuster;
       topReposImg.alt = `Top repositorios de GitHub para el usuario @${currentUsername}`;
     }
+    if (sponsorsImg) {
+      sponsorsImg.src = sponsorsUrl + cacheBuster;
+      sponsorsImg.alt = `Tarjeta de GitHub Sponsors para el usuario @${currentUsername}`;
+    }
     if (viewsImg) {
       viewsImg.src = viewsUrl + '&preview=true' + cacheBuster;
       viewsImg.alt = `Contador de visitas de GitHub para el usuario @${currentUsername}`;
@@ -1105,6 +1153,7 @@ import Footer from '@/components/Footer.astro';
     const markdownStreak = `![Racha de Contribuciones](${streakUrl})`;
     const markdownTrophies = `![Trofeos de GitHub](${trophiesUrl})`;
     const markdownTopRepos = `![Top Repositorios](${topReposUrl})`;
+    const markdownSponsors = `![GitHub Sponsors](${sponsorsUrl})`;
     const markdownViews = `![Visitas de Perfil](${viewsUrl})`;
 
     if (markdownStatsCode) markdownStatsCode.textContent = markdownStats;
@@ -1114,7 +1163,16 @@ import Footer from '@/components/Footer.astro';
     if (markdownStreakCode) markdownStreakCode.textContent = markdownStreak;
     if (markdownTrophiesCode) markdownTrophiesCode.textContent = markdownTrophies;
     if (markdownTopReposCode) markdownTopReposCode.textContent = markdownTopRepos;
+    if (markdownSponsorsCode) markdownSponsorsCode.textContent = markdownSponsors;
     if (markdownViewsCode) markdownViewsCode.textContent = markdownViews;
+
+    codeBlockWrappers.forEach((cb) => {
+      const parent = cb.closest('.card-preview-wrapper');
+      const img = parent?.querySelector('.preview-img') as HTMLImageElement | null;
+      if (img && img.src && (img.complete || !img.classList.contains('hidden'))) {
+        cb.classList.remove('hidden');
+      }
+    });
 
     setTimeout(() => {
       loadMetrics();
@@ -1152,13 +1210,16 @@ import Footer from '@/components/Footer.astro';
     placeholderElement: HTMLElement | null
   ) {
     if (!imgElement || !placeholderElement) return;
+
+    const isAlreadyLoaded = !imgElement.classList.contains('hidden');
+
     imgElement.classList.add('hidden');
     placeholderElement.classList.remove('hidden');
 
     const codeBlock = imgElement
       .closest('.card-preview-wrapper')
       ?.querySelector('.code-block-wrapper');
-    if (codeBlock) {
+    if (codeBlock && !isAlreadyLoaded) {
       codeBlock.classList.add('hidden');
     }
 
@@ -1263,6 +1324,7 @@ import Footer from '@/components/Footer.astro';
   setupImageEvents(streakImg, streakPlaceholder, 'Error al cargar racha de contribuciones.');
   setupImageEvents(trophiesImg, trophiesPlaceholder, 'Error al cargar trofeos.');
   setupImageEvents(topReposImg, topReposPlaceholder, 'Error al cargar repositorios.');
+  setupImageEvents(sponsorsImg, sponsorsPlaceholder, 'Error al cargar sponsors.');
   setupImageEvents(viewsImg, viewsPlaceholder, 'Error al cargar contador de visitas.');
 
   // Setup Clipboard Copy handlers
@@ -1273,6 +1335,7 @@ import Footer from '@/components/Footer.astro';
   setupCopyButton(btnCopyStreak, markdownStreakCode);
   setupCopyButton(btnCopyTrophies, markdownTrophiesCode);
   setupCopyButton(btnCopyTopRepos, markdownTopReposCode);
+  setupCopyButton(btnCopySponsors, markdownSponsorsCode);
   setupCopyButton(btnCopyViews, markdownViewsCode);
 
   // Setup Sample README.md copy button

@@ -3,6 +3,7 @@ import { UserStats } from '@/domain/entities/UserStats';
 import { LanguageStat } from '@/domain/entities/LanguageStat';
 import { RepoStats } from '@/domain/entities/RepoStats';
 import { StreakStats } from '@/domain/entities/StreakStats';
+import { SponsorStats } from '@/domain/entities/SponsorStats';
 
 interface CacheEntry<T> {
   data: T;
@@ -15,6 +16,7 @@ export class CachedGitHubRepository implements IGitHubRepository {
   private readonly repoCache = new Map<string, CacheEntry<RepoStats>>();
   private readonly streakCache = new Map<string, CacheEntry<StreakStats>>();
   private readonly topReposCache = new Map<string, CacheEntry<RepoStats[]>>();
+  private readonly sponsorsCache = new Map<string, CacheEntry<SponsorStats>>();
 
   private readonly CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
 
@@ -89,6 +91,19 @@ export class CachedGitHubRepository implements IGitHubRepository {
     return data;
   }
 
+  async getUserSponsors(username: string, userToken?: string): Promise<SponsorStats> {
+    const cacheKey = `${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
+    const cached = this.sponsorsCache.get(cacheKey);
+
+    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+      return cached.data;
+    }
+
+    const data = await this.delegate.getUserSponsors(username, userToken);
+    this.sponsorsCache.set(cacheKey, { data, timestamp: Date.now() });
+    return data;
+  }
+
   clearCache(username: string): void {
     const keyBase = username.toLowerCase();
     this.statsCache.delete(`${keyBase}:public`);
@@ -96,6 +111,8 @@ export class CachedGitHubRepository implements IGitHubRepository {
     this.languagesCache.delete(`${keyBase}:public`);
     this.languagesCache.delete(`${keyBase}:private`);
     this.streakCache.delete(keyBase);
+    this.sponsorsCache.delete(`${keyBase}:public`);
+    this.sponsorsCache.delete(`${keyBase}:private`);
 
     for (const key of this.repoCache.keys()) {
       if (key.startsWith(`${keyBase}:`)) {
