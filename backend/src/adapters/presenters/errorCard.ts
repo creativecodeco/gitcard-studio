@@ -7,6 +7,8 @@ import { escapeXml } from '@/utils/escape';
 export function renderErrorCard(message: string): string {
   const escapedMessage = escapeXml(message);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="495" height="195" viewBox="0 0 495 195">
+  <title>Error en GitHub Helpers</title>
+  <desc>${escapedMessage}</desc>
   <rect width="495" height="195" rx="12" fill="#0d1117" stroke="#f85149" stroke-width="2" />
   <g transform="translate(25, 45)">
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#f85149" transform="scale(1.5)"/>

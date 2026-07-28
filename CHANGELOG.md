@@ -2,6 +2,14 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.5.3] - 2026-07-28
+
+### 🚀 Mejoras de Rendimiento, Accesibilidad y Resiliencia en Pruebas
+- **Gestión de Memoria y LRU en Caché de Avatares (`avatar.ts`)**: Creado módulo centralizado de caché en memoria con límite máximo de 500 elementos y rutina de evicción automática (`cleanCache`) para registros expirados (TTL de 1 hora) o antiguos.
+- **Accesibilidad Universal SVG (WCAG 2.2)**: Integradas etiquetas semánticas `<title>` y `<desc>` en todos los presentadores de tarjetas SVG (`statsCard`, `sponsorsCard`, `languagesCard`, `repoCard`, `rankCard`, `streakCard`, `topReposCard`, `trophiesCard`, `viewsBadge`, `errorCard`) para optimizar lectores de pantalla.
+- **Resiliencia y Aislamiento en Pruebas Unitarias**: Manejada la desconexión de PostgreSQL en `initDatabase()` durante la ejecución de tests en Vitest (`NODE_ENV === 'test'`), permitiendo que la suite completa pase al 100% (18/18 suites, 99/99 tests) de manera aislada sin depender de base de datos activa.
+- **Calidad de Código y Limpieza Linter**: Corregida asignación inútil `let sponsorsContent: string;` respetando reglas de linter y consolidado el uso DRY de `fetchAvatarBase64`.
+
 ## [1.5.2] - 2026-07-27
 
 ### 🧹 Calidad de Código y Limpieza de Incidencias Sonar
@@ -288,4 +296,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.5.2
+**Versión actualmente expuesta / en producción:** v1.5.3

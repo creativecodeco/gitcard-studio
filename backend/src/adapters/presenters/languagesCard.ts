@@ -53,6 +53,8 @@ export function renderLanguagesCard(
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
+      <title>${t.languages.title}</title>
+      <desc>Top programming languages stats card</desc>
       <defs>
         ${backgroundDef}
         <clipPath id="bar-clip">

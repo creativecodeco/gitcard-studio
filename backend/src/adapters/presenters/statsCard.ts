@@ -1,22 +1,7 @@
 import { UserStats } from '@/domain/entities/UserStats';
 import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 import { getTranslations } from './i18n';
-import { logger } from '@/infrastructure/logging/logger';
-
-// Helper to convert avatar to Base64 to bypass GitHub camo block
-async function fetchAvatarBase64(url: string): Promise<string> {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return '';
-    const arrayBuffer = await res.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const mimeType = res.headers.get('content-type') || 'image/jpeg';
-    return `data:${mimeType};base64,${buffer.toString('base64')}`;
-  } catch (e) {
-    logger.warn('Failed to fetch avatar for base64 encoding', { avatarUrl: url, error: e });
-    return '';
-  }
-}
+import { fetchAvatarBase64 } from './avatar';
 
 // Crisp SVGs for metrics icons
 const ICONS = {
@@ -52,6 +37,8 @@ export async function renderStatsCard(
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
+      <title>${stats.name} - GitHub Stats</title>
+      <desc>GitHub stats card for ${stats.name}</desc>
       <defs>
         ${backgroundDef}
         <clipPath id="circle-clip">

@@ -66,6 +66,8 @@ export function renderTopReposCard(
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
+      <title>${t.topRepos.title}</title>
+      <desc>Top starred GitHub repositories card</desc>
       <defs>
         ${backgroundDef}
         <style>

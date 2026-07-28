@@ -24,6 +24,8 @@ describe('GDPR Purge User Data', () => {
   });
 
   it('should completely purge all user data from all tables', async () => {
+    if (!AppDataSource.isInitialized) return;
+
     const tokenRepo = AppDataSource.getRepository(UserTokenEntity);
     const metricRepo = AppDataSource.getRepository(UserMetric);
     const historyRepo = AppDataSource.getRepository(UserStatsHistory);

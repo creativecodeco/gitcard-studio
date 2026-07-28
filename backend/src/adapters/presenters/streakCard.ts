@@ -68,6 +68,8 @@ export function renderStreakCard(
 
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
+  <title>${t.streak.title}</title>
+  <desc>GitHub contribution streak stats card</desc>
   <defs>
     ${backgroundDef}
     <style>

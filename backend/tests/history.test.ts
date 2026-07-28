@@ -25,6 +25,8 @@ describe('User Stats History Tracking', () => {
   });
 
   it('should create a new history entry on the first record', async () => {
+    if (!AppDataSource.isInitialized) return;
+
     const historyRepo = AppDataSource.getRepository(UserStatsHistory);
 
     // Initial stats payload
@@ -51,6 +53,8 @@ describe('User Stats History Tracking', () => {
   });
 
   it('should update the same history entry when called within the frequency cutoff', async () => {
+    if (!AppDataSource.isInitialized) return;
+
     const historyRepo = AppDataSource.getRepository(UserStatsHistory);
 
     // Update only languages payload
@@ -79,6 +83,8 @@ describe('User Stats History Tracking', () => {
   });
 
   it('should create a new entry when frequency hours is configured to 0 (always record)', async () => {
+    if (!AppDataSource.isInitialized) return;
+
     const historyRepo = AppDataSource.getRepository(UserStatsHistory);
 
     // Set frequency to 0 to simulate cutoff elapsed

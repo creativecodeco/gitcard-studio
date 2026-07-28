@@ -59,6 +59,7 @@ export function renderViewsBadge(
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="20" role="img" aria-label="${labelText}: ${countText}">
+      <title>${labelText}: ${countText}</title>
       <linearGradient id="s" x2="0" y2="100%">
         <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
         <stop offset="1" stop-opacity=".1"/>

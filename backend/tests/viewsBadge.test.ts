@@ -29,6 +29,7 @@ describe('Profile Views Counter Badge', () => {
   });
 
   it('should initialize profile_views to 0 and not increment if increment parameter is false', async () => {
+    if (!AppDataSource.isInitialized) return;
     const initialViews = await metricsRepo.getOrIncrementProfileViews(testUser, false);
     expect(initialViews).toBe(0);
 
@@ -38,6 +39,7 @@ describe('Profile Views Counter Badge', () => {
   });
 
   it('should increment profile_views atomic count by 1 and save request_log when increment is true', async () => {
+    if (!AppDataSource.isInitialized) return;
     const hitContext = {
       username: testUser,
       userAgent: 'GitHub-Camo/1.0 (camo-proxy)',

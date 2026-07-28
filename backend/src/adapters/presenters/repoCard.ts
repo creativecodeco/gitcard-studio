@@ -48,6 +48,8 @@ export function renderRepoCard(
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
+      <title>${repo.name} - GitHub Repository</title>
+      <desc>Featured repository card for ${repo.name}</desc>
       <defs>
         ${backgroundDef}
         <style>

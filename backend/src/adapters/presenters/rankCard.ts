@@ -32,6 +32,8 @@ export function renderRankCard(
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
+      <title>${stats.name} - GitHub Rank ${stats.rank}</title>
+      <desc>GitHub Rank and Collaboration Index card for ${stats.name}</desc>
       <defs>
         ${backgroundDef}
         <style>

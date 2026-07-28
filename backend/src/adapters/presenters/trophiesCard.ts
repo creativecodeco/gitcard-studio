@@ -179,6 +179,8 @@ export function renderTrophiesCard(
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
+      <title>GitHub Trophies - ${stats.name}</title>
+      <desc>GitHub Trophies and achievements card for ${stats.name}</desc>
       <defs>
         ${backgroundDef}
         <style>
