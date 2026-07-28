@@ -6,9 +6,12 @@
 
 Desarrollado y mantenido por **[CreativeCode.com.co](https://creativecode.com.co)**.
 
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-ea4aaa?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sponsors/creativecodeco)
+
 ---
 
 ### 🌐 Generador Web en Vivo
+
 Diseña y personaliza tus tarjetas interactivamente en:  
 👉 **[https://github-helpers.creativecode.com.co/](https://github-helpers.creativecode.com.co/)**
 
@@ -23,6 +26,7 @@ Diseña y personaliza tus tarjetas interactivamente en:
 5. **Métricas Clave de Visibilidad:**
    - **Estadísticas Generales:** Commits totales, estrellas obtenidas, pull requests, issues y seguidores.
    - **Lenguajes más Usados:** Gráfica de distribución de lenguajes (calculada por peso de bytes) con leyenda estructurada.
+   - **Perfil de GitHub Sponsors:** Resumen de patrocinadores mensuales y de pago único, estimación de ingresos y grid interactivo de patrocinadores.
 6. **Múltiples Temas Estéticos:** Dark, Light, Neon, Solarized, Radical, Tokyonight y Glassmorphism.
 7. **Panel Web Premium (Glassmorphism):** Una interfaz web elegante construida en CSS puro con vista previa en tiempo real y copiador de enlaces Markdown automático.
 8. **Generador de README.md de Ejemplo:** Genera automáticamente una plantilla Markdown completa con el saludo al usuario y todas las tarjetas cargadas con éxito.
@@ -57,7 +61,9 @@ src/
 ```
 
 ### Path Aliases (Alias de Rutas)
+
 El proyecto utiliza alias `@/` apuntando al directorio `src/`. Esto previene la existencia de rutas relativas complejas como `../../`.
+
 - En desarrollo: Se resuelve en tiempo de ejecución utilizando `tsconfig-paths/register`.
 - En producción: `tsc-alias` reescribe los imports a rutas relativas nativas durante la compilación en el directorio `dist/`.
 
@@ -66,6 +72,7 @@ El proyecto utiliza alias `@/` apuntando al directorio `src/`. Esto previene la 
 ## 🚀 Comenzar (Desarrollo Local)
 
 ### Requisitos previos
+
 - Node.js v18 o superior.
 - (Opcional) Un token de acceso personal (PAT) de GitHub para aumentar el límite de peticiones de la API.
 
@@ -114,9 +121,11 @@ Una vez ejecutado, el panel de configuración estará disponible en:
 👉 **http://localhost:3000**
 
 ### 📦 Gestión de Versiones y Changelog
+
 Este proyecto utiliza `release-it` junto con la especificación de [Conventional Commits](https://www.conventionalcommits.org/) para automatizar los lanzamientos de versión.
 
 Cuando ejecutas `pnpm release`:
+
 1. Analiza el historial de commits desde la última versión.
 2. Calcula el incremento de versión correspondiente (Major, Minor, Patch).
 3. Actualiza la versión en `package.json` y genera/actualiza el archivo `CHANGELOG.md`.
@@ -130,28 +139,54 @@ Cuando ejecutas `pnpm release`:
 Las tarjetas se pueden incrustar en cualquier archivo Markdown usando la siguiente sintaxis:
 
 ### 1. Tarjeta de Estadísticas Generales
+
 ```markdown
 ![Estadísticas de GitHub](http://tu-servidor.com/api/stats?username=tu-usuario&theme=neon&locale=en)
 ```
+
 - **Parámetros:**
   - `username` (Obligatorio): Nombre de usuario en GitHub. Valida con regex `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`.
   - `theme` (Opcional): `dark` (por defecto), `light`, `neon`, `glassmorphism`, `solarized`, `radical`, `tokyonight`.
   - `locale` o `lang` (Opcional): `es` (Español, por defecto) o `en` (Inglés). Traduce dinámicamente los textos internos de la tarjeta.
 
 ### 2. Tarjeta de Lenguajes más Usados
+
 ```markdown
 ![Lenguajes de GitHub](http://tu-servidor.com/api/languages?username=tu-usuario&theme=tokyonight&locale=en)
 ```
+
 - **Parámetros:**
   - `username` (Obligatorio): Nombre de usuario en GitHub.
   - `theme` (Opcional): Mismos temas que la tarjeta de estadísticas.
   - `locale` (Opcional): `es` o `en` para traducción.
+
+### 3. Tarjeta de Perfil de GitHub Sponsors
+
+```markdown
+![GitHub Sponsors](http://tu-servidor.com/api/sponsors?username=tu-usuario&theme=neon&locale=es)
+```
+
+- **Parámetros:**
+  - `username` (Obligatorio): Nombre de usuario u organización en GitHub. Valida con regex `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`.
+  - `theme` (Opcional): Mismos temas soportados (`dark`, `light`, `neon`, `glassmorphism`, `solarized`, `radical`, `tokyonight`).
+  - `locale` o `lang` (Opcional): `es` (Español, por defecto) o `en` (Inglés). Traduce dinámicamente los textos internos de la tarjeta.
+
+---
+
+## 💖 GitHub Sponsors Profile / Apoya el Proyecto
+
+Si este proyecto te resulta útil para personalizar tu perfil de GitHub o tus repositorios, puedes apoyar el desarrollo y mantenimiento continuo a través del perfil de **GitHub Sponsors**:
+
+👉 **[https://github.com/sponsors/joaltoroc](https://github.com/sponsors/joaltoroc)**
+
+[![Sponsor en GitHub](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-ea4aaa?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sponsors/joaltoroc)
 
 ---
 
 ## 📊 Panel de Administración de Métricas (`/admin/metrics`)
 
 El servicio cuenta con una interfaz web segura de analíticas en la dirección `/admin/metrics`.
+
 - **Acceso:** Protegido mediante un formulario de autenticación glassmorphic que valida contra la clave configurada en la variable de entorno `METRICS_KEY`.
 - **Analíticas en Tiempo Real:**
   - Métricas KPI para renderizados totales, usuarios únicos registrados y vistas de insignias de perfil.
@@ -164,16 +199,17 @@ El servicio cuenta con una interfaz web segura de analíticas en la dirección `
 ## 🔒 Seguridad (Alineación OWASP)
 
 Este microservicio implementa las siguientes medidas de seguridad para entornos de producción:
-* **Cabeceras Seguras (Helmet)**: Configurado con políticas de recursos de origen cruzado (`cross-origin`) para permitir incrustar de forma segura las tarjetas en READMEs externos.
-* **Rate Limiting**: Límite de 100 peticiones cada 15 minutos por dirección IP. En caso de bloqueo, responde con un SVG legible para evitar errores de renderizado de imágenes.
-* **Validación de Parámetros por Expresión Regular**:
+
+- **Cabeceras Seguras (Helmet)**: Configurado con políticas de recursos de origen cruzado (`cross-origin`) para permitir incrustar de forma segura las tarjetas en READMEs externos.
+- **Rate Limiting**: Límite de 100 peticiones cada 15 minutos por dirección IP. En caso de bloqueo, responde con un SVG legible para evitar errores de renderizado de imágenes.
+- **Validación de Parámetros por Expresión Regular**:
   - Validado a nivel de Controller y en la capa de negocio de Use Cases.
   - Username: `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`
   - Repo: `/^[a-z\d-_.]{1,100}$/i`
-* **Estadísticas Privadas (Coming Soon - Doble Defensa)**:
+- **Estadísticas Privadas (Coming Soon - Doble Defensa)**:
   - Las características de almacenamiento cifrado de PATs personales de GitHub están marcadas en la interfaz frontend como deshabilitadas e inactivas.
   - Como doble defensa contra manipulaciones del DOM en el navegador, los casos de uso del backend (`RegisterUserTokenUseCase` y `RevokeUserTokenUseCase`) lanzan un error explícito de indisponibilidad si son llamados directamente en el API.
-* **Secure by Default**: Los endpoints de métricas se bloquean por defecto con error `403` si no se configura la variable `METRICS_KEY`.
+- **Secure by Default**: Los endpoints de métricas se bloquean por defecto con error `403` si no se configura la variable `METRICS_KEY`.
 
 ---
 
@@ -195,16 +231,17 @@ Dado que la base de datos se ha migrado a PostgreSQL, el contenedor de la aplica
    ```
 
 ### Despliegue en Coolify
+
 1. Crea un nuevo recurso de tipo **Application** en tu panel de Coolify.
 2. Selecciona **GitHub Repository** como fuente y apunta a este repositorio.
 3. En la configuración de construcción, selecciona **Dockerfile**.
 4. Configura el puerto de exposición en el puerto `3000`.
 5. **Base de Datos**: Añade un servicio de base de datos **PostgreSQL** en Coolify.
 6. **Variables de Entorno**: Agrega en la pestaña `Environment Variables` los datos de acceso de la base de datos y tus tokens de seguridad:
-   * `DB_HOST`: Host de tu base de datos PostgreSQL de Coolify.
-   * `DB_PORT`: `5432`
-   * `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`: Datos de tu base de datos PostgreSQL.
-   * `DB_SSL`: `'true'` (si la base de datos requiere SSL).
-   * `DB_SYNCHRONIZE`: `'true'` (si deseas que cree las tablas al iniciar la primera vez).
-   * `GITHUB_TOKEN`, `METRICS_KEY`, `TRUST_PROXY`.
+   - `DB_HOST`: Host de tu base de datos PostgreSQL de Coolify.
+   - `DB_PORT`: `5432`
+   - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`: Datos de tu base de datos PostgreSQL.
+   - `DB_SSL`: `'true'` (si la base de datos requiere SSL).
+   - `DB_SYNCHRONIZE`: `'true'` (si deseas que cree las tablas al iniciar la primera vez).
+   - `GITHUB_TOKEN`, `METRICS_KEY`, `TRUST_PROXY`.
 7. Haz clic en **Deploy**. Coolify construirá el contenedor seguro de producción y lo pondrá en marcha con SSL automático.
