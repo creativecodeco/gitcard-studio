@@ -554,10 +554,8 @@ export class ApiGitHubRepository implements IGitHubRepository {
   }
 
   async getUserLanguages(username: string, userToken?: string): Promise<LanguageStat[]> {
-    if (!userToken) {
-      const gqlLangs = await this.getUserLanguagesViaGraphQL(username, userToken);
-      if (gqlLangs && gqlLangs.length > 0) return gqlLangs;
-    }
+    const gqlLangs = await this.getUserLanguagesViaGraphQL(username, userToken);
+    if (gqlLangs && gqlLangs.length > 0) return gqlLangs;
 
     const repos = await this.fetchNonForkRepos(username, userToken);
     const languageMap = await this.aggregateRepoLanguages(repos, username, userToken);
@@ -718,28 +716,52 @@ export class ApiGitHubRepository implements IGitHubRepository {
     username: string,
     userToken?: string
   ): Promise<StreakStats | null> {
-    const query = `
-      query GetStreakStats($username: String!) {
-        user(login: $username) {
-          contributionsCollection {
-            contributionCalendar {
-              totalContributions
-              weeks {
-                contributionDays {
-                  contributionCount
-                  date
+    const isViewer = Boolean(userToken);
+    const query = isViewer
+      ? `
+        query GetViewerStreakStats {
+          viewer {
+            contributionsCollection {
+              contributionCalendar {
+                totalContributions
+                weeks {
+                  contributionDays {
+                    contributionCount
+                    date
+                  }
                 }
               }
             }
           }
         }
-      }
-    `;
+      `
+      : `
+        query GetStreakStats($username: String!) {
+          user(login: $username) {
+            contributionsCollection {
+              contributionCalendar {
+                totalContributions
+                weeks {
+                  contributionDays {
+                    contributionCount
+                    date
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
 
-    const data = await this.fetchGraphQL<{ user: any }>(query, { username }, userToken);
-    if (!data?.user) return null;
+    const data = await this.fetchGraphQL<{ user?: any; viewer?: any }>(
+      query,
+      isViewer ? {} : { username },
+      userToken
+    );
+    const targetUser = isViewer ? data?.viewer : data?.user;
+    if (!targetUser) return null;
 
-    const cal = data.user.contributionsCollection?.contributionCalendar;
+    const cal = targetUser.contributionsCollection?.contributionCalendar;
     if (!cal) return null;
 
     const contributions: { date: string; level: number }[] = [];
@@ -833,34 +855,64 @@ export class ApiGitHubRepository implements IGitHubRepository {
     limit: number = 4,
     userToken?: string
   ): Promise<RepoStats[] | null> {
-    const query = `
-      query GetUserTopRepos($username: String!) {
-        user(login: $username) {
-          repositories(first: 100, ownerAffiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER], isFork: false, orderBy: { field: STARGAZERS, direction: DESC }) {
-            nodes {
-              name
-              description
-              stargazerCount
-              forkCount
-              owner { login }
-              primaryLanguage {
+    const isViewer = Boolean(userToken);
+    const query = isViewer
+      ? `
+        query GetViewerTopRepos {
+          viewer {
+            repositories(first: 100, ownerAffiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER], isFork: false, orderBy: { field: STARGAZERS, direction: DESC }) {
+              nodes {
                 name
-                color
-              }
-              licenseInfo {
-                name
-                spdxId
+                description
+                stargazerCount
+                forkCount
+                owner { login }
+                primaryLanguage {
+                  name
+                  color
+                }
+                licenseInfo {
+                  name
+                  spdxId
+                }
               }
             }
           }
         }
-      }
-    `;
+      `
+      : `
+        query GetUserTopRepos($username: String!) {
+          user(login: $username) {
+            repositories(first: 100, ownerAffiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER], isFork: false, orderBy: { field: STARGAZERS, direction: DESC }) {
+              nodes {
+                name
+                description
+                stargazerCount
+                forkCount
+                owner { login }
+                primaryLanguage {
+                  name
+                  color
+                }
+                licenseInfo {
+                  name
+                  spdxId
+                }
+              }
+            }
+          }
+        }
+      `;
 
-    const data = await this.fetchGraphQL<{ user: any }>(query, { username }, userToken);
-    if (!data?.user) return null;
+    const data = await this.fetchGraphQL<{ user?: any; viewer?: any }>(
+      query,
+      isViewer ? {} : { username },
+      userToken
+    );
+    const targetUser = isViewer ? data?.viewer : data?.user;
+    if (!targetUser) return null;
 
-    const repos = data.user.repositories?.nodes ?? [];
+    const repos = targetUser.repositories?.nodes ?? [];
     const topRepos = repos.slice(0, limit);
 
     return topRepos.map((r: any) => {
@@ -1070,30 +1122,56 @@ export class ApiGitHubRepository implements IGitHubRepository {
     const hourlyMatrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
     let totalCommitsThisYear = 0;
 
-    const query = `
-      query GetCommitActivity($username: String!) {
-        user(login: $username) {
-          contributionsCollection {
-            totalCommitContributions
-            contributionCalendar {
-              totalContributions
-              weeks {
-                contributionDays {
-                  contributionCount
-                  date
-                  weekday
+    const isViewer = Boolean(userToken);
+    const query = isViewer
+      ? `
+        query GetViewerCommitActivity {
+          viewer {
+            contributionsCollection {
+              totalCommitContributions
+              contributionCalendar {
+                totalContributions
+                weeks {
+                  contributionDays {
+                    contributionCount
+                    date
+                    weekday
+                  }
                 }
               }
             }
           }
         }
-      }
-    `;
+      `
+      : `
+        query GetCommitActivity($username: String!) {
+          user(login: $username) {
+            contributionsCollection {
+              totalCommitContributions
+              contributionCalendar {
+                totalContributions
+                weeks {
+                  contributionDays {
+                    contributionCount
+                    date
+                    weekday
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
 
     try {
-      const data = await this.fetchGraphQL<{ user: any }>(query, { username }, userToken);
-      if (data?.user?.contributionsCollection) {
-        const cc = data.user.contributionsCollection;
+      const data = await this.fetchGraphQL<{ user?: any; viewer?: any }>(
+        query,
+        isViewer ? {} : { username },
+        userToken
+      );
+      const targetUser = isViewer ? data?.viewer : data?.user;
+      if (targetUser?.contributionsCollection) {
+        const cc = targetUser.contributionsCollection;
         totalCommitsThisYear = cc.totalCommitContributions ?? 0;
         const cal = cc.contributionCalendar;
 

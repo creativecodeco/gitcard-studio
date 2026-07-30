@@ -1,6 +1,6 @@
 {
   "name": "github-helpers-backend",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "High-performance NestJS & Fastify API backend server for GitHub Helpers SVG stats card generation, OAuth integration, and metrics tracking.",
   "main": "dist/server.js",
   "scripts": {

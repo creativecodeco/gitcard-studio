@@ -1,6 +1,6 @@
 {
   "name": "github-helpers-frontend",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Interactive Astro web client for GitHub Helpers real-time SVG card customization, live README preview, and markdown builder.",
   "private": true,
   "type": "module",

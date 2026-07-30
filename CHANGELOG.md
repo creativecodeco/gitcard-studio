@@ -2,6 +2,18 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.7.1] - 2026-07-30
+
+### 🐛 Correcciones en Autenticación, Repos Privados y Flujo de Desconexión
+- **Metadatos y Contribuciones Privadas en GraphQL (`viewer`)**: Actualizadas las consultas GraphQL (`getUserLanguagesViaGraphQL`, `getUserStreakViaGraphQL`, `getUserTopReposViaGraphQL`, `getUserCommitActivity`) para consultar el nodo `viewer` cuando se proporciona un token de usuario autenticado, permitiendo incluir contribuciones y repositorios privados.
+- **Alcance OAuth Ampliado (`read:user,repo`)**: Añadido el scope `read:user,repo` en la URL de inicio de sesión de GitHub OAuth para autorizar lectura de contribuciones y repositorios privados.
+- **Garantía y Flujo de Desconexión de Cuenta**:
+  - Limpieza total e incondicional de `localStorage`, `sessionStorage` y `CacheStorage` al presionar **Desconectar Cuenta**.
+  - Eliminación de bucles de recarga y parámetros residuales (`?auth_success=1&username=...`) de la barra de direcciones mediante navegación limpia y `history.replaceState`.
+  - Generación automática inmediata de tarjetas públicas en **🌐 Modo Público (Sin Cuenta)** tras desconectar la sesión sin perder el nombre de usuario del campo de entrada.
+  - Inicialización robusta del script en `PrivateTokenModal.astro` comprobando `document.readyState` para garantizar la asignación de eventos aun si la página ya finalizó de cargar.
+- **Sincronización de URLs en README.md Masivo**: Corregida la generación masiva del bloque de README.md para utilizar URLs de producción idénticas al copiado individual (sin parámetros `&preview=true` ni marcas temporales `&t=...`).
+
 ## [1.7.0] - 2026-07-30
 
 ### ✨ Matriz de Hábitos de Commit, Badges Personalizados y SEO de Alto Impacto
@@ -316,4 +328,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.7.0
+**Versión actualmente expuesta / en producción:** v1.7.1

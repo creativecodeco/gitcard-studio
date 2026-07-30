@@ -672,7 +672,7 @@ import Footer from '@/components/Footer.astro';
 
 <script>
   import { generateSampleReadme, type CardItem } from '@/utils/readmeGenerator';
-  import { t, updateDomTranslations, type TranslationKey } from '@/utils/i18n';
+  import { t, updateDomTranslations } from '@/utils/i18n';
 
   // Elements
   const usernameInput = document.getElementById('username-input') as HTMLInputElement | null;
@@ -948,17 +948,13 @@ import Footer from '@/components/Footer.astro';
     currentUsername = usernameVal;
     currentRepo = rInput ? rInput.value.trim() : '';
 
-    const newUrl = new URL(window.location.href);
+    const newUrl = new URL(window.location.origin + window.location.pathname);
     newUrl.searchParams.set('user', currentUsername);
     if (currentTheme) {
       newUrl.searchParams.set('theme', currentTheme);
-    } else {
-      newUrl.searchParams.delete('theme');
     }
     if (currentLocale && currentLocale !== 'es') {
       newUrl.searchParams.set('locale', currentLocale);
-    } else {
-      newUrl.searchParams.delete('locale');
     }
     window.history.pushState({}, '', newUrl.toString());
 
@@ -1136,17 +1132,47 @@ import Footer from '@/components/Footer.astro';
       return;
     }
 
+    const origin = window.location.origin;
+    const widthParam = currentCardWidth
+      ? `&card_width=${encodeURIComponent(currentCardWidth)}`
+      : '';
+    const localeParam = currentLocale ? `&locale=${encodeURIComponent(currentLocale)}` : '';
+    const customColors = getCustomThemeQueryParams();
+
+    const statsUrl = `${origin}/api/stats?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const languagesUrl = `${origin}/api/languages?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const rankUrl = `${origin}/api/rank?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const streakUrl = `${origin}/api/streak?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const trophiesUrl = `${origin}/api/trophies?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const topReposUrl = `${origin}/api/top-repos?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const sponsorsUrl = `${origin}/api/sponsors?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const commitActivityUrl = `${origin}/api/commit-activity?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+
+    let repoUrl = `${origin}/api/repo?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    if (currentRepo) {
+      repoUrl += `&repo=${encodeURIComponent(currentRepo)}`;
+    }
+
+    const labelVal = viewsLabel ? viewsLabel.value.trim() : '';
+    const colorVal = viewsColor ? viewsColor.value.trim() : '';
+    const styleVal = viewsStyle ? viewsStyle.value : '';
+
+    let viewsUrl = `${origin}/api/views?username=${currentUsername}&theme=${currentTheme}`;
+    if (labelVal) viewsUrl += `&label=${encodeURIComponent(labelVal)}`;
+    if (colorVal) viewsUrl += `&color=${encodeURIComponent(colorVal)}`;
+    if (styleVal) viewsUrl += `&style=${encodeURIComponent(styleVal)}`;
+
     const cardsConfig = [
-      { id: 'views', titleKey: 'title_views' as TranslationKey, getUrl: () => viewsImg?.src },
-      { id: 'stats', titleKey: 'title_stats' as TranslationKey, getUrl: () => statsImg?.src },
-      { id: 'languages', titleKey: 'title_languages' as TranslationKey, getUrl: () => languagesImg?.src },
-      { id: 'streak', titleKey: 'title_streak' as TranslationKey, getUrl: () => streakImg?.src },
-      { id: 'rank', titleKey: 'title_rank' as TranslationKey, getUrl: () => rankImg?.src },
-      { id: 'trophies', titleKey: 'title_trophies' as TranslationKey, getUrl: () => trophiesImg?.src },
-      { id: 'top-repos', titleKey: 'title_top_repos' as TranslationKey, getUrl: () => topReposImg?.src },
-      { id: 'sponsors', titleKey: 'title_sponsors' as TranslationKey, getUrl: () => sponsorsImg?.src },
-      { id: 'commit-activity', titleKey: 'title_commit_activity' as TranslationKey, getUrl: () => commitActivityImg?.src },
-      { id: 'repo', titleKey: 'title_repo' as TranslationKey, getUrl: () => repoImg?.src },
+      { id: 'views', title: 'Visitas de Perfil', cleanUrl: viewsUrl, getPreviewUrl: () => viewsImg?.src },
+      { id: 'stats', title: 'GitHub Stats', cleanUrl: statsUrl, getPreviewUrl: () => statsImg?.src },
+      { id: 'languages', title: 'Lenguajes más usados', cleanUrl: languagesUrl, getPreviewUrl: () => languagesImg?.src },
+      { id: 'streak', title: 'Racha de Contribuciones', cleanUrl: streakUrl, getPreviewUrl: () => streakImg?.src },
+      { id: 'rank', title: 'Rango de Desarrollador', cleanUrl: rankUrl, getPreviewUrl: () => rankImg?.src },
+      { id: 'trophies', title: 'Trofeos de GitHub', cleanUrl: trophiesUrl, getPreviewUrl: () => trophiesImg?.src },
+      { id: 'top-repos', title: 'Top Repositorios', cleanUrl: topReposUrl, getPreviewUrl: () => topReposImg?.src },
+      { id: 'sponsors', title: 'GitHub Sponsors', cleanUrl: sponsorsUrl, getPreviewUrl: () => sponsorsImg?.src },
+      { id: 'commit-activity', title: 'Matriz de Hábitos', cleanUrl: commitActivityUrl, getPreviewUrl: () => commitActivityImg?.src },
+      { id: 'repo', title: 'Repositorio Destacado', cleanUrl: repoUrl, getPreviewUrl: () => repoImg?.src },
     ];
 
     const activeCardsForMarkdown: CardItem[] = [];
@@ -1156,13 +1182,11 @@ import Footer from '@/components/Footer.astro';
       const img = document.getElementById(`${cfg.id}-img`) as HTMLImageElement | null;
       const placeholder = document.getElementById(`${cfg.id}-placeholder`);
       const hasError = placeholder ? placeholder.querySelector('svg.error') !== null : false;
-      const rawUrl = cfg.getUrl();
+      const previewUrl = cfg.getPreviewUrl();
 
-      if (img && !img.classList.contains('hidden') && !hasError && rawUrl) {
-        const cleanUrl = rawUrl.replace(/&t=\d+/, '');
-        const title = t(cfg.titleKey, currentLocale);
-        activeCardsForMarkdown.push({ id: cfg.id, title, url: cleanUrl });
-        activeCardsForPreview.push({ id: cfg.id, title, url: rawUrl });
+      if (img && !img.classList.contains('hidden') && !hasError && previewUrl) {
+        activeCardsForMarkdown.push({ id: cfg.id, title: cfg.title, url: cfg.cleanUrl });
+        activeCardsForPreview.push({ id: cfg.id, title: cfg.title, url: previewUrl });
       }
     });
 
@@ -1623,28 +1647,51 @@ import Footer from '@/components/Footer.astro';
     currentUsername = '';
     currentRepo = '';
 
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+    }
+
     updateThemeSelectorsState();
 
-    if (statsImg) statsImg.classList.add('hidden');
-    if (statsPlaceholder) statsPlaceholder.classList.remove('hidden');
+    const imgs = [
+      statsImg, languagesImg, repoImg, rankImg, streakImg,
+      trophiesImg, topReposImg, sponsorsImg, commitActivityImg, viewsImg
+    ];
+    imgs.forEach((img) => {
+      if (img) {
+        img.classList.add('hidden');
+        img.removeAttribute('src');
+        img.alt = '';
+      }
+    });
 
-    if (languagesImg) languagesImg.classList.add('hidden');
-    if (languagesPlaceholder) languagesPlaceholder.classList.remove('hidden');
+    const placeholders = [
+      statsPlaceholder, languagesPlaceholder, repoPlaceholder, rankPlaceholder, streakPlaceholder,
+      trophiesPlaceholder, topReposPlaceholder, sponsorsPlaceholder, commitActivityPlaceholder, viewsPlaceholder
+    ];
+    placeholders.forEach((ph) => {
+      if (ph) {
+        ph.classList.remove('hidden');
+        const pulseIcon = ph.querySelector('.pulse-icon');
+        const pText = ph.querySelector('p');
+        if (pulseIcon) {
+          pulseIcon.innerHTML = `
+            <svg class="placeholder-svg" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+          `;
+        }
+        if (pText) pText.textContent = 'Ingresa un usuario para generar tarjetas';
+      }
+    });
 
-    if (repoImg) repoImg.classList.add('hidden');
-    if (repoPlaceholder) repoPlaceholder.classList.remove('hidden');
-
-    if (rankImg) rankImg.classList.add('hidden');
-    if (rankPlaceholder) rankPlaceholder.classList.remove('hidden');
-
-    if (streakImg) streakImg.classList.add('hidden');
-    if (streakPlaceholder) streakPlaceholder.classList.remove('hidden');
-
-    if (trophiesImg) trophiesImg.classList.add('hidden');
-    if (trophiesPlaceholder) trophiesPlaceholder.classList.remove('hidden');
-
-    if (viewsImg) viewsImg.classList.add('hidden');
-    if (viewsPlaceholder) viewsPlaceholder.classList.remove('hidden');
+    const markdownCodes = [
+      markdownStatsCode, markdownLanguagesCode, markdownRepoCode, markdownRankCode, markdownStreakCode,
+      markdownTrophiesCode, markdownTopReposCode, markdownSponsorsCode, markdownCommitActivityCode, markdownViewsCode
+    ];
+    markdownCodes.forEach((mc) => {
+      if (mc) mc.textContent = '';
+    });
 
     if (viewsLabel) viewsLabel.value = 'Profile views';
     if (viewsColor) viewsColor.value = '';
@@ -1658,6 +1705,10 @@ import Footer from '@/components/Footer.astro';
 
     if (sampleReadmeTextarea) {
       sampleReadmeTextarea.value = '';
+    }
+    const renderedContainer = document.getElementById('rendered-readme-content');
+    if (renderedContainer) {
+      renderedContainer.innerHTML = `<p style="color: var(--text-secondary); text-align: center; margin-top: 40px;">${t('sample_readme_placeholder', currentLocale)}</p>`;
     }
   }
 
@@ -1873,6 +1924,28 @@ import Footer from '@/components/Footer.astro';
     }
   }) as EventListener);
 
+  window.addEventListener('app:user-authenticated', ((e: CustomEvent) => {
+    const user = e.detail?.username;
+    if (user) {
+      if (usernameInput) usernameInput.value = user;
+      currentUsername = user;
+      updateThemeSelectorsState();
+      updateCards();
+    }
+  }) as EventListener);
+
+  window.addEventListener('app:user-disconnected', ((e: CustomEvent) => {
+    const user = e.detail?.username;
+    if (user) {
+      if (usernameInput) usernameInput.value = user;
+      currentUsername = user;
+      updateThemeSelectorsState();
+      updateCards();
+    } else {
+      resetAppUI();
+    }
+  }) as EventListener);
+
   function setupCopyButton(button: HTMLElement | null, codeElement: HTMLElement | null) {
     if (!button || !codeElement) return;
     button.addEventListener('click', async () => {
@@ -1931,7 +2004,23 @@ import Footer from '@/components/Footer.astro';
   // --- URL Parameters Initialization on Load ---
   function initParamsFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
-    const userParam = urlParams.get('user') || urlParams.get('username');
+    const isReset = urlParams.get('reset') === '1';
+    const isAuthCallback = urlParams.get('auth_success') === '1';
+
+    if (isReset || isAuthCallback) {
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete('auth_success');
+      cleanUrl.searchParams.delete('username');
+      cleanUrl.searchParams.delete('reset');
+      window.history.replaceState({}, document.title, cleanUrl.pathname + (cleanUrl.search ? cleanUrl.search : ''));
+    }
+
+    if (isReset) {
+      resetAppUI();
+      return;
+    }
+
+    const userParam = urlParams.get('user') || localStorage.getItem('gh_active_user') || localStorage.getItem('registered-github-username');
     const themeParam = urlParams.get('theme');
     const localeParam = urlParams.get('locale');
 
@@ -1953,11 +2042,13 @@ import Footer from '@/components/Footer.astro';
 
     updateDomTranslations(currentLocale);
 
-    if (userParam && usernameInput) {
-      usernameInput.value = userParam;
+    if (userParam) {
+      if (usernameInput) usernameInput.value = userParam;
       currentUsername = userParam;
       updateThemeSelectorsState();
       updateCards();
+    } else {
+      resetAppUI();
     }
   }
   loadConfig().then(() => {

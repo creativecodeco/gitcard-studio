@@ -45,6 +45,7 @@
       </div>
 
       <button
+        type="button"
         id="btn-disconnect-account"
         class="theme-option"
         style="padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; height: 30px;"
@@ -234,7 +235,7 @@
   </div>
 
   <!-- TAB PANE 2: GITHUB APP -->
-  <div id="mode-pane-app" class="mode-tab-pane hidden">
+  <div id="mode-pane-app" class="hidden mode-tab-pane">
     <div class="tab-help-box" style="background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
         <span style="font-weight: 700; font-size: 0.8rem; color: #4ade80;">⚡ GitHub App (Recomendado)</span>
@@ -278,7 +279,7 @@
   </div>
 
   <!-- TAB PANE 3: TOKEN PAT -->
-  <div id="mode-pane-pat" class="mode-tab-pane hidden">
+  <div id="mode-pane-pat" class="hidden mode-tab-pane">
     <div class="tab-help-box" style="background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
         <span style="font-weight: 700; font-size: 0.8rem; color: #a855f7;">🔑 Personal Access Token (PAT)</span>
@@ -455,7 +456,7 @@
 
 <script>
   // Dynamic client script for OAuth status & personal metrics handling
-  document.addEventListener('DOMContentLoaded', () => {
+  function initPrivateTokenModal() {
     const urlParams = new URLSearchParams(window.location.search);
     const authSuccess = urlParams.get('auth_success');
     const authUsername = urlParams.get('username');
@@ -516,10 +517,16 @@
     modeTabApp?.addEventListener('click', () => switchModeTab('app'));
     modeTabPat?.addEventListener('click', () => switchModeTab('pat'));
 
-    let activeUser = authUsername || localStorage.getItem('gh_active_user') || '';
+    let activeUser = authUsername || localStorage.getItem('gh_active_user') || localStorage.getItem('registered-github-username') || '';
 
     if (authSuccess === '1' && authUsername) {
       localStorage.setItem('gh_active_user', authUsername);
+      localStorage.setItem('registered-github-username', authUsername);
+
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete('auth_success');
+      cleanUrl.searchParams.delete('username');
+      window.history.replaceState({}, document.title, cleanUrl.pathname + (cleanUrl.search ? cleanUrl.search : ''));
     }
 
     const authTabsNav = document.getElementById('auth-tabs-nav');
@@ -531,13 +538,17 @@
         if (!res.ok) return;
         const data = await res.json();
         if (data && data.connected) {
+          localStorage.setItem('gh_active_user', data.username);
+          localStorage.setItem('registered-github-username', data.username);
+          activeUser = data.username;
+
           tokenRegistered?.classList.remove('hidden');
           authTabsNav?.classList.add('hidden');
           [modePanePublic, modePaneApp, modePanePat].forEach(pane => {
             if (pane) pane.classList.add('hidden');
           });
           const usernameInput = document.getElementById('username-input') as HTMLInputElement;
-          if (usernameInput && !usernameInput.value) {
+          if (usernameInput) {
             usernameInput.value = data.username;
           }
           if (connectedUsernameDisplay) connectedUsernameDisplay.textContent = `@${data.username}`;
@@ -554,6 +565,8 @@
                                  (data.metrics.commit_activity_renders || 0);
             metricCardRenders.textContent = String(totalRenders);
           }
+
+          window.dispatchEvent(new CustomEvent('app:user-authenticated', { detail: { username: data.username } }));
         }
       } catch (err) {
         console.error('Error fetching user metrics:', err);
@@ -564,23 +577,48 @@
       loadUserMetrics(activeUser);
     }
 
-    btnDisconnectAccount?.addEventListener('click', async () => {
-      if (!activeUser) return;
-      try {
-        const res = await fetch('/api/auth/disconnect', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: activeUser })
-        });
-        if (res.ok) {
-          localStorage.removeItem('gh_active_user');
-          tokenRegistered?.classList.add('hidden');
-          authTabsNav?.classList.remove('hidden');
-          switchModeTab('public');
+    btnDisconnectAccount?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const targetUser = (
+        activeUser ||
+        connectedUsernameDisplay?.textContent?.replace(/^@/, '').trim() ||
+        localStorage.getItem('gh_active_user') ||
+        localStorage.getItem('registered-github-username') ||
+        ''
+      ).trim();
+
+      if (targetUser) {
+        try {
+          await fetch('/api/auth/disconnect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: targetUser })
+          });
+        } catch (err) {
+          console.error('Error disconnecting account:', err);
         }
-      } catch (err) {
-        console.error('Error disconnecting account:', err);
       }
+
+      localStorage.clear();
+      sessionStorage.clear();
+
+      if ('caches' in window) {
+        try {
+          const keys = await caches.keys();
+          await Promise.all(keys.map((key) => caches.delete(key)));
+        } catch (e) {
+          console.warn('Could not clear CacheStorage:', e);
+        }
+      }
+
+      activeUser = '';
+      tokenRegistered?.classList.add('hidden');
+      authTabsNav?.classList.remove('hidden');
+      switchModeTab('public');
+
+      window.dispatchEvent(new CustomEvent('app:user-disconnected', { detail: { username: targetUser } }));
     });
 
     function validatePurgeInput() {
@@ -655,5 +693,11 @@
         triggerToast('Error de red al intentar eliminar la cuenta.', 'error');
       }
     });
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPrivateTokenModal);
+  } else {
+    initPrivateTokenModal();
+  }
 </script>
