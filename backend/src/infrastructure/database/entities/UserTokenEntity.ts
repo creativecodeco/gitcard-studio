@@ -11,6 +11,21 @@ export class UserTokenEntity {
   @Column({ type: 'varchar', length: 100 })
   iv!: string;
 
+  @Column({ type: 'varchar', length: 50, default: 'pat' })
+  token_type!: string;
+
+  @Column({ type: 'text', nullable: true })
+  encrypted_refresh_token?: string | null;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  refresh_token_iv?: string | null;
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  expires_at?: Date | null;
+
+  @Column({ type: 'text', nullable: true })
+  scopes?: string | null;
+
   @Column({ type: 'boolean', default: false })
   consent_accepted!: boolean;
 
@@ -23,3 +38,4 @@ export class UserTokenEntity {
   @UpdateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   updated_at!: Date;
 }
+

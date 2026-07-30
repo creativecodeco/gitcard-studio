@@ -75,7 +75,12 @@ github-helpers/
 | GET | `/api/trophies` | `CardsController.getTrophies` | Pública |
 | GET | `/api/views` | `CardsController.getProfileViews` | Pública, `no-cache` |
 | GET | `/api/top-repos` | `CardsController.getTopRepos` | Pública, CORS `*` |
-| POST | `/api/tokens/register` | `TokensController.register` | Validado via DTO |
+| GET | `/api/auth/github` | `AuthController.initiateGitHubAuth` | Redirección OAuth GitHub App |
+| GET | `/api/auth/github/callback` | `AuthController.handleGitHubCallback` | Callback OAuth GitHub App |
+| GET | `/api/users/me/metrics` | `AuthController.getUserMetrics` | Métricas personales del usuario |
+| DELETE | `/api/users/me` | `AuthController.deleteUserAccount` | Purga autoverificada de datos |
+| POST | `/api/auth/disconnect` | `AuthController.disconnectAccount` | Desconexión de cuenta GitHub |
+| POST | `/api/tokens/register` | `TokensController.register` | Validado via DTO (PAT) |
 | DELETE | `/api/tokens/revoke` | `TokensController.revoke` | Validado via DTO |
 | DELETE | `/api/users/purge` | `TokensController.purge` | Validado via DTO |
 | GET | `/api/metrics` | `MetricsController.getMetrics` | `METRICS_KEY` requerida |
@@ -95,8 +100,11 @@ github-helpers/
 | `DATABASE_URL` | ✅ Sí | Cadena de conexión PostgreSQL |
 | `ENCRYPTION_KEY` | ✅ Sí | 64 caracteres hex para AES-256 de tokens |
 | `METRICS_KEY` | ✅ Sí | Clave secreta para endpoints de métricas (403 si no está) |
+| `GITHUB_CLIENT_ID` | No | Client ID para autenticación de GitHub App |
+| `GITHUB_CLIENT_SECRET` | No | Client Secret para autenticación de GitHub App |
+| `GITHUB_CALLBACK_URL` | No | URL de callback OAuth de GitHub App |
 | `GITHUB_TOKEN` | No | PAT de GitHub para mayor rate limit en la API |
-| `PRIVATE_STATS_COMING_SOON` | No | `'false'` para habilitar tokens privados |
+| `PRIVATE_STATS_COMING_SOON` | No | `'false'` para habilitar estadísticas privadas |
 | `PORT` | No | Puerto del servidor (default: `3000`) |
 
 ---

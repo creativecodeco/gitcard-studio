@@ -7,8 +7,14 @@ export interface ITokenRepository {
     iv: string,
     consentAccepted: boolean,
     consentDate: string,
-    consentFingerprint: string
+    consentFingerprint: string,
+    tokenType?: string,
+    encryptedRefreshToken?: string,
+    refreshTokenIv?: string,
+    expiresAt?: string,
+    scopes?: string
   ): Promise<void>;
   getToken(username: string): Promise<UserToken | null>;
   deleteToken(username: string): Promise<void>;
 }
+

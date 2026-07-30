@@ -69,6 +69,18 @@ class EnvConfigDto {
 
   @IsOptional()
   @IsString()
+  GITHUB_CLIENT_ID?: string;
+
+  @IsOptional()
+  @IsString()
+  GITHUB_CLIENT_SECRET?: string;
+
+  @IsOptional()
+  @IsString()
+  GITHUB_CALLBACK_URL?: string;
+
+  @IsOptional()
+  @IsString()
   LOG_LEVEL?: string;
 }
 

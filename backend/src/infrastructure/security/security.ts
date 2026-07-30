@@ -176,17 +176,125 @@ export async function validateTokenScopes(
   }
 }
 
+export async function getDecryptedRefreshToken(
+  tokenInfo: { encrypted_refresh_token?: string; refresh_token_iv?: string }
+): Promise<string | undefined> {
+  if (!tokenInfo.encrypted_refresh_token || !tokenInfo.refresh_token_iv) {
+    return undefined;
+  }
+  try {
+    return decryptToken(tokenInfo.encrypted_refresh_token, tokenInfo.refresh_token_iv);
+  } catch (e) {
+    logger.warn('Could not decrypt refresh token', { error: e });
+    return undefined;
+  }
+}
+
+export async function refreshGitHubAppToken(
+  username: string,
+  refreshToken: string,
+  tokenRepo: ITokenRepository
+): Promise<string | undefined> {
+  const clientId = process.env.GITHUB_CLIENT_ID;
+  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    logger.warn('Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET for refreshing token');
+    return undefined;
+  }
+
+  try {
+    const res = await fetch('https://github.com/login/oauth/access_token', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken
+      })
+    });
+
+    if (!res.ok) {
+      logger.error('Failed to refresh GitHub App token', { status: res.status });
+      return undefined;
+    }
+
+    const data = (await res.json()) as {
+      access_token?: string;
+      expires_in?: number;
+      refresh_token?: string;
+      scope?: string;
+    };
+
+    if (!data.access_token) {
+      logger.warn('GitHub App token refresh response did not contain access_token', { data });
+      return undefined;
+    }
+
+    const encToken = encryptToken(data.access_token);
+    let encRefresh: { encryptedToken: string; iv: string } | undefined;
+    if (data.refresh_token) {
+      encRefresh = encryptToken(data.refresh_token);
+    }
+
+    const expiresAt = data.expires_in
+      ? new Date(Date.now() + data.expires_in * 1000).toISOString()
+      : undefined;
+
+    const existingInfo = await tokenRepo.getToken(username);
+    await tokenRepo.saveToken(
+      username,
+      encToken.encryptedToken,
+      encToken.iv,
+      existingInfo ? existingInfo.consent_accepted === 1 : true,
+      existingInfo?.consent_date ?? new Date().toISOString(),
+      existingInfo?.consent_fingerprint ?? 'system-refresh',
+      'app_user',
+      encRefresh?.encryptedToken,
+      encRefresh?.iv,
+      expiresAt,
+      data.scope ?? existingInfo?.scopes
+    );
+
+    logger.info(`Refreshed GitHub App token for user ${username}`);
+    return data.access_token;
+  } catch (error) {
+    logger.error(`Error refreshing GitHub App token for user ${username}`, { error });
+    return undefined;
+  }
+}
+
 export async function getDecryptedToken(
   username: string,
   tokenRepo: ITokenRepository
 ): Promise<string | undefined> {
   try {
     const tokenInfo = await tokenRepo.getToken(username);
-    if (tokenInfo) {
-      return decryptToken(tokenInfo.encrypted_token, tokenInfo.iv);
+    if (!tokenInfo) return undefined;
+
+    // Check if token is expired or close to expiration (within 5 minutes)
+    if (tokenInfo.expires_at && tokenInfo.token_type === 'app_user') {
+      const expiresTime = new Date(tokenInfo.expires_at).getTime();
+      const fiveMinutes = 5 * 60 * 1000;
+      if (Date.now() + fiveMinutes >= expiresTime) {
+        const refreshToken = await getDecryptedRefreshToken(tokenInfo);
+        if (refreshToken) {
+          const freshAccessToken = await refreshGitHubAppToken(username, refreshToken, tokenRepo);
+          if (freshAccessToken) {
+            return freshAccessToken;
+          }
+        }
+      }
     }
+
+    return decryptToken(tokenInfo.encrypted_token, tokenInfo.iv);
   } catch (e) {
     logger.warn(`Could not decrypt token for user ${username}`, { username, error: e });
   }
   return undefined;
 }
+

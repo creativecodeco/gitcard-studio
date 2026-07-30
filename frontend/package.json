@@ -1,6 +1,7 @@
 {
   "name": "github-helpers-frontend",
-  "version": "1.5.3",
+  "version": "1.7.0",
+  "description": "Interactive Astro web client for GitHub Helpers real-time SVG card customization, live README preview, and markdown builder.",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,10 +14,10 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "astro": "7.1.3"
+    "astro": "7.1.6"
   },
   "devDependencies": {
-    "@playwright/test": "1.61.1",
+    "@playwright/test": "1.62.0",
     "happy-dom": "20.11.1",
     "vitest": "4.1.10"
   }

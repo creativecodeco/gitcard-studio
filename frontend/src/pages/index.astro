@@ -50,68 +50,20 @@ import Footer from '@/components/Footer.astro';
   <main class="main-content">
     <!-- Left Column Wrapper -->
     <div class="left-column" style="display: flex; flex-direction: column; gap: 24px; width: 100%">
-      <!-- Left Panel: Input & Settings -->
+      <!-- Master Left Panel: Settings, Connection & Customization -->
       <section class="settings-panel glass-card" style="width: 100%">
-        <h2 class="section-title" data-i18n="settings_title">Configuración</h2>
+        <h2 class="section-title" style="margin-bottom: 16px;" data-i18n="settings_title">Configuración e Identidad</h2>
 
-        <!-- Step 1: Username & Optional Repo -->
-        <div class="input-group">
-          <label for="username-input" class="input-label" data-i18n="username_label">Usuario de GitHub</label>
-          <div class="input-wrapper">
-            <span class="input-prefix">@</span>
-            <input
-              type="text"
-              id="username-input"
-              placeholder="ej. github"
-              data-i18n-placeholder="username_placeholder"
-              autocomplete="off"
-              required
-            />
-          </div>
+        <!-- Section 1: Identidad & Autenticación (Modos por Tabs) -->
+        <div style="margin-bottom: 20px;">
+          <PrivateTokenModal />
         </div>
 
-        <div class="input-group">
-          <label for="repo-input" class="input-label" data-i18n="repo_label">Repositorio Específico (Opcional)</label>
-          <div class="input-wrapper">
-            <span class="input-prefix">
-              <svg
-                viewBox="0 0 24 24"
-                width="14"
-                height="14"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                style="margin-right: 4px"
-                aria-hidden="true"
-              >
-                <path
-                  d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
-                ></path>
-              </svg>
-            </span>
-            <input
-              type="text"
-              id="repo-input"
-              placeholder="ej. github-helpers (o el más popular)"
-              data-i18n-placeholder="repo_placeholder"
-              autocomplete="off"
-            />
-          </div>
-        </div>
-
-        <button
-          id="btn-generate"
-          class="primary-btn full-width-btn"
-          style="margin-bottom: 24px; width: 100%"
-          data-i18n="btn_generate"
-        >
-          Generar Tarjetas
-        </button>
-
-        <!-- Step 3: Themes -->
-        <div class="themes-group">          <span class="input-label" data-i18n="theme_label">Selecciona un Estilo</span>
+        <!-- Section 3: Themes & Customization -->
+        <div style="border-top: 1px solid var(--glass-border); padding-top: 18px;">
+          <h3 class="section-title" style="font-size: 1.05rem; margin-bottom: 12px;" data-i18n="card_customization_title">Estilo & Personalización</h3>
+          <!-- Themes -->
+          <div class="themes-group">          <span class="input-label" data-i18n="theme_label">Selecciona un Estilo</span>
           <div class="themes-grid" id="themes-container">
             <button class="theme-option active" data-theme="dark" id="theme-dark">
               <span class="theme-name">Dark</span>
@@ -197,6 +149,43 @@ import Footer from '@/components/Footer.astro';
                 <span class="color-dot" style="background: #f97e72"></span>
               </span>
             </button>
+            <button class="theme-option" data-theme="custom" id="theme-custom">
+              <span class="theme-name">Custom 🎨</span>
+              <span class="theme-colors">
+                <span class="color-dot" style="background: #38bdf8"></span>
+                <span class="color-dot" style="background: #a855f7"></span>
+              </span>
+            </button>
+          </div>
+
+          <!-- Custom Theme Color Pickers Panel (Shown only when 'Custom 🎨' theme is active) -->
+          <div id="custom-theme-picker-panel" class="hidden" style="margin-top: 14px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 12px; background: rgba(0,0,0,0.3); transition: all 0.3s ease;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--accent-color); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+              🎨 <span>Personalizar Paleta de Colores</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+              <div>
+                <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">Fondo (BG)</label>
+                <input type="color" id="picker-bg" value="#0d1117" style="width: 100%; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">Título</label>
+                <input type="color" id="picker-title" value="#58a6ff" style="width: 100%; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">Texto</label>
+                <input type="color" id="picker-text" value="#c9d1d9" style="width: 100%; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">Iconos / Acento</label>
+                <input type="color" id="picker-icon" value="#58a6ff" style="width: 100%; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
+              </div>
+              <div style="grid-column: span 2;">
+                <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">Borde</label>
+                <input type="color" id="picker-border" value="#30363d" style="width: 100%; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -258,9 +247,8 @@ import Footer from '@/components/Footer.astro';
             </select>
           </div>
         </div>
+        </div>
       </section>
-
-      <PrivateTokenModal />
     </div>
 
     <!-- Right Panel: Live Preview & Code -->
@@ -545,6 +533,28 @@ import Footer from '@/components/Footer.astro';
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
           </CardPreview>
+
+          <!-- Commit Activity Grid Card Preview -->
+          <CardPreview id="commit-activity" title="Matriz de Hábitos de Commit" codeLabel="Matriz de Hábitos">
+            <svg
+              slot="placeholder-icon"
+              class="placeholder-svg"
+              viewBox="0 0 24 24"
+              width="48"
+              height="48"
+              fill="none"
+              stroke="#4ade80"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="3" y1="15" x2="21" y2="15"></line>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <line x1="15" y1="3" x2="15" y2="21"></line>
+            </svg>
+          </CardPreview>
         </div>
       </div>
 
@@ -667,7 +677,6 @@ import Footer from '@/components/Footer.astro';
   // Elements
   const usernameInput = document.getElementById('username-input') as HTMLInputElement | null;
   const repoInput = document.getElementById('repo-input') as HTMLInputElement | null;
-  const btnGenerate = document.getElementById('btn-generate');
   const themesContainer = document.getElementById('themes-container');
   const themeOptions = document.querySelectorAll('.theme-option') as NodeListOf<HTMLButtonElement>;
 
@@ -695,6 +704,9 @@ import Footer from '@/components/Footer.astro';
   const sponsorsImg = document.getElementById('sponsors-img') as HTMLImageElement | null;
   const sponsorsPlaceholder = document.getElementById('sponsors-placeholder');
 
+  const commitActivityImg = document.getElementById('commit-activity-img') as HTMLImageElement | null;
+  const commitActivityPlaceholder = document.getElementById('commit-activity-placeholder');
+
   const viewsImg = document.getElementById('views-img') as HTMLImageElement | null;
   const viewsPlaceholder = document.getElementById('views-placeholder');
 
@@ -707,6 +719,7 @@ import Footer from '@/components/Footer.astro';
   const markdownTrophiesCode = document.getElementById('markdown-trophies-code');
   const markdownTopReposCode = document.getElementById('markdown-top-repos-code');
   const markdownSponsorsCode = document.getElementById('markdown-sponsors-code');
+  const markdownCommitActivityCode = document.getElementById('markdown-commit-activity-code');
   const markdownViewsCode = document.getElementById('markdown-views-code');
 
   const btnCopyStats = document.getElementById('btn-copy-stats');
@@ -741,6 +754,11 @@ import Footer from '@/components/Footer.astro';
   let currentCardWidth = ''; // empty = default 495px
   let currentLocale = 'es';
   let currentReadmeLayout: 'vertical' | 'grid' = 'vertical';
+
+  let completedImagesCount = 0;
+  const totalImagesToLoad = 10; // stats, languages, repo, rank, streak, trophies, top-repos, sponsors, commit-activity, views
+  let isGeneratingAllCards = false;
+  let isUsingCustomTheme = false;
 
   const localeSelect = document.getElementById('locale-select') as HTMLSelectElement | null;
 
@@ -838,6 +856,14 @@ import Footer from '@/components/Footer.astro';
 
   loadMetrics();
 
+  // --- Custom Theme Color Pickers ---
+  const customThemePickerPanel = document.getElementById('custom-theme-picker-panel');
+  const pickerBg = document.getElementById('picker-bg') as HTMLInputElement | null;
+  const pickerTitle = document.getElementById('picker-title') as HTMLInputElement | null;
+  const pickerText = document.getElementById('picker-text') as HTMLInputElement | null;
+  const pickerIcon = document.getElementById('picker-icon') as HTMLInputElement | null;
+  const pickerBorder = document.getElementById('picker-border') as HTMLInputElement | null;
+
   // --- SVG Themes Selection logic ---
   themesContainer?.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
@@ -847,45 +873,80 @@ import Footer from '@/components/Footer.astro';
     themeOptions.forEach((opt) => opt.classList.remove('active'));
     option.classList.add('active');
 
-    currentTheme = option.dataset.theme || 'dark';
+    const selectedTheme = option.dataset.theme || 'dark';
+
+    if (selectedTheme === 'custom') {
+      isUsingCustomTheme = true;
+      currentTheme = 'dark';
+      customThemePickerPanel?.classList.remove('hidden');
+    } else {
+      isUsingCustomTheme = false;
+      currentTheme = selectedTheme;
+      customThemePickerPanel?.classList.add('hidden');
+    }
 
     if (currentUsername) {
       const newUrl = new URL(window.location.href);
-      newUrl.searchParams.set('theme', currentTheme);
+      newUrl.searchParams.set('theme', selectedTheme === 'custom' ? 'dark' : currentTheme);
       window.history.pushState({}, '', newUrl.toString());
 
       updateCards();
     }
   });
 
-  // Generate button handler
-  btnGenerate?.addEventListener('click', () => {
-    submitUsername();
+  // Real-time custom color updates
+  [pickerBg, pickerTitle, pickerText, pickerIcon, pickerBorder].forEach((picker) => {
+    picker?.addEventListener('input', () => {
+      if (isUsingCustomTheme && currentUsername) {
+        updateCards();
+      }
+    });
   });
 
-  // Enter key support in inputs
-  usernameInput?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
+  function getCustomThemeQueryParams(): string {
+    if (!isUsingCustomTheme) return '';
+    let params = '';
+    if (pickerBg && pickerBg.value) params += `&bg_color=${encodeURIComponent(pickerBg.value.replace('#', ''))}`;
+    if (pickerTitle && pickerTitle.value) params += `&title_color=${encodeURIComponent(pickerTitle.value.replace('#', ''))}`;
+    if (pickerText && pickerText.value) params += `&text_color=${encodeURIComponent(pickerText.value.replace('#', ''))}`;
+    if (pickerIcon && pickerIcon.value) params += `&icon_color=${encodeURIComponent(pickerIcon.value.replace('#', ''))}`;
+    if (pickerBorder && pickerBorder.value) params += `&border_color=${encodeURIComponent(pickerBorder.value.replace('#', ''))}`;
+    return params;
+  }
+  // Generate button handler with Event Delegation
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const btn = target.closest('#btn-generate');
+    if (btn) {
+      e.preventDefault();
       submitUsername();
     }
   });
 
-  repoInput?.addEventListener('keypress', (e) => {
+  // Enter key support in inputs with Event Delegation
+  document.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
-      submitUsername();
+      const target = e.target as HTMLElement;
+      if (target && (target.id === 'username-input' || target.id === 'repo-input')) {
+        e.preventDefault();
+        submitUsername();
+      }
     }
   });
 
   function submitUsername() {
-    if (!usernameInput) return;
-    const usernameVal = usernameInput.value.trim();
+    const uInput = (document.getElementById('username-input') as HTMLInputElement | null) || usernameInput;
+    const rInput = (document.getElementById('repo-input') as HTMLInputElement | null) || repoInput;
+
+    if (!uInput) return;
+    const usernameVal = uInput.value.trim();
     if (!usernameVal) {
-      usernameInput.focus();
+      uInput.focus();
       return;
     }
 
     currentUsername = usernameVal;
-    currentRepo = repoInput ? repoInput.value.trim() : '';
+    currentRepo = rInput ? rInput.value.trim() : '';
 
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.set('user', currentUsername);
@@ -905,9 +966,79 @@ import Footer from '@/components/Footer.astro';
     updateCards();
   }
 
-  let completedImagesCount = 0;
-  const totalImagesToLoad = 9; // stats, languages, repo, rank, streak, trophies, top-repos, sponsors, views
-  let isGeneratingAllCards = false;
+  // --- Direct Download Handlers (SVG & PNG) ---
+  document.addEventListener('click', async (e) => {
+    const target = e.target as HTMLElement;
+    const downloadSvgBtn = target.closest('.btn-download-svg') as HTMLButtonElement | null;
+    const downloadPngBtn = target.closest('.btn-download-png') as HTMLButtonElement | null;
+
+    if (downloadSvgBtn) {
+      const parent = downloadSvgBtn.closest('.card-preview-wrapper');
+      const img = parent?.querySelector('.preview-img') as HTMLImageElement | null;
+      const cardId = downloadSvgBtn.id.replace('btn-download-svg-', '');
+      if (!img || !img.src) return;
+
+      try {
+        const res = await fetch(img.src);
+        const svgText = await res.text();
+        const blob = new Blob([svgText], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `github-${currentUsername || 'user'}-${cardId}.svg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        window.dispatchEvent(new CustomEvent('app:toast', {
+          detail: { message: '¡Imagen SVG vectorial descargada!', type: 'success' }
+        }));
+      } catch (err) {
+        console.error('Error downloading SVG:', err);
+      }
+    }
+
+    if (downloadPngBtn) {
+      const parent = downloadPngBtn.closest('.card-preview-wrapper');
+      const img = parent?.querySelector('.preview-img') as HTMLImageElement | null;
+      const cardId = downloadPngBtn.id.replace('btn-download-png-', '');
+      if (!img || !img.src) return;
+
+      try {
+        const image = new Image();
+        image.crossOrigin = 'anonymous';
+        image.src = img.src;
+        image.onload = () => {
+          const canvas = document.createElement('canvas');
+          const scale = 2; // 2x Retina PNG resolution
+          canvas.width = (image.width || 495) * scale;
+          canvas.height = (image.height || 215) * scale;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.scale(scale, scale);
+            ctx.drawImage(image, 0, 0);
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `github-${currentUsername || 'user'}-${cardId}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                window.dispatchEvent(new CustomEvent('app:toast', {
+                  detail: { message: '¡Imagen PNG (Retina 2x) descargada!', type: 'success' }
+                }));
+              }
+            }, 'image/png');
+          }
+        };
+      } catch (err) {
+        console.error('Error downloading PNG:', err);
+      }
+    }
+  });
 
   function sortCardsByStatus() {
     const container = document.querySelector('.cards-preview-container');
@@ -917,13 +1048,11 @@ import Footer from '@/components/Footer.astro';
       container.querySelectorAll('.card-preview-wrapper')
     ) as HTMLElement[];
 
-    // Separate into success and error groups
     const successCards: HTMLElement[] = [];
     const errorCards: HTMLElement[] = [];
 
     wrappers.forEach((wrapper) => {
       const placeholder = wrapper.querySelector('.placeholder-card');
-      // A card is in error state if the placeholder is visible (not hidden) and has the red error SVG
       const hasErrorSvg = placeholder?.querySelector('svg.error') !== null;
       if (hasErrorSvg) {
         errorCards.push(wrapper);
@@ -932,12 +1061,12 @@ import Footer from '@/components/Footer.astro';
       }
     });
 
-    // Re-append in order: success first, then errors
     [...successCards, ...errorCards].forEach((wrapper) => container.appendChild(wrapper));
   }
 
-  function renderLiveReadmeHtml(username: string, activeCards: CardItem[], locale: string, layout: 'vertical' | 'grid'): string {
+  function renderLiveReadmeHtml(username: string, activeCards: CardItem[], locale: string, layout: 'vertical' | 'grid', generatorUrl?: string): string {
     const cleanUser = username.trim() || 'username';
+    const pageUrl = generatorUrl || window.location.href;
 
     if (activeCards.length === 0) {
       return `<h1 style="font-size: 1.4rem; color: #fff; border-bottom: 1px solid #30363d; padding-bottom: 8px; margin-top: 0;">${t('readme_preview_greeting', locale, { username: cleanUser })}</h1>
@@ -992,7 +1121,7 @@ import Footer from '@/components/Footer.astro';
       <h3 style="font-size: 1.1rem; color: #e6edf3; margin-bottom: 10px;">${sectionTitle}</h3>
       ${cardsHtml}
       <hr style="border: 0; border-top: 1px solid #30363d; margin: 20px 0 10px 0;" />
-      <p style="font-size: 0.8rem; color: #8b949e; font-style: italic; margin: 0;">${footerText}</p>
+      <p style="font-size: 0.8rem; color: #8b949e; font-style: italic; margin: 0;">${footerText} &bull; <a href="${pageUrl}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none;">${pageUrl}</a></p>
     `;
   }
 
@@ -1016,10 +1145,12 @@ import Footer from '@/components/Footer.astro';
       { id: 'trophies', titleKey: 'title_trophies' as TranslationKey, getUrl: () => trophiesImg?.src },
       { id: 'top-repos', titleKey: 'title_top_repos' as TranslationKey, getUrl: () => topReposImg?.src },
       { id: 'sponsors', titleKey: 'title_sponsors' as TranslationKey, getUrl: () => sponsorsImg?.src },
+      { id: 'commit-activity', titleKey: 'title_commit_activity' as TranslationKey, getUrl: () => commitActivityImg?.src },
       { id: 'repo', titleKey: 'title_repo' as TranslationKey, getUrl: () => repoImg?.src },
     ];
 
-    const activeCards: CardItem[] = [];
+    const activeCardsForMarkdown: CardItem[] = [];
+    const activeCardsForPreview: CardItem[] = [];
 
     cardsConfig.forEach((cfg) => {
       const img = document.getElementById(`${cfg.id}-img`) as HTMLImageElement | null;
@@ -1030,14 +1161,16 @@ import Footer from '@/components/Footer.astro';
       if (img && !img.classList.contains('hidden') && !hasError && rawUrl) {
         const cleanUrl = rawUrl.replace(/&t=\d+/, '');
         const title = t(cfg.titleKey, currentLocale);
-        activeCards.push({ id: cfg.id, title, url: cleanUrl });
+        activeCardsForMarkdown.push({ id: cfg.id, title, url: cleanUrl });
+        activeCardsForPreview.push({ id: cfg.id, title, url: rawUrl });
       }
     });
 
-    textarea.value = generateSampleReadme(currentUsername, activeCards, currentLocale, currentReadmeLayout);
+    const pageUrl = window.location.href;
+    textarea.value = generateSampleReadme(currentUsername, activeCardsForMarkdown, currentLocale, currentReadmeLayout, pageUrl);
 
     if (renderedContainer) {
-      renderedContainer.innerHTML = renderLiveReadmeHtml(currentUsername, activeCards, currentLocale, currentReadmeLayout);
+      renderedContainer.innerHTML = renderLiveReadmeHtml(currentUsername, activeCardsForPreview, currentLocale, currentReadmeLayout, pageUrl);
     }
   }
 
@@ -1049,7 +1182,6 @@ import Footer from '@/components/Footer.astro';
       if (globalLoading) {
         globalLoading.classList.add('hidden');
       }
-      // Sort cards: successful ones first, errored ones last
       sortCardsByStatus();
       updateSampleReadmeText();
       isGeneratingAllCards = false;
@@ -1072,16 +1204,18 @@ import Footer from '@/components/Footer.astro';
       ? `&card_width=${encodeURIComponent(currentCardWidth)}`
       : '';
     const localeParam = currentLocale ? `&locale=${encodeURIComponent(currentLocale)}` : '';
+    const customColors = getCustomThemeQueryParams();
 
-    const statsUrl = `${origin}/api/stats?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
-    const languagesUrl = `${origin}/api/languages?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
-    const rankUrl = `${origin}/api/rank?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
-    const streakUrl = `${origin}/api/streak?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
-    const trophiesUrl = `${origin}/api/trophies?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
-    const topReposUrl = `${origin}/api/top-repos?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
-    const sponsorsUrl = `${origin}/api/sponsors?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
+    const statsUrl = `${origin}/api/stats?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const languagesUrl = `${origin}/api/languages?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const rankUrl = `${origin}/api/rank?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const streakUrl = `${origin}/api/streak?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const trophiesUrl = `${origin}/api/trophies?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const topReposUrl = `${origin}/api/top-repos?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const sponsorsUrl = `${origin}/api/sponsors?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const commitActivityUrl = `${origin}/api/commit-activity?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
 
-    let repoUrl = `${origin}/api/repo?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}`;
+    let repoUrl = `${origin}/api/repo?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
     if (currentRepo) {
       repoUrl += `&repo=${encodeURIComponent(currentRepo)}`;
     }
@@ -1104,9 +1238,10 @@ import Footer from '@/components/Footer.astro';
     showImageLoading(trophiesImg, trophiesPlaceholder);
     showImageLoading(topReposImg, topReposPlaceholder);
     showImageLoading(sponsorsImg, sponsorsPlaceholder);
+    showImageLoading(commitActivityImg, commitActivityPlaceholder);
     showImageLoading(viewsImg, viewsPlaceholder);
 
-    // 2. Set image sources with cache buster to force rendering updates in preview
+    // 2. Set image sources with cache buster
     const cacheBuster = `&t=${Date.now()}`;
     if (statsImg) {
       statsImg.src = statsUrl + cacheBuster;
@@ -1140,6 +1275,10 @@ import Footer from '@/components/Footer.astro';
       sponsorsImg.src = sponsorsUrl + cacheBuster;
       sponsorsImg.alt = `Tarjeta de GitHub Sponsors para el usuario @${currentUsername}`;
     }
+    if (commitActivityImg) {
+      commitActivityImg.src = commitActivityUrl + cacheBuster;
+      commitActivityImg.alt = `Matriz de hábitos de commit para el usuario @${currentUsername}`;
+    }
     if (viewsImg) {
       viewsImg.src = viewsUrl + '&preview=true' + cacheBuster;
       viewsImg.alt = `Contador de visitas de GitHub para el usuario @${currentUsername}`;
@@ -1154,6 +1293,7 @@ import Footer from '@/components/Footer.astro';
     const markdownTrophies = `![Trofeos de GitHub](${trophiesUrl})`;
     const markdownTopRepos = `![Top Repositorios](${topReposUrl})`;
     const markdownSponsors = `![GitHub Sponsors](${sponsorsUrl})`;
+    const markdownCommitActivity = `![Matriz de Hábitos](${commitActivityUrl})`;
     const markdownViews = `![Visitas de Perfil](${viewsUrl})`;
 
     if (markdownStatsCode) markdownStatsCode.textContent = markdownStats;
@@ -1164,6 +1304,7 @@ import Footer from '@/components/Footer.astro';
     if (markdownTrophiesCode) markdownTrophiesCode.textContent = markdownTrophies;
     if (markdownTopReposCode) markdownTopReposCode.textContent = markdownTopRepos;
     if (markdownSponsorsCode) markdownSponsorsCode.textContent = markdownSponsors;
+    if (markdownCommitActivityCode) markdownCommitActivityCode.textContent = markdownCommitActivity;
     if (markdownViewsCode) markdownViewsCode.textContent = markdownViews;
 
     codeBlockWrappers.forEach((cb) => {
@@ -1325,9 +1466,12 @@ import Footer from '@/components/Footer.astro';
   setupImageEvents(trophiesImg, trophiesPlaceholder, 'Error al cargar trofeos.');
   setupImageEvents(topReposImg, topReposPlaceholder, 'Error al cargar repositorios.');
   setupImageEvents(sponsorsImg, sponsorsPlaceholder, 'Error al cargar sponsors.');
+  setupImageEvents(commitActivityImg, commitActivityPlaceholder, 'Error al cargar matriz de hábitos.');
   setupImageEvents(viewsImg, viewsPlaceholder, 'Error al cargar contador de visitas.');
 
   // Setup Clipboard Copy handlers
+  const btnCopyCommitActivity = document.getElementById('btn-copy-commit-activity');
+
   setupCopyButton(btnCopyStats, markdownStatsCode);
   setupCopyButton(btnCopyLanguages, markdownLanguagesCode);
   setupCopyButton(btnCopyRepo, markdownRepoCode);
@@ -1336,6 +1480,7 @@ import Footer from '@/components/Footer.astro';
   setupCopyButton(btnCopyTrophies, markdownTrophiesCode);
   setupCopyButton(btnCopyTopRepos, markdownTopReposCode);
   setupCopyButton(btnCopySponsors, markdownSponsorsCode);
+  setupCopyButton(btnCopyCommitActivity, markdownCommitActivityCode);
   setupCopyButton(btnCopyViews, markdownViewsCode);
 
   // Setup Sample README.md copy button
@@ -1678,11 +1823,11 @@ import Footer from '@/components/Footer.astro';
         showStatus(data.message, 'success');
         resetAppUI();
       } else {
-        alert(data.error || 'Error al intentar purgar los datos.');
+        showToast(data.error || 'Error al intentar purgar los datos.', 'error');
       }
     } catch (err) {
       console.error(err);
-      alert('Error de red al intentar purgar los datos.');
+      showToast('Error de red al intentar purgar los datos.', 'error');
     } finally {
       globalLoading.classList.add('hidden');
     }
@@ -1721,6 +1866,12 @@ import Footer from '@/components/Footer.astro';
       }, 300);
     }, 2700);
   }
+
+  document.addEventListener('app:toast', ((e: CustomEvent) => {
+    if (e.detail && e.detail.message) {
+      showToast(e.detail.message, e.detail.type || 'success');
+    }
+  }) as EventListener);
 
   function setupCopyButton(button: HTMLElement | null, codeElement: HTMLElement | null) {
     if (!button || !codeElement) return;

@@ -1,54 +1,298 @@
-<!-- Private Token Panel -->
-<section
-  class="token-panel glass-card"
-  style="padding: 24px; display: flex; flex-direction: column; gap: 16px; width: 100%"
+<!-- Private Token & Account Panel -->
+<div
+  class="token-panel"
+  style="display: flex; flex-direction: column; gap: 14px; width: 100%"
 >
-  <h2
-    class="section-title"
+  <!-- Active Account Dashboard (Visible when logged in) -->
+  <div id="token-registered" class="hidden" style="padding: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 4px;">
+    <div
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--glass-border);
+      "
+    >
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div
+          style="
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 0.95rem;
+          "
+          id="user-avatar-initial"
+        >
+          @
+        </div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-primary);" id="connected-username-display">
+            @octocat
+          </div>
+          <div style="font-size: 0.72rem; color: #4ade80; display: flex; align-items: center; gap: 4px;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #4ade80; display: inline-block;"></span>
+            <span id="connected-token-type">GitHub App Activa</span>
+          </div>
+        </div>
+      </div>
+
+      <button
+        id="btn-disconnect-account"
+        class="theme-option"
+        style="padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; height: 30px;"
+        data-i18n="disconnect_account_btn"
+      >
+        Desconectar
+      </button>
+    </div>
+
+    <!-- Personal User Metrics Dashboard Grid -->
+    <div style="margin-bottom: 12px;">
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 8px;
+        "
+      >
+        <div class="glass-card" style="padding: 8px 10px; text-align: center; border-radius: 6px;">
+          <div style="font-size: 0.68rem; color: var(--text-secondary);" data-i18n="user_views_label">Visitas Perfil</div>
+          <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-color); margin-top: 2px;" id="metric-profile-views">0</div>
+        </div>
+        <div class="glass-card" style="padding: 8px 10px; text-align: center; border-radius: 6px;">
+          <div style="font-size: 0.68rem; color: var(--text-secondary);" data-i18n="card_renders_label">Renders Cards</div>
+          <div style="font-size: 1.1rem; font-weight: 700; color: #4ade80; margin-top: 2px;" id="metric-card-renders">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger Zone / Account Deletion Trigger -->
+    <div>
+      <button
+        id="btn-open-purge-modal"
+        class="danger-btn"
+        style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; font-size: 0.75rem; height: 32px; padding: 0 12px; width: 100%; font-weight: 600; border-radius: 6px;"
+        data-i18n="delete_account_btn"
+      >
+        Eliminar Mi Cuenta y Datos
+      </button>
+    </div>
+  </div>
+
+  <!-- Mode Selection Tabs Header -->
+  <div
+    id="auth-tabs-nav"
+    class="auth-tabs-nav"
     style="
-      margin-bottom: 8px;
-      font-size: 1.25rem;
       display: flex;
-      align-items: center;
-      gap: 8px;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
     "
   >
-    <span data-i18n="private_stats_title">Estadísticas Privadas</span>
-    <span
-      id="private-stats-badge"
+    <button
+      type="button"
+      id="mode-tab-public"
+      class="mode-tab-btn active"
       style="
-        font-size: 0.7rem;
-        background: rgba(245, 158, 11, 0.15);
-        color: #f59e0b;
-        padding: 2px 8px;
-        border-radius: 9999px;
+        flex: 1;
+        padding: 8px 4px;
+        border-radius: 8px;
+        border: none;
+        background: rgba(88, 166, 255, 0.2);
+        color: var(--text-primary);
+        cursor: pointer;
+        font-size: 0.8rem;
         font-weight: 600;
-        border: 1px solid rgba(245, 158, 11, 0.2);
+        transition: all 0.2s ease;
+        text-align: center;
       "
-      >Coming Soon</span
     >
-  </h2>
-
-  <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4">
-    <span data-i18n="private_stats_desc">Para incluir tus repositorios privados, registra un Token Personal (PAT). Tus datos se cifran en el servidor.</span>
-    <a
-      href="/help/tokens"
-      target="_blank"
-      rel="noopener noreferrer"
-      style="color: var(--accent-color); text-decoration: none; font-weight: 500"
-      data-i18n="private_stats_guide"
-      >Leer Guía de Ayuda &rarr;</a
+      🌐 Público
+    </button>
+    <button
+      type="button"
+      id="mode-tab-app"
+      class="mode-tab-btn"
+      style="
+        flex: 1;
+        padding: 8px 4px;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-align: center;
+      "
     >
-  </p>
+      ⚡ GitHub App
+    </button>
+    <button
+      type="button"
+      id="mode-tab-pat"
+      class="mode-tab-btn"
+      style="
+        flex: 1;
+        padding: 8px 4px;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-align: center;
+      "
+    >
+      🔑 PAT
+    </button>
+  </div>
 
-  <div
-    id="token-form-container"
-    style="opacity: 0.55; pointer-events: none"
-    title="Esta característica estará disponible próximamente"
-  >
-    <!-- State: Unregistered -->
-    <div id="token-unregistered" class="">
-      <div class="input-group" style="margin-bottom: 12px">
+  <!-- TAB PANE 1: PUBLICO -->
+  <div id="mode-pane-public" class="mode-tab-pane">
+    <div class="tab-help-box" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+        <span style="font-weight: 700; font-size: 0.8rem; color: #38bdf8;">🌐 Modo Público (Sin Cuenta)</span>
+        <a href="/help/github-profile" target="_blank" rel="noopener noreferrer" title="Ver guía del modo público" style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(56, 189, 248, 0.18); color: #38bdf8; text-decoration: none; font-size: 0.78rem; font-weight: 800; transition: all 0.2s ease;">?</a>
+      </div>
+      <ul style="margin: 0; padding-left: 16px; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45;">
+        <li><b>Lo que obtienes:</b> Tarjetas de repositorios públicos, lenguajes y contador de visitas.</li>
+        <li><b>Ventaja:</b> No requiere inicio de sesión ni permisos.</li>
+        <li><b>Limitación:</b> Excluye repositorios y organizaciones privadas.</li>
+      </ul>
+    </div>
+
+    <!-- Step 1: Username & Optional Repo -->
+    <div class="input-group">
+      <label for="username-input" class="input-label" data-i18n="username_label">Usuario de GitHub</label>
+      <div class="input-wrapper">
+        <span class="input-prefix">@</span>
+        <input
+          type="text"
+          id="username-input"
+          placeholder="ej. github"
+          data-i18n-placeholder="username_placeholder"
+          autocomplete="off"
+          required
+        />
+      </div>
+    </div>
+
+    <div class="input-group" style="margin-top: 10px;">
+      <label for="repo-input" class="input-label" data-i18n="repo_label">Repositorio Específico (Opcional)</label>
+      <div class="input-wrapper">
+        <span class="input-prefix">
+          <svg
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="margin-right: 4px"
+            aria-hidden="true"
+          >
+            <path
+              d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+            ></path>
+          </svg>
+        </span>
+        <input
+          type="text"
+          id="repo-input"
+          placeholder="ej. github-helpers (o el más popular)"
+          data-i18n-placeholder="repo_placeholder"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+
+    <button
+      id="btn-generate"
+      class="primary-btn full-width-btn"
+      style="margin-top: 14px; margin-bottom: 4px; width: 100%"
+      data-i18n="btn_generate"
+    >
+      Generar Tarjetas
+    </button>
+  </div>
+
+  <!-- TAB PANE 2: GITHUB APP -->
+  <div id="mode-pane-app" class="mode-tab-pane hidden">
+    <div class="tab-help-box" style="background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+        <span style="font-weight: 700; font-size: 0.8rem; color: #4ade80;">⚡ GitHub App (Recomendado)</span>
+        <a href="/help/security" target="_blank" rel="noopener noreferrer" title="Ver guía de seguridad y permisos de la App" style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(74, 222, 128, 0.18); color: #4ade80; text-decoration: none; font-size: 0.78rem; font-weight: 800; transition: all 0.2s ease;">?</a>
+      </div>
+      <ul style="margin: 0; padding-left: 16px; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45;">
+        <li><b>Lo que obtienes:</b> Agregación automática de tus repositorios personales y de organizaciones privadas.</li>
+        <li><b>Ventajas:</b> Conexión 1-clic con OAuth de solo lectura. Sin contraseñas ni tokens expuestos.</li>
+        <li><b>Seguridad:</b> Cero acceso a tu código fuente; solo metadatos y conteo de commits.</li>
+      </ul>
+    </div>
+
+    <div id="token-unregistered">
+      <a
+        id="btn-github-oauth"
+        href="/api/auth/github"
+        class="primary-btn"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          height: 42px;
+          font-size: 0.92rem;
+          text-decoration: none;
+          background: #24292f;
+          color: #ffffff;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 8px;
+          font-weight: 600;
+          transition: all 0.2s ease;
+        "
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        <span data-i18n="connect_github_app">Conectar con GitHub App</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- TAB PANE 3: TOKEN PAT -->
+  <div id="mode-pane-pat" class="mode-tab-pane hidden">
+    <div class="tab-help-box" style="background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+        <span style="font-weight: 700; font-size: 0.8rem; color: #a855f7;">🔑 Personal Access Token (PAT)</span>
+        <a href="/help/tokens" target="_blank" rel="noopener noreferrer" title="Ver guía para generar un PAT Fine-grained" style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(168, 85, 247, 0.18); color: #a855f7; text-decoration: none; font-size: 0.78rem; font-weight: 800; transition: all 0.2s ease;">?</a>
+      </div>
+      <ul style="margin: 0; padding-left: 16px; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45;">
+        <li><b>Lo que obtienes:</b> Acceso a repositorios privados seleccionados mediante token manual.</li>
+        <li><b>Cifrado:</b> Almacenamiento cifrado hermético con AES-256 en PostgreSQL.</li>
+        <li><b>Revocación:</b> Puedes eliminar o revocar tu token cuando desees en 1-clic.</li>
+      </ul>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div class="input-group">
         <label for="token-username" class="input-label" style="font-size: 0.8rem" data-i18n="private_stats_username"
           >Usuario de GitHub</label
         >
@@ -60,12 +304,11 @@
             placeholder="ej. octocat"
             style="font-size: 0.85rem"
             autocomplete="off"
-            disabled
           />
         </div>
       </div>
 
-      <div class="input-group" style="margin-bottom: 12px">
+      <div class="input-group">
         <label for="token-input" class="input-label" style="font-size: 0.8rem" data-i18n="private_stats_pat"
           >Personal Access Token (PAT)</label
         >
@@ -76,7 +319,6 @@
             placeholder="github_pat_..."
             style="font-size: 0.85rem; padding-left: 12px"
             autocomplete="off"
-            disabled
           />
         </div>
       </div>
@@ -84,13 +326,12 @@
       <!-- Consent Checkbox -->
       <div
         class="consent-wrapper"
-        style="display: flex; gap: 8px; align-items: flex-start; margin-bottom: 16px"
+        style="display: flex; gap: 8px; align-items: flex-start;"
       >
         <input
           type="checkbox"
           id="token-consent"
           style="margin-top: 3px; cursor: pointer"
-          disabled
         />
         <label
           for="token-consent"
@@ -103,7 +344,7 @@
           "
           data-i18n="private_stats_consent"
         >
-          Acepto que esta aplicación guarde mi token cifrado en su base de datos para consultar mis estadísticas. Puedo revocarlo cuando quiera.
+          Acepto guardar mi token cifrado para consultar mis estadísticas. Puedo revocarlo cuando quiera.
         </label>
       </div>
 
@@ -111,98 +352,10 @@
         id="btn-save-token"
         class="primary-btn"
         style="width: 100%; height: 38px; font-size: 0.9rem"
-        disabled
         data-i18n="private_stats_register_btn"
       >
-        Registrar Token
+        Registrar Token PAT
       </button>
-    </div>
-
-    <!-- State: Registered -->
-    <div id="token-registered" class="hidden" style="text-align: center; padding: 10px 0">
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          color: #4ade80;
-          font-size: 0.9rem;
-          margin-bottom: 12px;
-          font-weight: 500;
-        "
-      >
-        <svg
-          viewBox="0 0 24 24"
-          width="18"
-          height="18"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        <span data-i18n="private_stats_active_label">Token Registrado Activo</span>
-      </div>
-      <p
-        style="
-          color: var(--text-secondary);
-          font-size: 0.8rem;
-          margin-bottom: 16px;
-          line-height: 1.3;
-        "
-        data-i18n="private_stats_active_desc"
-      >
-        Tus repositorios privados ya se están sumando en las consultas.
-      </p>
-
-      <!-- Deletion Verification Field -->
-      <div
-        class="input-group"
-        id="revoke-verification-group"
-        style="margin-bottom: 12px; text-align: left"
-      >
-        <label
-          for="token-revoke-input"
-          class="input-label"
-          style="font-size: 0.8rem; color: var(--error-color)"
-          data-i18n="private_stats_revoke_label"
-          >Introduce tu token para confirmar revocación</label
-        >
-        <div class="input-wrapper" style="height: 38px">
-          <input
-            type="password"
-            id="token-revoke-input"
-            placeholder="Introduce cualquier token tuyo"
-            style="font-size: 0.85rem; padding-left: 12px"
-            autocomplete="off"
-          />
-        </div>
-      </div>
-
-      <button id="btn-revoke-token" class="danger-btn" data-i18n="private_stats_revoke_btn">Revocar Token</button>
-
-      <div style="margin: 16px 0; border-top: 1px dashed var(--glass-border);"></div>
-
-      <div style="text-align: left; margin-bottom: 12px;">
-        <span
-          style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 6px;"
-          data-i18n="private_stats_purge_label"
-        >
-          ¿Deseas eliminar todo tu registro de forma permanente?
-        </span>
-        <button
-          id="btn-open-purge-modal"
-          class="danger-btn"
-          style="background: transparent; border: 1px solid var(--error-color); color: var(--error-color); font-size: 0.8rem; height: 32px; padding: 0 12px; width: auto; font-weight: 500;"
-          data-i18n="private_stats_purge_open_btn"
-        >
-          Eliminar todos mis datos
-        </button>
-      </div>
     </div>
   </div>
 
@@ -213,9 +366,9 @@
     style="font-size: 0.8rem; padding: 10px; border-radius: 6px; text-align: center"
   >
   </div>
-</section>
+</div>
 
-<!-- Purge Data Modal -->
+<!-- Purge / Account Deletion Modal -->
 <div
   id="purge-modal"
   class="hidden"
@@ -245,12 +398,12 @@
         <line x1="12" y1="17" x2="12.01" y2="17"></line>
       </svg>
       <div>
-        <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0; line-height: 1.2;" data-i18n="purge_modal_title">
-          Eliminar todos mis datos
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0; line-height: 1.2;" data-i18n="delete_account_modal_title">
+          Confirmar Eliminación de Cuenta
         </h3>
         <p
           style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 6px; line-height: 1.4;"
-          data-i18n="purge_modal_desc"
+          data-i18n="delete_account_modal_desc"
         >
           Esta acción es <strong>permanente e irreversible</strong>. Eliminará tu token cifrado, tu historial de estadísticas, tus métricas de consumo de cards y todos tus registros de logs del servidor.
         </p>
@@ -270,21 +423,9 @@
             placeholder="ej. octocat"
             style="font-size: 0.85rem;"
             autocomplete="off"
-          />
-        </div>
-      </div>
-
-      <div class="input-group">
-        <label for="purge-token" class="input-label" style="font-size: 0.8rem;" data-i18n="purge_modal_token_label"
-          >Introduce tu Token de Acceso para autorizar</label
-        >
-        <div class="input-wrapper" style="height: 38px;">
-          <input
-            type="password"
-            id="purge-token"
-            placeholder="github_pat_..."
-            style="font-size: 0.85rem; padding-left: 12px;"
-            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
           />
         </div>
       </div>
@@ -302,7 +443,8 @@
       <button
         id="btn-confirm-purge"
         class="danger-btn"
-        style="width: auto; height: 38px; padding: 0 20px; font-size: 0.85rem; opacity: 0.5; pointer-events: none;"
+        style="width: auto; height: 38px; padding: 0 20px; font-size: 0.85rem; opacity: 0.5; pointer-events: none; cursor: not-allowed;"
+        disabled
         data-i18n="purge_modal_confirm_btn"
       >
         Eliminar todo definitivamente
@@ -310,3 +452,208 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Dynamic client script for OAuth status & personal metrics handling
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authSuccess = urlParams.get('auth_success');
+    const authUsername = urlParams.get('username');
+
+    const tokenUnregistered = document.getElementById('token-unregistered');
+    const tokenRegistered = document.getElementById('token-registered');
+    const connectedUsernameDisplay = document.getElementById('connected-username-display');
+    const userAvatarInitial = document.getElementById('user-avatar-initial');
+    const metricProfileViews = document.getElementById('metric-profile-views');
+    const metricCardRenders = document.getElementById('metric-card-renders');
+    const btnDisconnectAccount = document.getElementById('btn-disconnect-account');
+    const btnOpenPurgeModal = document.getElementById('btn-open-purge-modal');
+    const purgeModal = document.getElementById('purge-modal');
+    const btnClosePurge = document.getElementById('btn-close-purge');
+    const btnConfirmPurge = document.getElementById('btn-confirm-purge');
+    const purgeUsernameInput = document.getElementById('purge-username') as HTMLInputElement;
+
+    // Tab elements
+    const modeTabPublic = document.getElementById('mode-tab-public');
+    const modeTabApp = document.getElementById('mode-tab-app');
+    const modeTabPat = document.getElementById('mode-tab-pat');
+
+    const modePanePublic = document.getElementById('mode-pane-public');
+    const modePaneApp = document.getElementById('mode-pane-app');
+    const modePanePat = document.getElementById('mode-pane-pat');
+
+    function switchModeTab(targetTab: string) {
+      [modeTabPublic, modeTabApp, modeTabPat].forEach(btn => {
+        if (btn) {
+          btn.classList.remove('active');
+          btn.style.background = 'transparent';
+          btn.style.color = 'var(--text-secondary)';
+        }
+      });
+      [modePanePublic, modePaneApp, modePanePat].forEach(pane => {
+        if (pane) pane.classList.add('hidden');
+      });
+
+      if (targetTab === 'public' && modeTabPublic && modePanePublic) {
+        modeTabPublic.classList.add('active');
+        modeTabPublic.style.background = 'rgba(88, 166, 255, 0.2)';
+        modeTabPublic.style.color = 'var(--text-primary)';
+        modePanePublic.classList.remove('hidden');
+      } else if (targetTab === 'app' && modeTabApp && modePaneApp) {
+        modeTabApp.classList.add('active');
+        modeTabApp.style.background = 'rgba(88, 166, 255, 0.2)';
+        modeTabApp.style.color = 'var(--text-primary)';
+        modePaneApp.classList.remove('hidden');
+      } else if (targetTab === 'pat' && modeTabPat && modePanePat) {
+        modeTabPat.classList.add('active');
+        modeTabPat.style.background = 'rgba(88, 166, 255, 0.2)';
+        modeTabPat.style.color = 'var(--text-primary)';
+        modePanePat.classList.remove('hidden');
+      }
+    }
+
+    modeTabPublic?.addEventListener('click', () => switchModeTab('public'));
+    modeTabApp?.addEventListener('click', () => switchModeTab('app'));
+    modeTabPat?.addEventListener('click', () => switchModeTab('pat'));
+
+    let activeUser = authUsername || localStorage.getItem('gh_active_user') || '';
+
+    if (authSuccess === '1' && authUsername) {
+      localStorage.setItem('gh_active_user', authUsername);
+    }
+
+    const authTabsNav = document.getElementById('auth-tabs-nav');
+
+    async function loadUserMetrics(username: string) {
+      if (!username) return;
+      try {
+        const res = await fetch(`/api/users/me/metrics?username=${encodeURIComponent(username)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.connected) {
+          tokenRegistered?.classList.remove('hidden');
+          authTabsNav?.classList.add('hidden');
+          [modePanePublic, modePaneApp, modePanePat].forEach(pane => {
+            if (pane) pane.classList.add('hidden');
+          });
+          const usernameInput = document.getElementById('username-input') as HTMLInputElement;
+          if (usernameInput && !usernameInput.value) {
+            usernameInput.value = data.username;
+          }
+          if (connectedUsernameDisplay) connectedUsernameDisplay.textContent = `@${data.username}`;
+          if (userAvatarInitial) userAvatarInitial.textContent = data.username.charAt(0).toUpperCase();
+          if (metricProfileViews) metricProfileViews.textContent = String(data.metrics.profile_views || 0);
+          if (metricCardRenders) {
+            const totalRenders = (data.metrics.stats_renders || 0) +
+                                 (data.metrics.languages_renders || 0) +
+                                 (data.metrics.repo_renders || 0) +
+                                 (data.metrics.streak_renders || 0) +
+                                 (data.metrics.rank_renders || 0) +
+                                 (data.metrics.trophies_renders || 0) +
+                                 (data.metrics.sponsors_renders || 0) +
+                                 (data.metrics.commit_activity_renders || 0);
+            metricCardRenders.textContent = String(totalRenders);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching user metrics:', err);
+      }
+    }
+
+    if (activeUser) {
+      loadUserMetrics(activeUser);
+    }
+
+    btnDisconnectAccount?.addEventListener('click', async () => {
+      if (!activeUser) return;
+      try {
+        const res = await fetch('/api/auth/disconnect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: activeUser })
+        });
+        if (res.ok) {
+          localStorage.removeItem('gh_active_user');
+          tokenRegistered?.classList.add('hidden');
+          authTabsNav?.classList.remove('hidden');
+          switchModeTab('public');
+        }
+      } catch (err) {
+        console.error('Error disconnecting account:', err);
+      }
+    });
+
+    function validatePurgeInput() {
+      if (!purgeUsernameInput || !btnConfirmPurge) return;
+      const typed = purgeUsernameInput.value.trim().toLowerCase();
+      const target = activeUser.trim().toLowerCase();
+
+      if (typed !== '' && (typed === target || typed === `@${target}`)) {
+        btnConfirmPurge.removeAttribute('disabled');
+        btnConfirmPurge.style.opacity = '1';
+        btnConfirmPurge.style.pointerEvents = 'auto';
+        btnConfirmPurge.style.cursor = 'pointer';
+      } else {
+        btnConfirmPurge.setAttribute('disabled', 'true');
+        btnConfirmPurge.style.opacity = '0.5';
+        btnConfirmPurge.style.pointerEvents = 'none';
+        btnConfirmPurge.style.cursor = 'not-allowed';
+      }
+    }
+
+    purgeUsernameInput?.addEventListener('input', validatePurgeInput);
+
+    // Prevent paste and drag-and-drop to require manual typing confirmation
+    purgeUsernameInput?.addEventListener('paste', (e) => {
+      e.preventDefault();
+    });
+
+    purgeUsernameInput?.addEventListener('drop', (e) => {
+      e.preventDefault();
+    });
+
+    btnOpenPurgeModal?.addEventListener('click', () => {
+      purgeModal?.classList.remove('hidden');
+      if (purgeUsernameInput) {
+        purgeUsernameInput.value = '';
+        purgeUsernameInput.focus();
+      }
+      validatePurgeInput();
+    });
+
+    btnClosePurge?.addEventListener('click', () => {
+      purgeModal?.classList.add('hidden');
+    });
+
+    function triggerToast(message: string, type: 'success' | 'error' = 'success') {
+      document.dispatchEvent(new CustomEvent('app:toast', { detail: { message, type } }));
+    }
+
+    btnConfirmPurge?.addEventListener('click', async () => {
+      const usernameToPurge = purgeUsernameInput?.value.trim().replace(/^@/, '');
+      if (!usernameToPurge) return;
+      try {
+        const res = await fetch(`/api/users/me?username=${encodeURIComponent(usernameToPurge)}`, {
+          method: 'DELETE'
+        });
+        if (res.ok) {
+          localStorage.removeItem('gh_active_user');
+          localStorage.removeItem('registered-github-username');
+          sessionStorage.clear();
+          purgeModal?.classList.add('hidden');
+          tokenRegistered?.classList.add('hidden');
+          tokenUnregistered?.classList.remove('hidden');
+          triggerToast('Tu cuenta y todos tus datos fueron eliminados correctamente.', 'success');
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1200);
+        } else {
+          triggerToast('Error al intentar eliminar la cuenta.', 'error');
+        }
+      } catch (err) {
+        console.error('Error purging account:', err);
+        triggerToast('Error de red al intentar eliminar la cuenta.', 'error');
+      }
+    });
+  });
+</script>

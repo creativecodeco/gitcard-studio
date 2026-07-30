@@ -1,0 +1,157 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<BaseLayout
+  title="Guía de Integración con Organizaciones de GitHub | GitHub Helpers"
+  description="Aprende cómo autorizar el acceso a tus organizaciones de GitHub y mostrar contribuciones privadas en tus tarjetas de perfil."
+>
+  <header class="app-header">
+    <div class="header-top-row">
+      <a href="/" class="logo" style="text-decoration: none">
+        <svg
+          class="logo-icon"
+          viewBox="0 0 24 24"
+          width="36"
+          height="36"
+          fill="none"
+          stroke="url(#logo-grad)"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8"></stop>
+              <stop offset="100%" stop-color="#a855f7"></stop>
+            </linearGradient>
+          </defs>
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <h1 style="margin: 0">GitHub <span class="accent-text">Helpers</span></h1>
+      </a>
+    </div>
+  </header>
+
+  <main class="help-content">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/help">Centro de Ayuda</a>
+      <span class="separator">/</span>
+      <span class="current">Estadísticas de Organizaciones</span>
+    </nav>
+
+    <div class="help-header">
+      <h2>Cómo Mostrar Contribuciones de Organizaciones y Repos Privados</h2>
+      <p style="color: var(--text-secondary); margin-top: 10px">
+        Guía paso a paso para autorizar el acceso de la aplicación a tus organizaciones en GitHub y sumar todas tus métricas de trabajo.
+      </p>
+    </div>
+
+    <section class="help-section">
+      <h3>1. Habilitar Contribuciones Privadas en tu Perfil de GitHub</h3>
+      <p>
+        Por defecto, la API GraphQL de GitHub solo reporta métricas públicas a menos que indiques explícitamente en tu cuenta de GitHub que deseas incluir tu actividad privada.
+      </p>
+      <ol class="steps-list">
+        <li>Ingresa a tu cuenta de GitHub y dirígete a <strong>Settings &rarr; Profile</strong>.</li>
+        <li>Baja hasta la sección <strong>Contributions & Activity</strong>.</li>
+        <li>Marca la casilla <strong>Include private contributions on my profile</strong>.</li>
+        <li>Haz clic en <strong>Update profile</strong> para guardar los cambios.</li>
+      </ol>
+    </section>
+
+    <section class="help-section">
+      <h3>2. Autorizar Acceso a Organizaciones en GitHub App</h3>
+      <p>
+        Si formas parte de una o más Organizaciones en GitHub (como propietario o miembro), la GitHub App de <strong>GitHub Helpers</strong> solicitará acceso de solo lectura para listar tus métricas agregadas:
+      </p>
+      <ol class="steps-list">
+        <li>Al hacer clic en <strong>Conectar con GitHub App</strong> en nuestra plataforma, serás redirigido a la pantalla oficial de autorización de GitHub.</li>
+        <li>En la sección <strong>Organization Access</strong>, verás el listado de tus organizaciones.</li>
+        <li>Junto a cada organización a la que perteneces, haz clic en el botón <strong>Grant</strong> (Conceder) o <strong>Request</strong> (Solicitar acceso al administrador).</li>
+        <li>Si eres propietario de la organización, el acceso se otorgará inmediatamente. Si eres miembro, se enviará una notificación a los administradores para su aprobación.</li>
+      </ol>
+    </section>
+
+    <section class="help-section">
+      <h3>3. Configuración para Personal Access Tokens (PAT)</h3>
+      <p>
+        Si prefieres usar un token PAT Fine-grained manual en lugar de GitHub App:
+      </p>
+      <ol class="steps-list">
+        <li>Al generar tu token en <strong>GitHub Settings &rarr; Developer Settings &rarr; Personal access tokens &rarr; Fine-grained tokens</strong>.</li>
+        <li>En el campo <strong>Resource owner</strong>, selecciona la Organización específica que deseas autorizar.</li>
+        <li>En <strong>Repository access</strong>, marca <em>All repositories</em> o selecciona los repositorios privados específicos.</li>
+        <li>En <strong>Permissions &rarr; Repository permissions</strong>, asigna únicamente <code>Metadata: Read-only</code>.</li>
+      </ol>
+    </section>
+
+    <section class="help-section" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); padding: 20px; border-radius: 12px;">
+      <h3 style="margin-top: 0; color: #38bdf8;">¿Preguntas Frecuentes?</h3>
+      <p><strong>¿GitHub Helpers tiene acceso al código fuente de mis organizaciones?</strong></p>
+      <p style="color: var(--text-secondary); margin-bottom: 0;">
+        <strong>No.</strong> Nuestra aplicación solo solicita permisos de metadatos (conteo de estrellas, forks, commits e idiomas utilizados). Nunca leemos, almacenamos ni descargamos código fuente de tus repositorios.
+      </p>
+    </section>
+
+    <div class="help-footer-nav" style="margin-top: 40px; display: flex; justify-content: space-between; gap: 16px;">
+      <a href="/help/security" class="secondary-btn">&larr; Seguridad y Cifrado</a>
+      <a href="/help/tokens" class="primary-btn">Guía de Tokens PAT &rarr;</a>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .help-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px 80px 20px;
+  }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+  }
+  .breadcrumb a {
+    color: var(--accent-color);
+    text-decoration: none;
+  }
+  .breadcrumb .current {
+    color: var(--text-primary);
+  }
+  .help-header h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .help-section {
+    margin-top: 36px;
+  }
+  .help-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+  }
+  .help-section p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .steps-list {
+    margin-top: 16px;
+    padding-left: 20px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .steps-list li {
+    margin-bottom: 10px;
+  }
+  .steps-list strong {
+    color: var(--text-primary);
+  }
+</style>

@@ -17,6 +17,11 @@ export interface BackendMessages {
   readonly metricsHistoryError: string;
   readonly userMetricsError: string;
   readonly userCountError: string;
+  readonly githubAppNotConfigured: string;
+  readonly oauthStateMismatch: string;
+  readonly oauthExchangeError: string;
+  readonly userMetricsFetchError: string;
+  readonly accountDisconnectSuccess: string;
 }
 
 const messages: Record<SupportedLocale, BackendMessages> = {
@@ -39,6 +44,11 @@ const messages: Record<SupportedLocale, BackendMessages> = {
     metricsHistoryError: 'Error interno al obtener el historial de métricas.',
     userMetricsError: 'Error interno al obtener las métricas de usuarios.',
     userCountError: 'Error interno al obtener el conteo de usuarios.',
+    githubAppNotConfigured: 'La aplicación de GitHub no está configurada en el servidor (GITHUB_CLIENT_ID).',
+    oauthStateMismatch: 'Error de verificación de estado (CSRF state mismatch). Intenta de nuevo.',
+    oauthExchangeError: 'Error al intercambiar el código de autorización con GitHub.',
+    userMetricsFetchError: 'Error al obtener las métricas personales del usuario.',
+    accountDisconnectSuccess: 'Tu cuenta de GitHub ha sido desconectada exitosamente.'
   },
   en: {
     invalidGithubUser: 'Invalid GitHub username.',
@@ -58,6 +68,11 @@ const messages: Record<SupportedLocale, BackendMessages> = {
     metricsHistoryError: 'Internal error while fetching metrics history.',
     userMetricsError: 'Internal error while fetching user metrics.',
     userCountError: 'Internal error while fetching user count.',
+    githubAppNotConfigured: 'GitHub Application is not configured on server (GITHUB_CLIENT_ID).',
+    oauthStateMismatch: 'State verification error (CSRF state mismatch). Please try again.',
+    oauthExchangeError: 'Error exchanging authorization code with GitHub.',
+    userMetricsFetchError: 'Error fetching personal user metrics.',
+    accountDisconnectSuccess: 'Your GitHub account has been disconnected successfully.'
   },
 };
 

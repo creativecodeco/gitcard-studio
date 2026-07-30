@@ -11,7 +11,12 @@ export class TypeORMTokenRepository implements ITokenRepository {
     iv: string,
     consentAccepted: boolean,
     consentDate: string,
-    consentFingerprint: string
+    consentFingerprint: string,
+    tokenType: string = 'pat',
+    encryptedRefreshToken?: string,
+    refreshTokenIv?: string,
+    expiresAt?: string,
+    scopes?: string
   ): Promise<void> {
     try {
       const tokenRepo = AppDataSource.getRepository(UserTokenEntity);
@@ -23,6 +28,11 @@ export class TypeORMTokenRepository implements ITokenRepository {
           username: username.toLowerCase(),
           encrypted_token: encryptedToken,
           iv,
+          token_type: tokenType,
+          encrypted_refresh_token: encryptedRefreshToken ?? null,
+          refresh_token_iv: refreshTokenIv ?? null,
+          expires_at: expiresAt ? new Date(expiresAt) : null,
+          scopes: scopes ?? null,
           consent_accepted: consentAccepted,
           consent_date: new Date(consentDate),
           consent_fingerprint: consentFingerprint
@@ -31,6 +41,11 @@ export class TypeORMTokenRepository implements ITokenRepository {
           [
             'encrypted_token',
             'iv',
+            'token_type',
+            'encrypted_refresh_token',
+            'refresh_token_iv',
+            'expires_at',
+            'scopes',
             'consent_accepted',
             'consent_date',
             'consent_fingerprint',
@@ -55,6 +70,11 @@ export class TypeORMTokenRepository implements ITokenRepository {
         username: entity.username,
         encrypted_token: entity.encrypted_token,
         iv: entity.iv,
+        token_type: entity.token_type ?? 'pat',
+        encrypted_refresh_token: entity.encrypted_refresh_token ?? undefined,
+        refresh_token_iv: entity.refresh_token_iv ?? undefined,
+        expires_at: entity.expires_at ? entity.expires_at.toISOString() : undefined,
+        scopes: entity.scopes ?? undefined,
         consent_accepted: entity.consent_accepted ? 1 : 0, // Map boolean to number (1/0) for domain compatibility
         consent_date: entity.consent_date.toISOString(),
         consent_fingerprint: entity.consent_fingerprint,

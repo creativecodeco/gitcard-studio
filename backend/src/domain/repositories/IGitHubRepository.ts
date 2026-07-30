@@ -11,5 +11,6 @@ export interface IGitHubRepository {
   getUserTopRepos(username: string, limit?: number, userToken?: string): Promise<RepoStats[]>;
   getUserStreak(username: string, userToken?: string): Promise<StreakStats>;
   getUserSponsors(username: string, userToken?: string): Promise<SponsorStats>;
+  getUserCommitActivity(username: string, userToken?: string): Promise<{ username: string; totalCommitsThisYear: number; hourlyMatrix: number[][] }>;
   clearCache(username: string): void;
 }

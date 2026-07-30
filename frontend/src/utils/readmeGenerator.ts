@@ -10,10 +10,12 @@ export function generateSampleReadme(
   username: string,
   activeCards: CardItem[],
   locale: string = 'es',
-  layout: ReadmeLayout = 'vertical'
+  layout: ReadmeLayout = 'vertical',
+  generatorUrl?: string
 ): string {
   const cleanUsername = username.trim() || 'username';
   const isEn = locale === 'en';
+  const pageUrl = generatorUrl || `https://github-helpers.creativecode.com.co/?user=${encodeURIComponent(cleanUsername)}`;
 
   if (activeCards.length === 0) {
     return isEn
@@ -33,8 +35,8 @@ export function generateSampleReadme(
           .join('\n\n');
 
   const footer = isEn
-    ? `\n\n---\n*Generated with [GitHub Helpers](https://github.com/creativecodeco/github-helpers)*`
-    : `\n\n---\n*Generado con [GitHub Helpers](https://github.com/creativecodeco/github-helpers)*`;
+    ? `\n\n---\n*Generated with [GitHub Helpers](${pageUrl})*`
+    : `\n\n---\n*Generado con [GitHub Helpers](${pageUrl})*`;
 
   return `${header}\n${cardsMarkdown}${footer}`;
 }

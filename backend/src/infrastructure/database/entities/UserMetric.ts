@@ -48,6 +48,12 @@ export class UserMetric {
   sponsors_github!: number;
 
   @Column({ type: 'integer', default: 0 })
+  commit_activity_web!: number;
+
+  @Column({ type: 'integer', default: 0 })
+  commit_activity_github!: number;
+
+  @Column({ type: 'integer', default: 0 })
   profile_views!: number;
 
   @Column({ type: 'timestamp with time zone', nullable: true })

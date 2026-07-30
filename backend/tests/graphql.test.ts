@@ -99,7 +99,7 @@ describe('GitHub GraphQL API v4 Integration', () => {
       ok: true,
       json: async () => ({
         data: {
-          user: {
+          viewer: {
             login: 'patuser',
             name: 'PAT User',
             followers: { totalCount: 10 },

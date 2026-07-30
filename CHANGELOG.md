@@ -2,6 +2,26 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.7.0] - 2026-07-30
+
+### ✨ Matriz de Hábitos de Commit, Badges Personalizados y SEO de Alto Impacto
+- **Matriz de Hábitos de Commit (`/api/commit-activity`)**: Creado caso de uso `GetUserCommitActivityCardUseCase`, adaptador GraphQL para consultar `contributionCalendar` anual de GitHub API y presentador de mapa de calor semanal (grilla 7x24) de distribución horaria de commits con 7 temas de color.
+- **Insignias SVG Personalizadas & Contador de Vistas (`/api/badge`)**: Creado presentador `renderBadgeSVG` con diseño tipo Shields.io para representar el contador de visitas al perfil (`profile_views`) y grados/rangos del desarrollador en tarjetas livianas para incrustar en GitHub.
+- **Optimización SEO Avanzada & Rich Snippets**: Incorporado marcado estructurado JSON-LD `WebApplication` (Schema.org), etiquetas alternativas `hreflang` (`es`, `en`, `x-default`), meta etiquetas Open Graph/Twitter y 20 keywords/topics de alto impacto en búsqueda.
+- **Mejoras UX / UI en Generador de README**:
+  - Ocultamiento automático de la barra de pestañas de autenticación en `PrivateTokenModal.astro` cuando el usuario ya ha iniciado sesión.
+  - Corrección de la vista previa en tiempo real utilizando URLs `rawUrl` con marcas de tiempo (`timestamp`) para forzar la actualización del navegador e invalidar la caché antigua de la matriz de commits.
+  - Inclusión de las 10 tarjetas activas generadas exitosamente (incluyendo el contador de visitas) en la plantilla Markdown y vista previa HTML con enlace al generador web al pie.
+- **Suite de Gobernanza Abierta & Seguridad**: Creados los archivos oficiales [`CONTRIBUTING.md`](CONTRIBUTING.md), [`SECURITY.md`](SECURITY.md) y [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) con políticas OWASP, formato de contribución bilingüe y estándar Contributor Covenant v2.1.
+
+## [1.6.0] - 2026-07-29
+
+### ✨ Autenticación GitHub App & Dashboard de Métricas de Usuario
+- **Autorización Directa con GitHub App (OAuth Web Flow)**: Incorporado flujo completo de vinculación "Conectar con GitHub App" (`/api/auth/github` y `/api/auth/github/callback`) con soporte de **Refresh Tokens** automáticos (renovación transparente antes de la expiración de 8 horas) y alcance de solo lectura de metadata de repositorios públicos, privados y organizaciones.
+- **Opción de PAT Manual Secundaria**: Mantenida la alternativa de registrar un Personal Access Token (PAT) de forma secundaria para usuarios avanzados o despliegues self-hosted.
+- **Panel de Métricas Personales**: Añadido endpoint `/api/users/me/metrics` y componente frontend interactivo en `PrivateTokenModal.astro` para que los usuarios autenticados consulten sus propias métricas personales (visitas a perfil `profile_views` y conteo de renders de tarjetas de estadísticas, lenguajes, repositorios y racha).
+- **Eliminación Directa de Cuenta (GDPR)**: Incorporado el endpoint `DELETE /api/users/me` y modal de confirmación en la interfaz para permitir a los usuarios purgar de forma irreversible sus tokens cifrados y registros del servidor.
+
 ## [1.5.3] - 2026-07-28
 
 ### 🚀 Mejoras de Rendimiento, Accesibilidad y Resiliencia en Pruebas
@@ -296,4 +316,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.5.3
+**Versión actualmente expuesta / en producción:** v1.7.0

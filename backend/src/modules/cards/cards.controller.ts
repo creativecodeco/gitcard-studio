@@ -8,9 +8,11 @@ import { GetUserStreakCardUseCase } from '@/use-cases/cards/GetUserStreakCardUse
 import { GetUserTrophiesCardUseCase } from '@/use-cases/cards/GetUserTrophiesCardUseCase';
 import { GetUserTopReposCardUseCase } from '@/use-cases/cards/GetUserTopReposCardUseCase';
 import { GetUserSponsorsCardUseCase } from '@/use-cases/cards/GetUserSponsorsCardUseCase';
+import { GetUserCommitActivityCardUseCase } from '@/use-cases/cards/GetUserCommitActivityCardUseCase';
 import { RecordProfileViewUseCase } from '@/use-cases/metrics/RecordProfileViewUseCase';
 import { renderViewsBadge } from '@/adapters/presenters/viewsBadge';
 import { renderErrorCard } from '@/adapters/presenters/errorCard';
+import { renderBadgeSVG } from '@/adapters/presenters/badge.presenter';
 import { GITHUB_USERNAME_REGEX, GITHUB_REPO_REGEX } from '@/domain/entities/Validation';
 import { HitContext } from '@/domain/entities/Metrics';
 import { logger } from '@/infrastructure/logging/logger';
@@ -27,7 +29,8 @@ export class CardsController {
     private readonly trophiesCardUseCase: GetUserTrophiesCardUseCase,
     private readonly recordProfileViewUseCase: RecordProfileViewUseCase,
     private readonly topReposCardUseCase: GetUserTopReposCardUseCase,
-    private readonly sponsorsCardUseCase: GetUserSponsorsCardUseCase
+    private readonly sponsorsCardUseCase: GetUserSponsorsCardUseCase,
+    private readonly commitActivityCardUseCase: GetUserCommitActivityCardUseCase
   ) {}
 
   private async handleCardRequest(
@@ -234,5 +237,47 @@ export class CardsController {
     return this.handleCardRequest(query, userAgent, referer, ip, res, 'Sponsors', (u, t, o, h) =>
       this.sponsorsCardUseCase.execute(u, t, o, h)
     );
+  }
+
+  @Get('commit-activity')
+  async getCommitActivity(
+    @Query() query: Record<string, unknown>,
+    @Headers('user-agent') userAgent: string | undefined,
+    @Headers('referer') referer: string | undefined,
+    @Ip() ip: string,
+    @Res({ passthrough: true }) res: FastifyReply
+  ): Promise<string> {
+    const cardWidth = extractCardWidth(query);
+    return this.handleCardRequest(query, userAgent, referer, ip, res, 'CommitActivity', (u, t, o, h) =>
+      this.commitActivityCardUseCase.execute(u, t, o, cardWidth, h)
+    );
+  }
+
+  @Get('badge')
+  async getBadge(
+    @Query() query: Record<string, unknown>,
+    @Res({ passthrough: true }) res: FastifyReply
+  ): Promise<string> {
+    const rawUsername = query.username;
+    if (!rawUsername || typeof rawUsername !== 'string' || !GITHUB_USERNAME_REGEX.test(rawUsername.trim())) {
+      res.type('image/svg+xml').status(400);
+      return renderBadgeSVG({ label: 'github helpers', value: 'invalid user', valueColor: '#ef4444' });
+    }
+
+    const username = rawUsername.trim();
+    const type = typeof query.type === 'string' ? query.type : 'views';
+    const color = typeof query.color === 'string' ? `#${query.color.replace('#', '')}` : '#38bdf8';
+    const label = typeof query.label === 'string' ? query.label : (type === 'views' ? 'profile views' : 'github helpers');
+
+    let value = '1';
+    if (type === 'views') {
+      const views = await this.recordProfileViewUseCase.execute(username, undefined, undefined, true);
+      value = String(views);
+    }
+
+    res.header('Content-Type', 'image/svg+xml')
+       .header('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+
+    return renderBadgeSVG({ label, value, valueColor: color });
   }
 }

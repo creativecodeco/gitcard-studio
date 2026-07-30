@@ -8,7 +8,7 @@ import { logger } from '@/infrastructure/logging/logger';
 
 export class TypeORMMetricsRepository implements IMetricsRepository {
   recordHit(
-    type: 'stats' | 'languages' | 'repo' | 'rank' | 'streak' | 'trophies' | 'views' | 'sponsors',
+    type: 'stats' | 'languages' | 'repo' | 'rank' | 'streak' | 'trophies' | 'views' | 'sponsors' | 'commit-activity',
     context?: HitContext
   ): void {
     const username = context?.username || 'unknown';
@@ -28,16 +28,17 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
         .where('metric_key = :key', { key: 'totalRenders' })
         .execute();
 
+      const normalizedType = type === 'commit-activity' ? 'commit_activity' : type;
+      const metricKey = type === 'commit-activity' ? 'commitActivityRenders' : `${type}Renders`;
+      const column = `${normalizedType}_${source}`;
+
       // 2. Increment specific card type renders
       await transactionalEntityManager
         .createQueryBuilder()
         .update(GlobalMetric)
         .set({ metric_value: () => 'metric_value + 1' })
-        .where('metric_key = :key', { key: `${type}Renders` })
+        .where('metric_key = :key', { key: metricKey })
         .execute();
-
-      // 3. Upsert user metrics in a clean, concurrency-safe manner:
-      const column = `${type}_${source}`;
 
       // First, insert user row if not exists (using ON CONFLICT DO NOTHING / orIgnore)
       await transactionalEntityManager

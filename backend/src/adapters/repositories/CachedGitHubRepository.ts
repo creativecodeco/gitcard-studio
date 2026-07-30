@@ -91,6 +91,8 @@ export class CachedGitHubRepository implements IGitHubRepository {
     return data;
   }
 
+  private readonly commitActivityCache = new Map<string, { data: { username: string; totalCommitsThisYear: number; hourlyMatrix: number[][] }; timestamp: number }>();
+
   async getUserSponsors(username: string, userToken?: string): Promise<SponsorStats> {
     const cacheKey = `${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
     const cached = this.sponsorsCache.get(cacheKey);
@@ -101,6 +103,22 @@ export class CachedGitHubRepository implements IGitHubRepository {
 
     const data = await this.delegate.getUserSponsors(username, userToken);
     this.sponsorsCache.set(cacheKey, { data, timestamp: Date.now() });
+    return data;
+  }
+
+  async getUserCommitActivity(
+    username: string,
+    userToken?: string
+  ): Promise<{ username: string; totalCommitsThisYear: number; hourlyMatrix: number[][] }> {
+    const cacheKey = `${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
+    const cached = this.commitActivityCache.get(cacheKey);
+
+    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+      return cached.data;
+    }
+
+    const data = await this.delegate.getUserCommitActivity(username, userToken);
+    this.commitActivityCache.set(cacheKey, { data, timestamp: Date.now() });
     return data;
   }
 
