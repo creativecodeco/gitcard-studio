@@ -97,7 +97,7 @@ export class RootController {
     const encodedTheme = encodeURIComponent(targetTheme);
 
     const safeImageUrl = escapeXml(`${baseUrl}/api/stats?username=${encodedUser}&theme=${encodedTheme}`);
-    const safeTitle = escapeXml(`Tarjetas de estadísticas para @${targetUsername} | GitHub Helpers`);
+    const safeTitle = escapeXml(`Tarjetas de estadísticas para @${targetUsername} | GitCard Studio`);
     const safeDescription = escapeXml(
       `Mira las estadísticas, lenguajes más usados y trofeos de GitHub para @${targetUsername} generados dinámicamente.`
     );

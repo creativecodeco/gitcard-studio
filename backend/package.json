@@ -1,7 +1,7 @@
 {
-  "name": "github-helpers-backend",
-  "version": "1.7.1",
-  "description": "High-performance NestJS & Fastify API backend server for GitHub Helpers SVG stats card generation, OAuth integration, and metrics tracking.",
+  "name": "gitcard-studio-backend",
+  "version": "1.7.2",
+  "description": "High-performance NestJS & Fastify API backend server for GitCard Studio SVG stats card generation, OAuth integration, and metrics tracking.",
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
@@ -29,7 +29,7 @@
   "devDependencies": {
     "@nestjs/testing": "11.1.28",
     "@types/node": "26.1.2",
-    "@types/pg": "8.20.0",
+    "@types/pg": "8.20.1",
     "ts-node-dev": "2.0.0",
     "tsc-alias": "1.9.1",
     "tsconfig-paths": "4.2.0",
@@ -38,6 +38,7 @@
   },
   "overrides": {
     "brace-expansion": "5.0.8",
+    "fastify": "5.10.0",
     "find-my-way": "9.7.0"
   }
 }

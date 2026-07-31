@@ -1,4 +1,4 @@
-# GitHub Helpers - Stats Generator & Live API 🚀
+# GitCard Studio - Stats Generator & Live API 🚀
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/creativecodeco/github-helpers?style=flat-square)](https://github.com/creativecodeco/github-helpers/stargazers)
@@ -11,9 +11,9 @@
 <a name="-english-summary--quick-start"></a>
 ## 🌐 English Summary & Quick Start
 
-> **Generate dynamic and customizable SVG cards with your GitHub statistics to showcase your profile and projects.**
+> **Generate dynamic and customizable SVG cards with your GitHub & Git statistics to showcase your profile and projects.**
 
-**GitHub Helpers** is an open-source, production-grade microservice and web application built with **TypeScript, NestJS, and Astro**. It allows you to query real-time general stats, commit activity habits, streak counters, developer ranks, trophies, top repositories, and programming language distributions for any GitHub user, generating high-definition vector SVG cards ready to embed directly into your `README.md`.
+**GitCard Studio** is an open-source, production-grade microservice and web application built with **TypeScript, NestJS, and Astro**. It allows you to query real-time general stats, commit activity habits, streak counters, developer ranks, trophies, top repositories, and programming language distributions for any developer profile, generating high-definition vector SVG cards ready to embed directly into your `README.md`.
 
 Developed and maintained by **[CreativeCode.com.co](https://creativecode.com.co)**.
 
@@ -58,9 +58,9 @@ Interactively customize and preview your cards in real time at:
 <a name="-documentación-en-español"></a>
 ## 🇪🇸 Documentación en Español
 
-> **Genera tarjetas SVG dinámicas y personalizables con tus estadísticas de GitHub para destacar tu perfil y tus proyectos.**
+> **Genera tarjetas SVG dinámicas y personalizables con tus estadísticas para destacar tu perfil y tus proyectos.**
 
-**GitHub Helpers** es un microservicio y cliente web desarrollado en **Node.js con TypeScript, NestJS y Astro**. Permite consultar en tiempo real las estadísticas generales, matriz de hábitos de commit, trofeos y la distribución de lenguajes de cualquier usuario de GitHub, generando tarjetas vectoriales (**SVG**) listas para incrustar directamente en tu archivo `README.md`.
+**GitCard Studio** es un microservicio y cliente web desarrollado en **Node.js con TypeScript, NestJS y Astro**. Permite consultar en tiempo real las estadísticas generales, matriz de hábitos de commit, trofeos y la distribución de lenguajes de cualquier perfil de usuario, generando tarjetas vectoriales (**SVG**) listas para incrustar directamente en tu archivo `README.md`.
 
 Desarrollado y mantenido por **[CreativeCode.com.co](https://creativecode.com.co)**.
 

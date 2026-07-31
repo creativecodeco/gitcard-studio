@@ -1,4 +1,4 @@
-# Contributing to GitHub Helpers / Guía de Contribución 🤝
+# Contributing to GitCard Studio / Guía de Contribución 🤝
 
 [🌐 English](#-english-contributing-guide) | [🇪🇸 Español](#-guía-de-contribución-en-español)
 
@@ -7,7 +7,7 @@
 <a name="-english-contributing-guide"></a>
 ## 🌐 English Contributing Guide
 
-Thank you for your interest in contributing to **GitHub Helpers**! We welcome bug fixes, feature enhancements, documentation improvements, and architectural suggestions.
+Thank you for your interest in contributing to **GitCard Studio**! We welcome bug fixes, feature enhancements, documentation improvements, and architectural suggestions.
 
 Please take a moment to review these guidelines and our **[Code of Conduct (CODE_OF_CONDUCT.md)](CODE_OF_CONDUCT.md)** before submitting a Pull Request (PR) or creating an Issue.
 
@@ -71,7 +71,7 @@ We follow the **[Conventional Commits](https://www.conventionalcommits.org/)** s
 <a name="-guía-de-contribución-en-español"></a>
 ## 🇪🇸 Guía de Contribución en Español
 
-¡Gracias por tu interés en contribuir a **GitHub Helpers**! Apreciamos las correcciones de errores, nuevas tarjetas, mejoras en la interfaz web y optimizaciones en la documentación.
+¡Gracias por tu interés en contribuir a **GitCard Studio**! Apreciamos las correcciones de errores, nuevas tarjetas, mejoras en la interfaz web y optimizaciones en la documentación.
 
 Por favor, tómate un momento para revisar estas reglas antes de abrir un Pull Request (PR) o una Issue.
 

@@ -7,7 +7,7 @@
 <a name="-english-security-policy"></a>
 ## 🌐 English Security Policy
 
-The **GitHub Helpers** team takes the security of our application, API endpoints, and user data very seriously. We appreciate the responsible disclosure of any security vulnerabilities found in this repository or service.
+The **GitCard Studio** team takes the security of our application, API endpoints, and user data very seriously. We appreciate the responsible disclosure of any security vulnerabilities found in this repository or service.
 
 ---
 
@@ -55,7 +55,7 @@ Our codebase implements defense-in-depth security measures aligned with OWASP st
 <a name="-política-de-seguridad-en-español"></a>
 ## 🇪🇸 Política de Seguridad en Español
 
-El equipo de **GitHub Helpers** se toma muy en serio la seguridad del microservicio, los endpoints de la API y los datos de nuestros usuarios. Agradecemos la divulgación responsable de cualquier vulnerabilidad encontrada.
+El equipo de **GitCard Studio** se toma muy en serio la seguridad del microservicio, los endpoints de la API y los datos de nuestros usuarios. Agradecemos la divulgación responsable de cualquier vulnerabilidad encontrada.
 
 ---
 

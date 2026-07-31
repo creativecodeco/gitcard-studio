@@ -1,7 +1,7 @@
 {
-  "name": "github-helpers-frontend",
-  "version": "1.7.1",
-  "description": "Interactive Astro web client for GitHub Helpers real-time SVG card customization, live README preview, and markdown builder.",
+  "name": "gitcard-studio-frontend",
+  "version": "1.7.2",
+  "description": "Interactive Astro web client for GitCard Studio real-time SVG card customization, live README preview, and markdown builder.",
   "private": true,
   "type": "module",
   "scripts": {
@@ -17,7 +17,7 @@
     "astro": "7.1.6"
   },
   "devDependencies": {
-    "@playwright/test": "1.62.0",
+    "@playwright/test": "1.62.1",
     "happy-dom": "20.11.1",
     "vitest": "4.1.10"
   }

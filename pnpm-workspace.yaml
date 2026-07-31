@@ -33,3 +33,4 @@ minimumReleaseAgeExclude:
   - '@astrojs/compiler-binding@0.3.2'
   - '@astrojs/compiler-rs@0.3.2'
   - '@fastify/rate-limit@11.2.0'
+  - '@types/pg@8.20.1'

@@ -2,6 +2,16 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.7.2] - 2026-07-31
+
+### 🎨 Rebranding Oficial a GitCard Studio & Mejoras de Identidad
+- **Rebranding Completo**: Renombrado el proyecto de `github-helpers` a **GitCard Studio** (`gitcard-studio`) en los paquetes raíz (`root`), backend (`gitcard-studio-backend`) y frontend (`gitcard-studio-frontend`).
+- **Sincronización Visual y SEO**:
+  - Actualizados los títulos, logos, encabezados y metadatos SEO / JSON-LD (`WebApplication.name`) en el generador web de Astro y las tarjetas SVG.
+  - Actualizado el pie de página predeterminado de las plantillas Markdown generadas a `*Generated with [GitCard Studio]*`.
+  - Actualizada la documentación de gobernanza ([`README.md`](README.md), [`SECURITY.md`](SECURITY.md) y [`CONTRIBUTING.md`](CONTRIBUTING.md)) reflejando la nueva identidad visual y marca propia del proyecto.
+  - Ajustadas las suites de pruebas unitarias y E2E para validar el nuevo nombre e interfaz de usuario de GitCard Studio.
+
 ## [1.7.1] - 2026-07-30
 
 ### 🐛 Correcciones en Autenticación, Repos Privados y Flujo de Desconexión
@@ -328,4 +338,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.7.1
+**Versión actualmente expuesta / en producción:** v1.7.2

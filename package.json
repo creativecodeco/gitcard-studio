@@ -1,13 +1,14 @@
 {
-  "name": "github-helpers",
-  "version": "1.7.1",
-  "description": "High-performance NestJS & Fastify API server and interactive Astro web frontend for real-time customizable GitHub profile README stats cards, commit habit heatmaps, streak counters, developer ranks, trophies, badges, and metrics tracking.",
+  "name": "gitcard-studio",
+  "version": "1.7.2",
+  "description": "High-performance NestJS & Fastify API server and interactive Astro web frontend for GitCard Studio real-time customizable profile README stats cards, commit habit heatmaps, streak counters, developer ranks, trophies, badges, and metrics tracking.",
   "keywords": [
     "astro",
     "clean-architecture",
     "developer-tools",
     "fast-github-stats",
     "fastify",
+    "gitcard-studio",
     "github-api",
     "github-languages-card",
     "github-profile-stats",
@@ -36,12 +37,12 @@
   ],
   "packageManager": "pnpm@11.18.0",
   "scripts": {
-    "build": "pnpm --filter github-helpers-frontend build && pnpm --filter github-helpers-backend build",
-    "start": "pnpm --filter github-helpers-backend start",
-    "dev": "pnpm --filter github-helpers-backend dev",
-    "dev:frontend": "pnpm --filter github-helpers-frontend dev",
+    "build": "pnpm --filter gitcard-studio-frontend build && pnpm --filter gitcard-studio-backend build",
+    "start": "pnpm --filter gitcard-studio-backend start",
+    "dev": "pnpm --filter gitcard-studio-backend dev",
+    "dev:frontend": "pnpm --filter gitcard-studio-frontend dev",
     "test": "pnpm -r test",
-    "test:e2e": "pnpm --filter github-helpers-frontend test:e2e",
+    "test:e2e": "pnpm --filter gitcard-studio-frontend test:e2e",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"backend/src/**/*.ts\" \"backend/tests/**/*.ts\" \"frontend/src/**/*.{astro,css,ts,js}\"",
@@ -63,6 +64,7 @@
   },
   "overrides": {
     "brace-expansion": "5.0.8",
+    "fastify": "5.10.0",
     "find-my-way": "9.7.0"
   }
 }

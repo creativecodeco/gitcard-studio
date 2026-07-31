@@ -35,8 +35,8 @@ export function generateSampleReadme(
           .join('\n\n');
 
   const footer = isEn
-    ? `\n\n---\n*Generated with [GitHub Helpers](${pageUrl})*`
-    : `\n\n---\n*Generado con [GitHub Helpers](${pageUrl})*`;
+    ? `\n\n---\n*Generated with [GitCard Studio](${pageUrl})*`
+    : `\n\n---\n*Generado con [GitCard Studio](${pageUrl})*`;
 
   return `${header}\n${cardsMarkdown}${footer}`;
 }

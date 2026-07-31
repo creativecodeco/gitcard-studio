@@ -12,7 +12,7 @@ describe('Sample README Generator Utility', () => {
     expect(result).toContain('# ¡Hola! Soy @octocat 👋');
     expect(result).toContain('![GitHub Stats](https://example.com/api/stats?username=octocat)');
     expect(result).toContain('![Lenguajes más usados](https://example.com/api/languages?username=octocat)');
-    expect(result).toContain('Generado con [GitHub Helpers]');
+    expect(result).toContain('Generado con [GitCard Studio]');
   });
 
   it('should generate English README in grid table layout when layout is grid', () => {
@@ -26,7 +26,7 @@ describe('Sample README Generator Utility', () => {
     expect(result).toContain('<table border="0">');
     expect(result).toContain('<td valign="top" width="50%">');
     expect(result).toContain('src="https://example.com/api/stats?username=octocat"');
-    expect(result).toContain('Generated with [GitHub Helpers]');
+    expect(result).toContain('Generated with [GitCard Studio]');
   });
 
   it('should fallback gracefully when no cards are active', () => {

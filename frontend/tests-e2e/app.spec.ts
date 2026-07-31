@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('GitHub Helpers App E2E Tests', () => {
+test.describe('GitCard Studio App E2E Tests', () => {
   test.beforeEach(async ({ context, page }) => {
     // Grant clipboard permissions for copy testing
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
@@ -48,7 +48,7 @@ test.describe('GitHub Helpers App E2E Tests', () => {
 
   test('should load the page and show initial components', async ({ page }) => {
     // Check main title
-    await expect(page.locator('h1')).toContainText('GitHub Helpers');
+    await expect(page.locator('h1')).toContainText('GitCard Studio');
     
     // Check configuration section is visible
     await expect(page.locator('h2.section-title').first()).toContainText('Configuración');
