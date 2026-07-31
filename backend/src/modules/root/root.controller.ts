@@ -36,7 +36,7 @@ export class RootController {
       return html;
     }
 
-    const rawHost = hostHeader ?? 'github-helpers.creativecode.com.co';
+    const rawHost = hostHeader ?? 'gitcard-studio.creativecode.com.co';
     const safeHost = rawHost.replace(HOST_CLEAN_REGEX, '');
     const protocol = forwardedProto === 'https' ? 'https' : 'http';
     const baseUrl = `${protocol}://${safeHost}`;

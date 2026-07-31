@@ -2,6 +2,12 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.7.3] - 2026-07-31
+
+### 🏷️ Estandarización de Marca & Placeholders de Usuario
+- **Limpieza de Referencias Legacy**: Reemplazadas de forma exhaustiva todas las cadenas y variables legacy (`github-helpers`) por `gitcard-studio` en los `User-Agent` del backend, almacenamiento de `sessionStorage`, scripts de pruebas unitarias y configuración de Playwright.
+- **Estandarización de Placeholders de Usuario**: Unificados todos los campos de entrada de usuario (`username-input`, `token-username`, `purge-username`) en `PrivateTokenModal.astro` para usar una única constante de ejemplo bilingüe (`ej. octocat` / `e.g. octocat`) mediante la clave de i18n `username_placeholder`.
+
 ## [1.7.2] - 2026-07-31
 
 ### 🎨 Rebranding Oficial a GitCard Studio & Mejoras de Identidad
@@ -338,4 +344,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.7.2
+**Versión actualmente expuesta / en producción:** v1.7.3

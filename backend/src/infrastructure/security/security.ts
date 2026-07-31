@@ -93,7 +93,7 @@ export async function validateTokenScopes(
     // 1. Verify token validity by requesting user profile info
     const profileRes = await fetch('https://api.github.com/user', {
       headers: {
-        'User-Agent': 'github-helpers-security',
+        'User-Agent': 'gitcard-studio-security',
         Accept: 'application/vnd.github.v3+json',
         Authorization: `token ${token}`
       }
@@ -150,7 +150,7 @@ export async function validateTokenScopes(
     const probeRes = await fetch('https://api.github.com/user/repos', {
       method: 'POST',
       headers: {
-        'User-Agent': 'github-helpers-security',
+        'User-Agent': 'gitcard-studio-security',
         Accept: 'application/vnd.github.v3+json',
         Authorization: `token ${token}`
       },

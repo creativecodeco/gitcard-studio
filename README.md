@@ -1,7 +1,7 @@
 # GitCard Studio - Stats Generator & Live API 🚀
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/creativecodeco/github-helpers?style=flat-square)](https://github.com/creativecodeco/github-helpers/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/creativecodeco/gitcard-studio?style=flat-square)](https://github.com/creativecodeco/gitcard-studio/stargazers)
 [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-ea4aaa?style=flat-square&logo=github)](https://github.com/sponsors/joaltoroc)
 
 [🌐 English Version](#-english-summary--quick-start) | [🇪🇸 Versión en Español](#-documentación-en-español)

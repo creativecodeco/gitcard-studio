@@ -108,7 +108,7 @@ export class AuthController {
       // 2. Fetch authenticated GitHub user login
       const userRes = await fetch('https://api.github.com/user', {
         headers: {
-          'User-Agent': 'github-helpers-app',
+          'User-Agent': 'gitcard-studio-app',
           Accept: 'application/vnd.github.v3+json',
           Authorization: `Bearer ${tokenData.access_token}`,
         },

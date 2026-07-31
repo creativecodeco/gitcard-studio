@@ -79,7 +79,7 @@ describe('renderer tests', () => {
 
   it('should render a beautiful repository card SVG', () => {
     const mockRepo: RepoStats = {
-      name: 'github-helpers',
+      name: 'gitcard-studio',
       owner: 'creativecodeco',
       description: 'API microservice to generate profile stats',
       stars: 120,
@@ -93,7 +93,7 @@ describe('renderer tests', () => {
 
     expect(svg).toContain('<svg');
     expect(svg).toContain('</svg>');
-    expect(svg).toContain('github-helpers');
+    expect(svg).toContain('gitcard-studio');
     expect(svg).toContain('creativecodeco');
     expect(svg).toContain('API microservice');
     expect(svg).toContain('TypeScript');
@@ -104,7 +104,7 @@ describe('renderer tests', () => {
 
   it('should support custom overrides in renderRepoCard', () => {
     const mockRepo: RepoStats = {
-      name: 'github-helpers',
+      name: 'gitcard-studio',
       owner: 'creativecodeco',
       description: 'API microservice',
       stars: 120,

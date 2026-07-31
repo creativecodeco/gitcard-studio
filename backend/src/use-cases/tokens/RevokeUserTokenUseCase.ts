@@ -16,7 +16,7 @@ export class RevokeUserTokenUseCase {
     // 1. Verify who owns the provided token
     const profileRes = await fetch('https://api.github.com/user', {
       headers: {
-        'User-Agent': 'github-helpers-security',
+        'User-Agent': 'gitcard-studio-security',
         Accept: 'application/vnd.github.v3+json',
         Authorization: `token ${providedToken}`
       }

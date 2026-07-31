@@ -97,7 +97,7 @@ export class TokensController {
 
     const profileRes = await fetch('https://api.github.com/user', {
       headers: {
-        'User-Agent': 'github-helpers-security',
+        'User-Agent': 'gitcard-studio-security',
         Accept: 'application/vnd.github.v3+json',
         Authorization: `token ${providedToken}`,
       },

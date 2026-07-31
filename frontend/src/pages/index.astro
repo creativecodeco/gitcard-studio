@@ -916,7 +916,7 @@ import Footer from '@/components/Footer.astro';
   // Generate button handler with Event Delegation
   document.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
-    const btn = target.closest('#btn-generate');
+    const btn = target.closest('#btn-generate, #btn-generate-auth');
     if (btn) {
       e.preventDefault();
       submitUsername();
@@ -938,10 +938,9 @@ import Footer from '@/components/Footer.astro';
     const uInput = (document.getElementById('username-input') as HTMLInputElement | null) || usernameInput;
     const rInput = (document.getElementById('repo-input') as HTMLInputElement | null) || repoInput;
 
-    if (!uInput) return;
-    const usernameVal = uInput.value.trim();
+    const usernameVal = (uInput?.value.trim()) || currentUsername;
     if (!usernameVal) {
-      uInput.focus();
+      if (uInput) uInput.focus();
       return;
     }
 
@@ -1163,16 +1162,16 @@ import Footer from '@/components/Footer.astro';
     if (styleVal) viewsUrl += `&style=${encodeURIComponent(styleVal)}`;
 
     const cardsConfig = [
-      { id: 'views', title: 'Visitas de Perfil', cleanUrl: viewsUrl, getPreviewUrl: () => viewsImg?.src },
-      { id: 'stats', title: 'GitHub Stats', cleanUrl: statsUrl, getPreviewUrl: () => statsImg?.src },
-      { id: 'languages', title: 'Lenguajes más usados', cleanUrl: languagesUrl, getPreviewUrl: () => languagesImg?.src },
-      { id: 'streak', title: 'Racha de Contribuciones', cleanUrl: streakUrl, getPreviewUrl: () => streakImg?.src },
-      { id: 'rank', title: 'Rango de Desarrollador', cleanUrl: rankUrl, getPreviewUrl: () => rankImg?.src },
-      { id: 'trophies', title: 'Trofeos de GitHub', cleanUrl: trophiesUrl, getPreviewUrl: () => trophiesImg?.src },
-      { id: 'top-repos', title: 'Top Repositorios', cleanUrl: topReposUrl, getPreviewUrl: () => topReposImg?.src },
-      { id: 'sponsors', title: 'GitHub Sponsors', cleanUrl: sponsorsUrl, getPreviewUrl: () => sponsorsImg?.src },
-      { id: 'commit-activity', title: 'Matriz de Hábitos', cleanUrl: commitActivityUrl, getPreviewUrl: () => commitActivityImg?.src },
-      { id: 'repo', title: 'Repositorio Destacado', cleanUrl: repoUrl, getPreviewUrl: () => repoImg?.src },
+      { id: 'views', title: t('code_label_views', currentLocale), cleanUrl: viewsUrl, getPreviewUrl: () => viewsImg?.src },
+      { id: 'stats', title: t('code_label_stats', currentLocale), cleanUrl: statsUrl, getPreviewUrl: () => statsImg?.src },
+      { id: 'languages', title: t('code_label_languages', currentLocale), cleanUrl: languagesUrl, getPreviewUrl: () => languagesImg?.src },
+      { id: 'streak', title: t('code_label_streak', currentLocale), cleanUrl: streakUrl, getPreviewUrl: () => streakImg?.src },
+      { id: 'rank', title: t('title_rank', currentLocale), cleanUrl: rankUrl, getPreviewUrl: () => rankImg?.src },
+      { id: 'trophies', title: t('code_label_trophies', currentLocale), cleanUrl: trophiesUrl, getPreviewUrl: () => trophiesImg?.src },
+      { id: 'top-repos', title: t('code_label_top_repos', currentLocale), cleanUrl: topReposUrl, getPreviewUrl: () => topReposImg?.src },
+      { id: 'sponsors', title: t('code_label_sponsors', currentLocale), cleanUrl: sponsorsUrl, getPreviewUrl: () => sponsorsImg?.src },
+      { id: 'commit-activity', title: t('code_label_commit_activity', currentLocale), cleanUrl: commitActivityUrl, getPreviewUrl: () => commitActivityImg?.src },
+      { id: 'repo', title: t('title_repo', currentLocale), cleanUrl: repoUrl, getPreviewUrl: () => repoImg?.src },
     ];
 
     const activeCardsForMarkdown: CardItem[] = [];
@@ -1309,16 +1308,16 @@ import Footer from '@/components/Footer.astro';
     }
 
     // 3. Update Markdown Codes
-    const markdownStats = `![GitHub Stats](${statsUrl})`;
-    const markdownLanguages = `![Lenguajes más usados](${languagesUrl})`;
-    const markdownRepo = `![Repositorio Destacado](${repoUrl})`;
-    const markdownRank = `![Rango de Desarrollador](${rankUrl})`;
-    const markdownStreak = `![Racha de Contribuciones](${streakUrl})`;
-    const markdownTrophies = `![Trofeos de GitHub](${trophiesUrl})`;
-    const markdownTopRepos = `![Top Repositorios](${topReposUrl})`;
-    const markdownSponsors = `![GitHub Sponsors](${sponsorsUrl})`;
-    const markdownCommitActivity = `![Matriz de Hábitos](${commitActivityUrl})`;
-    const markdownViews = `![Visitas de Perfil](${viewsUrl})`;
+    const markdownStats = `![${t('code_label_stats', currentLocale)}](${statsUrl})`;
+    const markdownLanguages = `![${t('code_label_languages', currentLocale)}](${languagesUrl})`;
+    const markdownRepo = `![${t('title_repo', currentLocale)}](${repoUrl})`;
+    const markdownRank = `![${t('title_rank', currentLocale)}](${rankUrl})`;
+    const markdownStreak = `![${t('code_label_streak', currentLocale)}](${streakUrl})`;
+    const markdownTrophies = `![${t('code_label_trophies', currentLocale)}](${trophiesUrl})`;
+    const markdownTopRepos = `![${t('code_label_top_repos', currentLocale)}](${topReposUrl})`;
+    const markdownSponsors = `![${t('code_label_sponsors', currentLocale)}](${sponsorsUrl})`;
+    const markdownCommitActivity = `![${t('code_label_commit_activity', currentLocale)}](${commitActivityUrl})`;
+    const markdownViews = `![${t('code_label_views', currentLocale)}](${viewsUrl})`;
 
     if (markdownStatsCode) markdownStatsCode.textContent = markdownStats;
     if (markdownLanguagesCode) markdownLanguagesCode.textContent = markdownLanguages;
@@ -1363,7 +1362,7 @@ import Footer from '@/components/Footer.astro';
       viewsImg.src = viewsUrl + '&preview=true' + cacheBuster;
     }
 
-    const markdownViews = `![Visitas de Perfil](${viewsUrl})`;
+    const markdownViews = `![${t('code_label_views', currentLocale)}](${viewsUrl})`;
     if (markdownViewsCode) markdownViewsCode.textContent = markdownViews;
 
     updateSampleReadmeText();

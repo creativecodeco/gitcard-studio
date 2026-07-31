@@ -40,7 +40,7 @@ const DEFAULT_COLOR = '#858585';
 export class ApiGitHubRepository implements IGitHubRepository {
   private getHeaders(userToken?: string): HeadersInit {
     const headers: HeadersInit = {
-      'User-Agent': 'github-helpers-stats',
+      'User-Agent': 'gitcard-studio-stats',
       Accept: 'application/vnd.github.v3+json'
     };
 
@@ -138,7 +138,7 @@ export class ApiGitHubRepository implements IGitHubRepository {
       const response = await fetch('https://api.github.com/graphql', {
         method: 'POST',
         headers: {
-          'User-Agent': 'github-helpers-stats',
+          'User-Agent': 'gitcard-studio-stats',
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
@@ -827,7 +827,7 @@ export class ApiGitHubRepository implements IGitHubRepository {
     const url = `https://github.com/users/${username}/contributions`;
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'github-helpers-stats',
+        'User-Agent': 'gitcard-studio-stats',
         Accept: 'text/html'
       }
     });

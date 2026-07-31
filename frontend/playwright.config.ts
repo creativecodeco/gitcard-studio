@@ -23,7 +23,7 @@ export default defineConfig({
     }
   ],
   webServer: {
-    command: 'pnpm --filter github-helpers-backend dev',
+    command: 'pnpm --filter gitcard-studio-backend dev',
     url: 'http://localhost:3000/health',
     reuseExistingServer: true,
     timeout: 120000

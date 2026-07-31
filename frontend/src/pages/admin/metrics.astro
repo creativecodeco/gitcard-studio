@@ -394,7 +394,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     try {
       const response = await fetch(`/api/metrics?key=${encodeURIComponent(key)}`);
       if (response.ok) {
-        sessionStorage.setItem('github-helpers-metrics-key', key);
+        sessionStorage.setItem('gitcard-studio-metrics-key', key);
         await initDashboard(key);
       } else {
         showError('Acceso no autorizado. Clave incorrecta.');
@@ -416,7 +416,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
   function handleLogout() {
     stopPolling();
-    sessionStorage.removeItem('github-helpers-metrics-key');
+    sessionStorage.removeItem('gitcard-studio-metrics-key');
     window.location.reload();
   }
 
@@ -811,7 +811,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   function setupAutoRefresh() {
     stopPolling();
     if (checkboxAutoRefresh && checkboxAutoRefresh.checked) {
-      const key = sessionStorage.getItem('github-helpers-metrics-key') || '';
+      const key = sessionStorage.getItem('gitcard-studio-metrics-key') || '';
       pollingInterval = setInterval(() => {
         if (key) loadDashboardData(key);
       }, 30000); // 30 seconds
@@ -826,7 +826,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   }
 
   // Init
-  const storedKey = sessionStorage.getItem('github-helpers-metrics-key');
+  const storedKey = sessionStorage.getItem('gitcard-studio-metrics-key');
   if (storedKey) {
     initDashboard(storedKey);
   } else {
@@ -844,7 +844,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   btnLogout?.addEventListener('click', handleLogout);
 
   btnRefresh?.addEventListener('click', () => {
-    const key = sessionStorage.getItem('github-helpers-metrics-key') || '';
+    const key = sessionStorage.getItem('gitcard-studio-metrics-key') || '';
     if (key) loadDashboardData(key);
   });
 

@@ -75,6 +75,18 @@
       </div>
     </div>
 
+    <!-- Refresh / Generate Cards Action Button for Authenticated Users -->
+    <div style="margin-bottom: 12px;">
+      <button
+        id="btn-generate-auth"
+        class="primary-btn full-width-btn"
+        style="width: 100%; height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; font-size: 0.85rem;"
+        data-i18n="btn_refresh"
+      >
+        🔄 Refrescar Tarjetas
+      </button>
+    </div>
+
     <!-- Danger Zone / Account Deletion Trigger -->
     <div>
       <button
@@ -185,7 +197,7 @@
         <input
           type="text"
           id="username-input"
-          placeholder="ej. github"
+          placeholder="ej. octocat"
           data-i18n-placeholder="username_placeholder"
           autocomplete="off"
           required
@@ -217,7 +229,7 @@
         <input
           type="text"
           id="repo-input"
-          placeholder="ej. github-helpers (o el más popular)"
+          placeholder="ej. gitcard-studio (o el más popular)"
           data-i18n-placeholder="repo_placeholder"
           autocomplete="off"
         />
@@ -303,6 +315,7 @@
             type="text"
             id="token-username"
             placeholder="ej. octocat"
+            data-i18n-placeholder="username_placeholder"
             style="font-size: 0.85rem"
             autocomplete="off"
           />
@@ -422,6 +435,7 @@
             type="text"
             id="purge-username"
             placeholder="ej. octocat"
+            data-i18n-placeholder="username_placeholder"
             style="font-size: 0.85rem;"
             autocomplete="off"
             autocorrect="off"
