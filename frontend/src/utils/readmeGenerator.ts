@@ -15,7 +15,9 @@ export function generateSampleReadme(
 ): string {
   const cleanUsername = username.trim() || 'username';
   const isEn = locale === 'en';
-  const pageUrl = generatorUrl || `https://github-helpers.creativecode.com.co/?user=${encodeURIComponent(cleanUsername)}`;
+  const pageUrl =
+    generatorUrl ||
+    `https://gitcard-studio.creativecode.com.co/?user=${encodeURIComponent(cleanUsername)}`;
 
   if (activeCards.length === 0) {
     return isEn
@@ -30,9 +32,7 @@ export function generateSampleReadme(
   const cardsMarkdown =
     layout === 'grid'
       ? formatGridCards(activeCards)
-      : activeCards
-          .map((card) => `![${card.title}](${card.url})`)
-          .join('\n\n');
+      : activeCards.map((card) => `![${card.title}](${card.url})`).join('\n\n');
 
   const footer = isEn
     ? `\n\n---\n*Generated with [GitCard Studio](${pageUrl})*`
@@ -67,4 +67,3 @@ function formatGridCards(activeCards: CardItem[]): string {
 
   return `<table border="0">\n${rows.join('\n')}\n</table>`;
 }
-

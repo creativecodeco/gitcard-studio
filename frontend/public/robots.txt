@@ -47,4 +47,4 @@ User-agent: Twitterbot
 Disallow: /api/
 Disallow: /private/
 
-Sitemap: https://github-helpers.creativecode.com.co/sitemap.xml
+Sitemap: https://gitcard-studio.creativecode.com.co/sitemap.xml

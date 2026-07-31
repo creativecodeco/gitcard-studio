@@ -19,7 +19,7 @@ Developed and maintained by **[CreativeCode.com.co](https://creativecode.com.co)
 
 ### 🚀 Live Web Generator
 Interactively customize and preview your cards in real time at:  
-👉 **[https://github-helpers.creativecode.com.co/](https://github-helpers.creativecode.com.co/)**
+👉 **[https://gitcard-studio.creativecode.com.co/](https://gitcard-studio.creativecode.com.co/)**
 
 ### ⚡ Key Features
 - **Clean Architecture:** Domain-Driven Design (DDD) with decoupled Domain, Use Cases, Adapters, and Infrastructure layers.
@@ -41,16 +41,16 @@ Interactively customize and preview your cards in real time at:
 
 ```markdown
 <!-- General Stats Card -->
-![GitHub Stats](https://github-helpers.creativecode.com.co/api/stats?username=your-username&theme=dark&locale=en)
+![GitHub Stats](https://gitcard-studio.creativecode.com.co/api/stats?username=your-username&theme=dark&locale=en)
 
 <!-- Most Used Languages Card -->
-![Top Languages](https://github-helpers.creativecode.com.co/api/languages?username=your-username&theme=tokyonight&locale=en)
+![Top Languages](https://gitcard-studio.creativecode.com.co/api/languages?username=your-username&theme=tokyonight&locale=en)
 
 <!-- Commit Activity Heatmap Matrix -->
-![Commit Activity](https://github-helpers.creativecode.com.co/api/commit-activity?username=your-username&theme=neon&locale=en)
+![Commit Activity](https://gitcard-studio.creativecode.com.co/api/commit-activity?username=your-username&theme=neon&locale=en)
 
 <!-- Profile Views Badge -->
-![Profile Views](https://github-helpers.creativecode.com.co/api/badge?username=your-username&type=views&color=38bdf8)
+![Profile Views](https://gitcard-studio.creativecode.com.co/api/badge?username=your-username&type=views&color=38bdf8)
 ```
 
 ---
@@ -69,7 +69,7 @@ Desarrollado y mantenido por **[CreativeCode.com.co](https://creativecode.com.co
 ### 🌐 Generador Web en Vivo
 
 Diseña y personaliza tus tarjetas interactivamente en:  
-👉 **[https://github-helpers.creativecode.com.co/](https://github-helpers.creativecode.com.co/)**
+👉 **[https://gitcard-studio.creativecode.com.co/](https://gitcard-studio.creativecode.com.co/)**
 
 ---
 
@@ -191,15 +191,15 @@ Las tarjetas se pueden incrustar en cualquier archivo Markdown usando la siguien
 
 | Endpoint | Descripción | Ejemplo de Uso |
 | :--- | :--- | :--- |
-| `/api/stats` | Estadísticas generales (commits, PRs, estrellas, seguidores) | `![Stats](https://github-helpers.creativecode.com.co/api/stats?username=tu-usuario&theme=dark)` |
-| `/api/languages` | Gráfico de distribución de lenguajes | `![Languages](https://github-helpers.creativecode.com.co/api/languages?username=tu-usuario&theme=tokyonight)` |
-| `/api/commit-activity` | Matriz semanal 7x24 de hábitos de commit | `![Commit Activity](https://github-helpers.creativecode.com.co/api/commit-activity?username=tu-usuario&theme=neon)` |
-| `/api/streak` | Racha de contribuciones activas y récords | `![Streak](https://github-helpers.creativecode.com.co/api/streak?username=tu-usuario&theme=radical)` |
-| `/api/rank` | Tarjeta de grado / rango de desarrollador (S+, A+, B) | `![Rank](https://github-helpers.creativecode.com.co/api/rank?username=tu-usuario&theme=glassmorphism)` |
-| `/api/trophies` | Trofeos e hitos alcanzados en GitHub | `![Trophies](https://github-helpers.creativecode.com.co/api/trophies?username=tu-usuario&theme=dark)` |
-| `/api/top-repos` | Tarjeta con los repositorios más destacados | `![Top Repos](https://github-helpers.creativecode.com.co/api/top-repos?username=tu-usuario&theme=solarized)` |
-| `/api/sponsors` | Tarjeta del perfil de GitHub Sponsors | `![Sponsors](https://github-helpers.creativecode.com.co/api/sponsors?username=tu-usuario&theme=neon)` |
-| `/api/badge` | Insignia SVG estilo Shields.io / Contador de visitas | `![Views](https://github-helpers.creativecode.com.co/api/badge?username=tu-usuario&type=views&color=38bdf8)` |
+| `/api/stats` | Estadísticas generales (commits, PRs, estrellas, seguidores) | `![Stats](https://gitcard-studio.creativecode.com.co/api/stats?username=tu-usuario&theme=dark)` |
+| `/api/languages` | Gráfico de distribución de lenguajes | `![Languages](https://gitcard-studio.creativecode.com.co/api/languages?username=tu-usuario&theme=tokyonight)` |
+| `/api/commit-activity` | Matriz semanal 7x24 de hábitos de commit | `![Commit Activity](https://gitcard-studio.creativecode.com.co/api/commit-activity?username=tu-usuario&theme=neon)` |
+| `/api/streak` | Racha de contribuciones activas y récords | `![Streak](https://gitcard-studio.creativecode.com.co/api/streak?username=tu-usuario&theme=radical)` |
+| `/api/rank` | Tarjeta de grado / rango de desarrollador (S+, A+, B) | `![Rank](https://gitcard-studio.creativecode.com.co/api/rank?username=tu-usuario&theme=glassmorphism)` |
+| `/api/trophies` | Trofeos e hitos alcanzados en GitHub | `![Trophies](https://gitcard-studio.creativecode.com.co/api/trophies?username=tu-usuario&theme=dark)` |
+| `/api/top-repos` | Tarjeta con los repositorios más destacados | `![Top Repos](https://gitcard-studio.creativecode.com.co/api/top-repos?username=tu-usuario&theme=solarized)` |
+| `/api/sponsors` | Tarjeta del perfil de GitHub Sponsors | `![Sponsors](https://gitcard-studio.creativecode.com.co/api/sponsors?username=tu-usuario&theme=neon)` |
+| `/api/badge` | Insignia SVG estilo Shields.io / Contador de visitas | `![Views](https://gitcard-studio.creativecode.com.co/api/badge?username=tu-usuario&type=views&color=38bdf8)` |
 
 #### **Parámetros Comunes:**
 - `username` (Obligatorio): Nombre de usuario u organización en GitHub. Valida con regex `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`.

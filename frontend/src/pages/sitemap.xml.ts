@@ -1,5 +1,5 @@
 export async function GET() {
-  const siteUrl = 'https://github-helpers.creativecode.com.co';
+  const siteUrl = 'https://gitcard-studio.creativecode.com.co';
   const lastmod = '2026-07-20';
   const pages = [
     { loc: '/', changefreq: 'monthly', priority: '1.0' },
