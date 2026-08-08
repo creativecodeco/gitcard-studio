@@ -256,12 +256,43 @@ import Footer from '@/components/Footer.astro';
       <!-- Live Preview -->
       <div class="preview-card glass-card">
         <h2 class="section-title" data-i18n="preview_title">Vista Previa</h2>
+
+        <!-- Card Category Filter Bar -->
+        <div class="card-filter-bar" id="card-filter-bar">
+          <button class="filter-tab active" data-filter="all" type="button">
+            <span class="tab-icon">🌟</span>
+            <span class="tab-label" data-i18n="cat_all">Todas</span>
+            <span class="filter-badge">12</span>
+          </button>
+          <button class="filter-tab" data-filter="stats" type="button">
+            <span class="tab-icon">📊</span>
+            <span class="tab-label" data-i18n="cat_stats">Estadísticas</span>
+            <span class="filter-badge">4</span>
+          </button>
+          <button class="filter-tab" data-filter="activity" type="button">
+            <span class="tab-icon">🔥</span>
+            <span class="tab-label" data-i18n="cat_activity">Actividad</span>
+            <span class="filter-badge">4</span>
+          </button>
+          <button class="filter-tab" data-filter="repos" type="button">
+            <span class="tab-icon">📦</span>
+            <span class="tab-label" data-i18n="cat_repos">Repositorios</span>
+            <span class="filter-badge">3</span>
+          </button>
+          <button class="filter-tab" data-filter="badges" type="button">
+            <span class="tab-icon">🏷️</span>
+            <span class="tab-label" data-i18n="cat_badges">Badges</span>
+            <span class="filter-badge">1</span>
+          </button>
+        </div>
+
         <div class="cards-preview-container">
           <!-- Profile Views Badge Preview -->
           <CardPreview
             id="views"
             title="Contador de Visitas del Perfil"
             codeLabel="Contador de Visitas"
+            category="badges"
             frameStyle="min-height: auto; padding: 20px 0;"
             imgStyle="max-height: 20px; object-fit: contain;"
           >
@@ -368,6 +399,7 @@ import Footer from '@/components/Footer.astro';
             id="stats"
             title="Tarjeta de Estadísticas"
             codeLabel="Estadísticas Generales"
+            category="stats"
           >
             <svg
               slot="placeholder-icon"
@@ -388,7 +420,7 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- Languages Card Preview -->
-          <CardPreview id="languages" title="Tarjeta de Lenguajes" codeLabel="Lenguajes Más Usados">
+          <CardPreview id="languages" title="Tarjeta de Lenguajes" codeLabel="Lenguajes Más Usados" category="stats">
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -411,6 +443,7 @@ import Footer from '@/components/Footer.astro';
             id="repo"
             title="Tarjeta de Repositorio Destacado"
             codeLabel="Repositorio Destacado"
+            category="repos"
           >
             <svg
               slot="placeholder-icon"
@@ -434,6 +467,7 @@ import Footer from '@/components/Footer.astro';
             id="rank"
             title="Tarjeta de Rango de Desarrollador"
             codeLabel="Rango de Desarrollador"
+            category="stats"
           >
             <svg
               slot="placeholder-icon"
@@ -457,6 +491,7 @@ import Footer from '@/components/Footer.astro';
             id="streak"
             title="Tarjeta de Racha de Contribuciones"
             codeLabel="Racha de Contribuciones"
+            category="activity"
           >
             <svg
               slot="placeholder-icon"
@@ -475,7 +510,7 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- Trophies Card Preview -->
-          <CardPreview id="trophies" title="Tarjeta de Trofeos" codeLabel="Trofeos de GitHub">
+          <CardPreview id="trophies" title="Tarjeta de Trofeos" codeLabel="Trofeos de GitHub" category="stats">
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -497,7 +532,7 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- Top Repositories Card Preview -->
-          <CardPreview id="top-repos" title="Top Repositorios" codeLabel="Top Repositorios">
+          <CardPreview id="top-repos" title="Top Repositorios" codeLabel="Top Repositorios" category="repos">
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -517,7 +552,7 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- GitHub Sponsors Card Preview -->
-          <CardPreview id="sponsors" title="GitHub Sponsors" codeLabel="GitHub Sponsors">
+          <CardPreview id="sponsors" title="GitHub Sponsors" codeLabel="GitHub Sponsors" category="repos">
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -535,7 +570,7 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- Commit Activity Grid Card Preview -->
-          <CardPreview id="commit-activity" title="Matriz de Hábitos de Commit" codeLabel="Matriz de Hábitos">
+          <CardPreview id="commit-activity" title="Matriz de Hábitos de Commit" codeLabel="Matriz de Hábitos" category="activity">
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -557,7 +592,7 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- Today's Commit Status Badge Preview -->
-          <CardPreview id="today-status" title="Estado de Actividad de Hoy" codeLabel="Estado de Actividad Hoy">
+          <CardPreview id="today-status" title="Estado de Actividad de Hoy" codeLabel="Estado de Actividad Hoy" category="activity">
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -576,7 +611,7 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- Coding Productivity Timeline Card Preview -->
-          <CardPreview id="timeline-matrix" title="Línea de Tiempo de Productividad" codeLabel="Línea de Tiempo">
+          <CardPreview id="timeline-matrix" title="Línea de Tiempo de Productividad" codeLabel="Línea de Tiempo" category="activity">
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -819,6 +854,29 @@ import Footer from '@/components/Footer.astro';
     if (currentUsername) {
       updateCards();
     }
+  });
+
+  // --- Card Category Filter Tabs ---
+  const filterTabs = document.querySelectorAll('.filter-tab') as NodeListOf<HTMLButtonElement>;
+
+  filterTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      filterTabs.forEach((t) => t.classList.remove('active'));
+      tab.classList.add('active');
+      const selectedCategory = tab.getAttribute('data-filter') || 'all';
+
+      const cardWrappers = document.querySelectorAll('.card-preview-wrapper');
+      cardWrappers.forEach((wrapper) => {
+        const cat = wrapper.getAttribute('data-category');
+        if (selectedCategory === 'all' || cat === selectedCategory) {
+          wrapper.classList.remove('cat-hidden');
+          wrapper.classList.add('cat-visible');
+        } else {
+          wrapper.classList.add('cat-hidden');
+          wrapper.classList.remove('cat-visible');
+        }
+      });
+    });
   });
   // --- Card Width Control ---
   const widthOptions = document.querySelectorAll('.width-option') as NodeListOf<HTMLButtonElement>;

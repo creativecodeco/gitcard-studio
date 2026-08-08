@@ -6,6 +6,7 @@ interface Props {
   codeLabel: string;
   frameStyle?: string;
   imgStyle?: string;
+  category?: string;
 }
 
 const {
@@ -14,11 +15,12 @@ const {
   placeholderMsg = 'Ingresa tu usuario de GitHub para cargar la vista previa',
   codeLabel,
   frameStyle = '',
-  imgStyle = ''
+  imgStyle = '',
+  category = 'all'
 } = Astro.props;
 ---
 
-<div class="card-preview-wrapper">
+<div class="card-preview-wrapper" data-category={category}>
   <h3 class="card-title-label" data-i18n={`title_${id}`}>{title}</h3>
   <div class="image-frame" id={`${id}-frame`} style={frameStyle}>
     <img

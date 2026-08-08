@@ -35,6 +35,13 @@ export const TRANSLATIONS = {
     tab_readme_code: "Código Markdown",
     tab_readme_preview: "Vista Previa Live",
 
+    // Category Filter Tabs
+    cat_all: "Todas",
+    cat_stats: "Estadísticas",
+    cat_activity: "Actividad",
+    cat_repos: "Repositorios",
+    cat_badges: "Badges",
+
     // Card titles & labels
     title_views: "Contador de Visitas del Perfil",
     code_label_views: "Contador de Visitas",
@@ -157,6 +164,13 @@ export const TRANSLATIONS = {
     readme_layout_grid: "Table (2 Col)",
     tab_readme_code: "Markdown Code",
     tab_readme_preview: "Live Preview",
+
+    // Category Filter Tabs
+    cat_all: "All",
+    cat_stats: "Statistics",
+    cat_activity: "Activity",
+    cat_repos: "Repositories",
+    cat_badges: "Badges",
 
     // Card titles & labels
     title_views: "Profile Views Counter Badge",
