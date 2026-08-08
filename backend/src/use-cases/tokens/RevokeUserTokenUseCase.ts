@@ -8,11 +8,6 @@ export class RevokeUserTokenUseCase {
   ) {}
 
   async execute(username: string, providedToken: string): Promise<{ message: string }> {
-    const isComingSoon = process.env.PRIVATE_STATS_COMING_SOON !== 'false';
-    if (isComingSoon) {
-      throw new Error('Esta característica no está disponible temporalmente (Coming Soon).');
-    }
-
     // 1. Verify who owns the provided token
     const profileRes = await fetch('https://api.github.com/user', {
       headers: {

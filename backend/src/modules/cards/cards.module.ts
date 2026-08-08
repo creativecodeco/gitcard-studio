@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CardsController } from './cards.controller';
+import { ApiV1Controller } from '../api-v1/api-v1.controller';
 import { ApiGitHubRepository } from '@/adapters/repositories/ApiGitHubRepository';
 import { CachedGitHubRepository } from '@/adapters/repositories/CachedGitHubRepository';
 import { TypeORMTokenRepository } from '@/adapters/repositories/TypeORMTokenRepository';
@@ -16,7 +17,7 @@ import { GetUserCommitActivityCardUseCase } from '@/use-cases/cards/GetUserCommi
 import { RecordProfileViewUseCase } from '@/use-cases/metrics/RecordProfileViewUseCase';
 
 @Module({
-  controllers: [CardsController],
+  controllers: [CardsController, ApiV1Controller],
   providers: [
     {
       provide: 'IGitHubRepository',

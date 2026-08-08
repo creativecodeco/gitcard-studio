@@ -88,7 +88,7 @@ export class MetricsController {
   @Get('config')
   getConfig(): { privateStatsComingSoon: boolean } {
     return {
-      privateStatsComingSoon: process.env.PRIVATE_STATS_COMING_SOON !== 'false',
+      privateStatsComingSoon: false,
     };
   }
 }

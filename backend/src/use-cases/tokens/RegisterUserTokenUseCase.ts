@@ -19,11 +19,6 @@ export class RegisterUserTokenUseCase {
     ip: string,
     userAgent: string
   ): Promise<{ message: string }> {
-    const isComingSoon = process.env.PRIVATE_STATS_COMING_SOON !== 'false';
-    if (isComingSoon) {
-      throw new Error('Esta característica no está disponible temporalmente (Coming Soon).');
-    }
-
     if (consentAccepted !== true) {
       throw new Error('Debes aceptar los términos y condiciones de almacenamiento de datos.');
     }

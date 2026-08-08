@@ -2,6 +2,29 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.8.0] - 2026-08-08
+
+### 🚀 Nuevas Tarjetas SVG de Gamificación & Productividad
+- **Mini-Badge Dinámico "Today's Commit Status" (`GET /api/today-status`)**: Módulo presentador `todayStatusBadge.presenter.ts` que consulta el estado de contribuciones en el día actual (`🔥 Activo hoy • X commits` o `💤 Descansando hoy`).
+- **Tarjeta "Coding Productivity Timeline" (`GET /api/timeline-matrix`)**: Presentador gráfico SVG `timelineMatrixCard.ts` con desglose visual de horas de programación en 4 franjas horarias (*Mañana*, *Tarde*, *Noche* y *Madrugada*).
+- **Builder de Temas Personalizados (Custom Theme Permalinks)**: Sobreescritura dinámica de colores mediante query params (`theme=custom&bg=HEX&accent=HEX...`) validado por la regex de seguridad OWASP `sanitizeColor`.
+
+### 🖼️ Exportación Multiformato (PNG / SVG) & Encabezados CDN
+- **Convertidor Gráfico SVG -> PNG (`imageConverter.ts`)**: Módulo de renderizado mediante `@resvg/resvg-js` para entregar buffers PNG de alta resolución cuando se incluye `?format=png`.
+- **Encabezados HTTP CDN**: Directivas `Cache-Control: public, max-age=7200, s-maxage=7200` y etiquetas `ETag` para aceleración global en CDNs (Cloudflare / Fastly).
+
+### ⚡ Caché Distribuido (Stale-While-Revalidate) & Webhooks de GitHub
+- **Capa de Caché Distribuido (`RedisCacheAdapter.ts`)**: Almacenamiento en caché de alta velocidad con fallback en memoria.
+- **Endpoint de Webhooks de GitHub (`POST /api/webhooks/github`)**: Verificación de firma HMAC `X-Hub-Signature-256` para invalidar inmediatamente la caché del usuario al recibir eventos de commit (`push`).
+
+### 🔑 API Pública REST JSON para Desarrolladores & Claves API
+- **Endpoint JSON v1 (`GET /api/v1/user/stats`)**: Exposición de datos de usuario en formato JSON estructurado listo para consumir en sitios web personales o portafolios (React/Next.js/Vue).
+- **Entidad Base de Datos de API Keys (`ApiKeyEntity.ts`)**: Almacenamiento cifrado de API Keys con scopes y expiración.
+
+### 📊 Integración en Frontend Astro & Dashboard de Métricas Avanzado
+- **Actualización de Vistas Previas**: Integración del catálogo completo de 12 tarjetas en el builder del README y la vista previa interactiva de `index.astro`.
+- **Gráficos Chart.js**: Actualización de la vista `/admin/metrics` con desglose en tiempo real de todas las tarjetas.
+
 ## [1.7.4] - 2026-08-07
 
 ### 🧹 Calidad de Código & Limpieza de Incidencias Sonar (0 Incidencias)
@@ -366,4 +389,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.7.4
+**Versión actualmente expuesta / en producción:** v1.8.0

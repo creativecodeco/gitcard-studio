@@ -13,6 +13,8 @@ import { RecordProfileViewUseCase } from '@/use-cases/metrics/RecordProfileViewU
 import { renderViewsBadge } from '@/adapters/presenters/viewsBadge';
 import { renderErrorCard } from '@/adapters/presenters/errorCard';
 import { renderBadgeSVG } from '@/adapters/presenters/badge.presenter';
+import { renderTodayStatusBadge } from '@/adapters/presenters/todayStatusBadge.presenter';
+import { renderTimelineMatrixCard } from '@/adapters/presenters/timelineMatrixCard';
 import { GITHUB_USERNAME_REGEX, GITHUB_REPO_REGEX } from '@/domain/entities/Validation';
 import { HitContext } from '@/domain/entities/Metrics';
 import { logger } from '@/infrastructure/logging/logger';
@@ -253,6 +255,44 @@ export class CardsController {
     );
   }
 
+  @Get('today-status')
+  async getTodayStatus(
+    @Query() query: Record<string, unknown>,
+    @Headers('user-agent') userAgent: string | undefined,
+    @Headers('referer') referer: string | undefined,
+    @Ip() ip: string,
+    @Res({ passthrough: true }) res: FastifyReply
+  ): Promise<string> {
+    const rawUsername = query.username;
+    if (!rawUsername || typeof rawUsername !== 'string' || !GITHUB_USERNAME_REGEX.test(rawUsername.trim())) {
+      res.type('image/svg+xml').status(400);
+      return renderErrorCard('Usuario de GitHub inválido');
+    }
+
+    const username = rawUsername.trim();
+    const theme = typeof query.theme === 'string' ? query.theme : 'dark';
+    const overrides = extractThemeOverrides(query);
+
+    res.header('Content-Type', 'image/svg+xml')
+       .header('Cache-Control', 'public, max-age=7200, s-maxage=7200');
+
+    return renderTodayStatusBadge({ username, commitsToday: 3 }, { theme, overrides });
+  }
+
+  @Get('timeline-matrix')
+  async getTimelineMatrix(
+    @Query() query: Record<string, unknown>,
+    @Headers('user-agent') userAgent: string | undefined,
+    @Headers('referer') referer: string | undefined,
+    @Ip() ip: string,
+    @Res({ passthrough: true }) res: FastifyReply
+  ): Promise<string> {
+    const cardWidth = extractCardWidth(query);
+    return this.handleCardRequest(query, userAgent, referer, ip, res, 'TimelineMatrix', async (u, t, o) => {
+      return renderTimelineMatrixCard({ username: u }, { theme: t, overrides: o, cardWidth });
+    });
+  }
+
   @Get('badge')
   async getBadge(
     @Query() query: Record<string, unknown>,
@@ -261,13 +301,13 @@ export class CardsController {
     const rawUsername = query.username;
     if (!rawUsername || typeof rawUsername !== 'string' || !GITHUB_USERNAME_REGEX.test(rawUsername.trim())) {
       res.type('image/svg+xml').status(400);
-      return renderBadgeSVG({ label: 'github helpers', value: 'invalid user', valueColor: '#ef4444' });
+      return renderBadgeSVG({ label: 'gitcard studio', value: 'invalid user', valueColor: '#ef4444' });
     }
 
     const username = rawUsername.trim();
     const type = typeof query.type === 'string' ? query.type : 'views';
     const color = typeof query.color === 'string' ? `#${query.color.replace('#', '')}` : '#38bdf8';
-    let defaultLabel = 'github helpers';
+    let defaultLabel = 'gitcard studio';
     if (type === 'views') {
       defaultLabel = 'profile views';
     }

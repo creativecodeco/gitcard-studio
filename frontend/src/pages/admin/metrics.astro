@@ -574,7 +574,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           'Rango',
           'Racha',
           'Trofeos',
-          'Vistas de Perfil'
+          'Vistas de Perfil',
+          'Estado de Hoy',
+          'Línea de Tiempo'
         ],
         datasets: [
           {
@@ -585,7 +587,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
               globalData.rankRenders || 0,
               globalData.streakRenders || 0,
               globalData.trophiesRenders || 0,
-              globalData.viewsRenders || 0
+              globalData.viewsRenders || 0,
+              globalData.todayStatusRenders || 0,
+              globalData.timelineMatrixRenders || 0
             ],
             backgroundColor: [
               '#38bdf8', // stats
@@ -594,7 +598,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
               '#3b82f6', // rank
               '#f85149', // streak
               '#a855f7', // trophies
-              '#e2e8f0' // views
+              '#e2e8f0', // views
+              '#ff7edb', // today-status
+              '#06b6d4'  // timeline-matrix
             ],
             borderWidth: 1,
             borderColor: '#1e293b'

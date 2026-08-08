@@ -154,7 +154,6 @@ El proyecto utiliza alias `@/` apuntando al directorio `src/`. Esto previene la 
    - `GITHUB_TOKEN`: Tu token de acceso personal de GitHub para evitar límites de tasa.
    - `METRICS_KEY`: Clave secreta obligatoria para poder acceder a los endpoints de analíticas (`/api/metrics`).
    - `TRUST_PROXY`: Número de saltos del proxy (por defecto `1`), útil para que el rate limit identifique correctamente las IPs detrás de Cloudflare, Nginx, etc.
-   - `PRIVATE_STATS_COMING_SOON`: Estado de configuración de estadísticas privadas. Establécelo en `false` para habilitar y activar completamente la funcionalidad de registro/revocación de tokens (por defecto `true`).
    - `STATS_HISTORY_FREQUENCY_HOURS`: Frecuencia mínima en horas entre tomas de instantáneas del historial de estadísticas del usuario (por defecto `12`).
 
 ### Scripts de Desarrollo

@@ -555,6 +555,45 @@ import Footer from '@/components/Footer.astro';
               <line x1="15" y1="3" x2="15" y2="21"></line>
             </svg>
           </CardPreview>
+
+          <!-- Today's Commit Status Badge Preview -->
+          <CardPreview id="today-status" title="Estado de Actividad de Hoy" codeLabel="Estado de Actividad Hoy">
+            <svg
+              slot="placeholder-icon"
+              class="placeholder-svg"
+              viewBox="0 0 24 24"
+              width="48"
+              height="48"
+              fill="none"
+              stroke="#ff7edb"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </CardPreview>
+
+          <!-- Coding Productivity Timeline Card Preview -->
+          <CardPreview id="timeline-matrix" title="Línea de Tiempo de Productividad" codeLabel="Línea de Tiempo">
+            <svg
+              slot="placeholder-icon"
+              class="placeholder-svg"
+              viewBox="0 0 24 24"
+              width="48"
+              height="48"
+              fill="none"
+              stroke="#38bdf8"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="12" y1="20" x2="12" y2="10"></line>
+              <line x1="18" y1="20" x2="18" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="16"></line>
+            </svg>
+          </CardPreview>
         </div>
       </div>
 
@@ -708,6 +747,12 @@ import Footer from '@/components/Footer.astro';
   const commitActivityImg = document.getElementById('commit-activity-img') as HTMLImageElement | null;
   const commitActivityPlaceholder = document.getElementById('commit-activity-placeholder');
 
+  const todayStatusImg = document.getElementById('today-status-img') as HTMLImageElement | null;
+  const todayStatusPlaceholder = document.getElementById('today-status-placeholder');
+
+  const timelineMatrixImg = document.getElementById('timeline-matrix-img') as HTMLImageElement | null;
+  const timelineMatrixPlaceholder = document.getElementById('timeline-matrix-placeholder');
+
   const viewsImg = document.getElementById('views-img') as HTMLImageElement | null;
   const viewsPlaceholder = document.getElementById('views-placeholder');
 
@@ -721,6 +766,8 @@ import Footer from '@/components/Footer.astro';
   const markdownTopReposCode = document.getElementById('markdown-top-repos-code');
   const markdownSponsorsCode = document.getElementById('markdown-sponsors-code');
   const markdownCommitActivityCode = document.getElementById('markdown-commit-activity-code');
+  const markdownTodayStatusCode = document.getElementById('markdown-today-status-code');
+  const markdownTimelineMatrixCode = document.getElementById('markdown-timeline-matrix-code');
   const markdownViewsCode = document.getElementById('markdown-views-code');
 
   const btnCopyStats = document.getElementById('btn-copy-stats');
@@ -757,7 +804,7 @@ import Footer from '@/components/Footer.astro';
   let currentReadmeLayout: 'vertical' | 'grid' = 'vertical';
 
   let completedImagesCount = 0;
-  const totalImagesToLoad = 10; // stats, languages, repo, rank, streak, trophies, top-repos, sponsors, commit-activity, views
+  const totalImagesToLoad = 12; // stats, languages, repo, rank, streak, trophies, top-repos, sponsors, commit-activity, today-status, timeline-matrix, views
   let isGeneratingAllCards = false;
   let isUsingCustomTheme = false;
 
@@ -1152,6 +1199,8 @@ import Footer from '@/components/Footer.astro';
     const topReposUrl = `${origin}/api/top-repos?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
     const sponsorsUrl = `${origin}/api/sponsors?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
     const commitActivityUrl = `${origin}/api/commit-activity?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const todayStatusUrl = `${origin}/api/today-status?username=${currentUsername}&theme=${currentTheme}${localeParam}${customColors}`;
+    const timelineMatrixUrl = `${origin}/api/timeline-matrix?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
 
     let repoUrl = `${origin}/api/repo?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
     if (currentRepo) {
@@ -1168,6 +1217,7 @@ import Footer from '@/components/Footer.astro';
     if (styleVal) viewsUrl += `&style=${encodeURIComponent(styleVal)}`;
 
     const cardsConfig = [
+      { id: 'today-status', title: t('code_label_today_status', currentLocale), cleanUrl: todayStatusUrl, getPreviewUrl: () => (document.getElementById('today-status-img') as HTMLImageElement | null)?.src },
       { id: 'views', title: t('code_label_views', currentLocale), cleanUrl: viewsUrl, getPreviewUrl: () => viewsImg?.src },
       { id: 'stats', title: t('code_label_stats', currentLocale), cleanUrl: statsUrl, getPreviewUrl: () => statsImg?.src },
       { id: 'languages', title: t('code_label_languages', currentLocale), cleanUrl: languagesUrl, getPreviewUrl: () => languagesImg?.src },
@@ -1177,6 +1227,7 @@ import Footer from '@/components/Footer.astro';
       { id: 'top-repos', title: t('code_label_top_repos', currentLocale), cleanUrl: topReposUrl, getPreviewUrl: () => topReposImg?.src },
       { id: 'sponsors', title: t('code_label_sponsors', currentLocale), cleanUrl: sponsorsUrl, getPreviewUrl: () => sponsorsImg?.src },
       { id: 'commit-activity', title: t('code_label_commit_activity', currentLocale), cleanUrl: commitActivityUrl, getPreviewUrl: () => commitActivityImg?.src },
+      { id: 'timeline-matrix', title: t('code_label_timeline_matrix', currentLocale), cleanUrl: timelineMatrixUrl, getPreviewUrl: () => (document.getElementById('timeline-matrix-img') as HTMLImageElement | null)?.src },
       { id: 'repo', title: t('title_repo', currentLocale), cleanUrl: repoUrl, getPreviewUrl: () => repoImg?.src },
     ];
 
@@ -1243,6 +1294,8 @@ import Footer from '@/components/Footer.astro';
     const topReposUrl = `${origin}/api/top-repos?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
     const sponsorsUrl = `${origin}/api/sponsors?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
     const commitActivityUrl = `${origin}/api/commit-activity?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
+    const todayStatusUrl = `${origin}/api/today-status?username=${currentUsername}&theme=${currentTheme}${localeParam}${customColors}`;
+    const timelineMatrixUrl = `${origin}/api/timeline-matrix?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
 
     let repoUrl = `${origin}/api/repo?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
     if (currentRepo) {
@@ -1268,6 +1321,8 @@ import Footer from '@/components/Footer.astro';
     showImageLoading(topReposImg, topReposPlaceholder);
     showImageLoading(sponsorsImg, sponsorsPlaceholder);
     showImageLoading(commitActivityImg, commitActivityPlaceholder);
+    showImageLoading(todayStatusImg, todayStatusPlaceholder);
+    showImageLoading(timelineMatrixImg, timelineMatrixPlaceholder);
     showImageLoading(viewsImg, viewsPlaceholder);
 
     // 2. Set image sources with cache buster
@@ -1308,6 +1363,14 @@ import Footer from '@/components/Footer.astro';
       commitActivityImg.src = commitActivityUrl + cacheBuster;
       commitActivityImg.alt = `Matriz de hábitos de commit para el usuario @${currentUsername}`;
     }
+    if (todayStatusImg) {
+      todayStatusImg.src = todayStatusUrl + cacheBuster;
+      todayStatusImg.alt = `Estado de actividad de hoy para el usuario @${currentUsername}`;
+    }
+    if (timelineMatrixImg) {
+      timelineMatrixImg.src = timelineMatrixUrl + cacheBuster;
+      timelineMatrixImg.alt = `Línea de tiempo de productividad para el usuario @${currentUsername}`;
+    }
     if (viewsImg) {
       viewsImg.src = viewsUrl + '&preview=true' + cacheBuster;
       viewsImg.alt = `Contador de visitas de GitHub para el usuario @${currentUsername}`;
@@ -1323,6 +1386,8 @@ import Footer from '@/components/Footer.astro';
     const markdownTopRepos = `![${t('code_label_top_repos', currentLocale)}](${topReposUrl})`;
     const markdownSponsors = `![${t('code_label_sponsors', currentLocale)}](${sponsorsUrl})`;
     const markdownCommitActivity = `![${t('code_label_commit_activity', currentLocale)}](${commitActivityUrl})`;
+    const markdownTodayStatus = `![${t('code_label_today_status', currentLocale)}](${todayStatusUrl})`;
+    const markdownTimelineMatrix = `![${t('code_label_timeline_matrix', currentLocale)}](${timelineMatrixUrl})`;
     const markdownViews = `![${t('code_label_views', currentLocale)}](${viewsUrl})`;
 
     if (markdownStatsCode) markdownStatsCode.textContent = markdownStats;
@@ -1334,6 +1399,8 @@ import Footer from '@/components/Footer.astro';
     if (markdownTopReposCode) markdownTopReposCode.textContent = markdownTopRepos;
     if (markdownSponsorsCode) markdownSponsorsCode.textContent = markdownSponsors;
     if (markdownCommitActivityCode) markdownCommitActivityCode.textContent = markdownCommitActivity;
+    if (markdownTodayStatusCode) markdownTodayStatusCode.textContent = markdownTodayStatus;
+    if (markdownTimelineMatrixCode) markdownTimelineMatrixCode.textContent = markdownTimelineMatrix;
     if (markdownViewsCode) markdownViewsCode.textContent = markdownViews;
 
     codeBlockWrappers.forEach((cb) => {
@@ -1496,10 +1563,14 @@ import Footer from '@/components/Footer.astro';
   setupImageEvents(topReposImg, topReposPlaceholder, 'Error al cargar repositorios.');
   setupImageEvents(sponsorsImg, sponsorsPlaceholder, 'Error al cargar sponsors.');
   setupImageEvents(commitActivityImg, commitActivityPlaceholder, 'Error al cargar matriz de hábitos.');
+  setupImageEvents(todayStatusImg, todayStatusPlaceholder, 'Error al cargar estado de hoy.');
+  setupImageEvents(timelineMatrixImg, timelineMatrixPlaceholder, 'Error al cargar línea de tiempo.');
   setupImageEvents(viewsImg, viewsPlaceholder, 'Error al cargar contador de visitas.');
 
   // Setup Clipboard Copy handlers
   const btnCopyCommitActivity = document.getElementById('btn-copy-commit-activity');
+  const btnCopyTodayStatus = document.getElementById('btn-copy-today-status');
+  const btnCopyTimelineMatrix = document.getElementById('btn-copy-timeline-matrix');
 
   setupCopyButton(btnCopyStats, markdownStatsCode);
   setupCopyButton(btnCopyLanguages, markdownLanguagesCode);
@@ -1510,6 +1581,8 @@ import Footer from '@/components/Footer.astro';
   setupCopyButton(btnCopyTopRepos, markdownTopReposCode);
   setupCopyButton(btnCopySponsors, markdownSponsorsCode);
   setupCopyButton(btnCopyCommitActivity, markdownCommitActivityCode);
+  setupCopyButton(btnCopyTodayStatus, markdownTodayStatusCode);
+  setupCopyButton(btnCopyTimelineMatrix, markdownTimelineMatrixCode);
   setupCopyButton(btnCopyViews, markdownViewsCode);
 
   // Setup Sample README.md copy button
@@ -1660,7 +1733,8 @@ import Footer from '@/components/Footer.astro';
 
     const imgs = [
       statsImg, languagesImg, repoImg, rankImg, streakImg,
-      trophiesImg, topReposImg, sponsorsImg, commitActivityImg, viewsImg
+      trophiesImg, topReposImg, sponsorsImg, commitActivityImg,
+      todayStatusImg, timelineMatrixImg, viewsImg
     ];
     imgs.forEach((img) => {
       if (img) {
@@ -1672,7 +1746,8 @@ import Footer from '@/components/Footer.astro';
 
     const placeholders = [
       statsPlaceholder, languagesPlaceholder, repoPlaceholder, rankPlaceholder, streakPlaceholder,
-      trophiesPlaceholder, topReposPlaceholder, sponsorsPlaceholder, commitActivityPlaceholder, viewsPlaceholder
+      trophiesPlaceholder, topReposPlaceholder, sponsorsPlaceholder, commitActivityPlaceholder,
+      todayStatusPlaceholder, timelineMatrixPlaceholder, viewsPlaceholder
     ];
     placeholders.forEach((ph) => {
       if (ph) {
@@ -1692,7 +1767,8 @@ import Footer from '@/components/Footer.astro';
 
     const markdownCodes = [
       markdownStatsCode, markdownLanguagesCode, markdownRepoCode, markdownRankCode, markdownStreakCode,
-      markdownTrophiesCode, markdownTopReposCode, markdownSponsorsCode, markdownCommitActivityCode, markdownViewsCode
+      markdownTrophiesCode, markdownTopReposCode, markdownSponsorsCode, markdownCommitActivityCode,
+      markdownTodayStatusCode, markdownTimelineMatrixCode, markdownViewsCode
     ];
     markdownCodes.forEach((mc) => {
       if (mc) mc.textContent = '';

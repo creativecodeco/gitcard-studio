@@ -132,19 +132,8 @@ describe('MetricsController', () => {
   });
 
   describe('getConfig()', () => {
-    it('should return privateStatsComingSoon as true by default', () => {
-      delete process.env.PRIVATE_STATS_COMING_SOON;
-
+    it('should return privateStatsComingSoon as false', () => {
       const result = controller.getConfig();
-
-      expect(result.privateStatsComingSoon).toBe(true);
-    });
-
-    it('should return privateStatsComingSoon as false when env is "false"', () => {
-      process.env.PRIVATE_STATS_COMING_SOON = 'false';
-
-      const result = controller.getConfig();
-
       expect(result.privateStatsComingSoon).toBe(false);
     });
   });

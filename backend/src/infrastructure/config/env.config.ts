@@ -65,10 +65,6 @@ class EnvConfigDto {
 
   @IsOptional()
   @IsString()
-  PRIVATE_STATS_COMING_SOON?: string;
-
-  @IsOptional()
-  @IsString()
   GITHUB_CLIENT_ID?: string;
 
   @IsOptional()

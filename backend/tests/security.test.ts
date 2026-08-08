@@ -5,6 +5,8 @@ import {
   generateConsentFingerprint,
   validateTokenScopes
 } from '@/infrastructure/security/security';
+import { sanitizeColor } from '@/adapters/presenters/theme';
+import { extractCardWidth } from '@/modules/cards/card-query.helpers';
 
 // Mock global fetch
 const mockFetch = vi.fn();
@@ -105,9 +107,7 @@ describe('security.ts tests', () => {
   });
 
   describe('SVG attribute injection sanitization', () => {
-    it('should sanitize valid hex, rgb, and hsl colors and reject XSS payload strings', async () => {
-      const { sanitizeColor } = await import('@/adapters/presenters/theme');
-
+    it('should sanitize valid hex, rgb, and hsl colors and reject XSS payload strings', () => {
       expect(sanitizeColor('#000000')).toBe('#000000');
       expect(sanitizeColor('38bdf8')).toBe('#38bdf8');
       expect(sanitizeColor('rgb(255, 0, 0)')).toBe('rgb(255, 0, 0)');
@@ -119,9 +119,7 @@ describe('security.ts tests', () => {
       expect(sanitizeColor('url(http://malicious.com)')).toBeUndefined();
     });
 
-    it('should validate card_width and reject attribute injection payloads', async () => {
-      const { extractCardWidth } = await import('@/modules/cards/card-query.helpers');
-
+    it('should validate card_width and reject attribute injection payloads', () => {
       expect(extractCardWidth({ width: '500px' })).toBe('500px');
       expect(extractCardWidth({ card_width: '100%' })).toBe('100%');
       expect(extractCardWidth({ full_width: 'true' })).toBe('100%');

@@ -6,9 +6,11 @@ import { TokensModule } from './modules/tokens/tokens.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
 import { AuthModule } from './modules/auth/auth.module';
 
+import { WebhooksController } from './modules/webhooks/webhooks.controller';
+
 @Module({
   imports: [CardsModule, TokensModule, MetricsModule, AuthModule],
-  controllers: [RootController],
+  controllers: [RootController, WebhooksController],
   providers: [HtmlFileService],
 })
 export class AppModule {}
