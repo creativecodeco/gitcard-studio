@@ -673,6 +673,7 @@ import Footer from '@/components/Footer.astro';
 <script>
   import { generateSampleReadme, type CardItem } from '@/utils/readmeGenerator';
   import { t, updateDomTranslations } from '@/utils/i18n';
+  import { escapeHtml } from '@/utils/escape';
 
   // Elements
   const usernameInput = document.getElementById('username-input') as HTMLInputElement | null;
@@ -1060,8 +1061,9 @@ import Footer from '@/components/Footer.astro';
   }
 
   function renderLiveReadmeHtml(username: string, activeCards: CardItem[], locale: string, layout: 'vertical' | 'grid', generatorUrl?: string): string {
-    const cleanUser = username.trim() || 'username';
-    const pageUrl = generatorUrl || window.location.href;
+    const cleanUser = escapeHtml(username.trim() || 'username');
+    const rawPageUrl = generatorUrl || window.location.href;
+    const safePageUrl = escapeHtml(rawPageUrl);
 
     if (activeCards.length === 0) {
       return `<h1 style="font-size: 1.4rem; color: #fff; border-bottom: 1px solid #30363d; padding-bottom: 8px; margin-top: 0;">${t('readme_preview_greeting', locale, { username: cleanUser })}</h1>
@@ -1079,19 +1081,23 @@ import Footer from '@/components/Footer.astro';
       for (let i = 0; i < activeCards.length; i += 2) {
         const c1 = activeCards[i];
         const c2 = activeCards[i + 1];
+        const url1 = escapeHtml(c1.url);
+        const title1 = escapeHtml(c1.title);
         if (c2) {
+          const url2 = escapeHtml(c2.url);
+          const title2 = escapeHtml(c2.title);
           rows.push(`<tr>
             <td valign="top" style="padding: 6px; width: 50%;">
-              <img src="${c1.url}" alt="${c1.title}" style="width: 100%; border-radius: 6px; display: block;" />
+              <img src="${url1}" alt="${title1}" style="width: 100%; border-radius: 6px; display: block;" />
             </td>
             <td valign="top" style="padding: 6px; width: 50%;">
-              <img src="${c2.url}" alt="${c2.title}" style="width: 100%; border-radius: 6px; display: block;" />
+              <img src="${url2}" alt="${title2}" style="width: 100%; border-radius: 6px; display: block;" />
             </td>
           </tr>`);
         } else {
           rows.push(`<tr>
             <td valign="top" style="padding: 6px; width: 50%;">
-              <img src="${c1.url}" alt="${c1.title}" style="width: 100%; border-radius: 6px; display: block;" />
+              <img src="${url1}" alt="${title1}" style="width: 100%; border-radius: 6px; display: block;" />
             </td>
             <td style="width: 50%;"></td>
           </tr>`);
@@ -1102,7 +1108,7 @@ import Footer from '@/components/Footer.astro';
       cardsHtml = activeCards
         .map(
           (c) => `<div style="margin-bottom: 12px;">
-          <img src="${c.url}" alt="${c.title}" style="max-width: 100%; border-radius: 6px; display: block;" />
+          <img src="${escapeHtml(c.url)}" alt="${escapeHtml(c.title)}" style="max-width: 100%; border-radius: 6px; display: block;" />
         </div>`
         )
         .join('');
@@ -1116,7 +1122,7 @@ import Footer from '@/components/Footer.astro';
       <h3 style="font-size: 1.1rem; color: #e6edf3; margin-bottom: 10px;">${sectionTitle}</h3>
       ${cardsHtml}
       <hr style="border: 0; border-top: 1px solid #30363d; margin: 20px 0 10px 0;" />
-      <p style="font-size: 0.8rem; color: #8b949e; font-style: italic; margin: 0;">${footerText} &bull; <a href="${pageUrl}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none;">${pageUrl}</a></p>
+      <p style="font-size: 0.8rem; color: #8b949e; font-style: italic; margin: 0;">${footerText} &bull; <a href="${safePageUrl}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none;">${safePageUrl}</a></p>
     `;
   }
 

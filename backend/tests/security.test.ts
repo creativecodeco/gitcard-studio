@@ -103,4 +103,32 @@ describe('security.ts tests', () => {
     expect(result.valid).toBe(false);
     expect(result.reason).toContain('permisos de creación/escritura');
   });
+
+  describe('SVG attribute injection sanitization', () => {
+    it('should sanitize valid hex, rgb, and hsl colors and reject XSS payload strings', async () => {
+      const { sanitizeColor } = await import('@/adapters/presenters/theme');
+
+      expect(sanitizeColor('#000000')).toBe('#000000');
+      expect(sanitizeColor('38bdf8')).toBe('#38bdf8');
+      expect(sanitizeColor('rgb(255, 0, 0)')).toBe('rgb(255, 0, 0)');
+      expect(sanitizeColor('rgba(0, 0, 0, 0.5)')).toBe('rgba(0, 0, 0, 0.5)');
+
+      // Malicious XSS attribute injection strings must return undefined
+      expect(sanitizeColor('#000000" onload="alert(1)')).toBeUndefined();
+      expect(sanitizeColor('red"><script>alert(1)</script>')).toBeUndefined();
+      expect(sanitizeColor('url(http://malicious.com)')).toBeUndefined();
+    });
+
+    it('should validate card_width and reject attribute injection payloads', async () => {
+      const { extractCardWidth } = await import('@/modules/cards/card-query.helpers');
+
+      expect(extractCardWidth({ width: '500px' })).toBe('500px');
+      expect(extractCardWidth({ card_width: '100%' })).toBe('100%');
+      expect(extractCardWidth({ full_width: 'true' })).toBe('100%');
+
+      // Malicious payloads must return undefined
+      expect(extractCardWidth({ width: '500px" onload="alert(1)' })).toBeUndefined();
+      expect(extractCardWidth({ card_width: '100% font-size:100px' })).toBeUndefined();
+    });
+  });
 });

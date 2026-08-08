@@ -1,4 +1,18 @@
 {
   "cSpell.language": "en,es",
-  "cSpell.words": ["camo", "creativecode", "gitcard", "github", "Github", "gtag", "nestjs", "Segoe"]
+  "cSpell.words": [
+    "camo",
+    "creativecode",
+    "creativecodeco",
+    "gitcard",
+    "github",
+    "Github",
+    "gtag",
+    "nestjs",
+    "Segoe"
+  ],
+  "sonarlint.connectedMode.project": {
+    "connectionId": "creativecodeco",
+    "projectKey": "creativecodeco_gitcard-studio"
+  }
 }

@@ -47,3 +47,4 @@ skills-lock.json
 # Astro compiled assets in root
 /public/
 
+.scannerwork

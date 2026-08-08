@@ -37,14 +37,14 @@ export class RegisterUserTokenUseCase {
     const fingerprint = generateConsentFingerprint(ip, userAgent);
     const consentDate = new Date().toISOString();
 
-    await this.tokenRepo.saveToken(
+    await this.tokenRepo.saveToken({
       username,
       encryptedToken,
       iv,
       consentAccepted,
       consentDate,
-      fingerprint
-    );
+      consentFingerprint: fingerprint
+    });
 
     // Clear caches to force reloading with the new private token
     this.githubRepo.clearCache(username);

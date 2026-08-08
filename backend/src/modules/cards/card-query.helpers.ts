@@ -46,7 +46,10 @@ export function extractCardWidth(query: Record<string, unknown>): string | undef
 
   const widthVal = query.card_width ?? query.width;
   if (typeof widthVal === 'string' && widthVal.trim() !== '') {
-    return widthVal.trim();
+    const trimmed = widthVal.trim();
+    if (/^\d+(?:px|%)?$/i.test(trimmed)) {
+      return trimmed;
+    }
   }
 
   return undefined;

@@ -246,19 +246,19 @@ export async function refreshGitHubAppToken(
       : undefined;
 
     const existingInfo = await tokenRepo.getToken(username);
-    await tokenRepo.saveToken(
+    await tokenRepo.saveToken({
       username,
-      encToken.encryptedToken,
-      encToken.iv,
-      existingInfo ? existingInfo.consent_accepted === 1 : true,
-      existingInfo?.consent_date ?? new Date().toISOString(),
-      existingInfo?.consent_fingerprint ?? 'system-refresh',
-      'app_user',
-      encRefresh?.encryptedToken,
-      encRefresh?.iv,
+      encryptedToken: encToken.encryptedToken,
+      iv: encToken.iv,
+      consentAccepted: existingInfo ? existingInfo.consent_accepted === 1 : true,
+      consentDate: existingInfo?.consent_date ?? new Date().toISOString(),
+      consentFingerprint: existingInfo?.consent_fingerprint ?? 'system-refresh',
+      tokenType: 'app_user',
+      encryptedRefreshToken: encRefresh?.encryptedToken,
+      refreshTokenIv: encRefresh?.iv,
       expiresAt,
-      data.scope ?? existingInfo?.scopes
-    );
+      scopes: data.scope ?? existingInfo?.scopes
+    });
 
     logger.info(`Refreshed GitHub App token for user ${username}`);
     return data.access_token;

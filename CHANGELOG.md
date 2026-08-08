@@ -2,11 +2,33 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.7.4] - 2026-08-07
+
+### 🧹 Calidad de Código & Limpieza de Incidencias Sonar (0 Incidencias)
+- **Remediación Completa de Incidencias SonarCloud**: Corregidas las 23 incidencias detectadas por SonarScanner en la plataforma:
+  - **Simplificación de Expresiones Regulares (`S5843`)**: Optimizadas las expresiones regulares de colores RGB y HSL en `theme.ts` reduciendo la complejidad cognitiva por debajo de los límites exigidos.
+  - **Extracción de Operadores Ternarios Anidados (`S3358`)**: Refactorizada la lógica de asignación de etiquetas en `CardsController.ts` y las insignias de persona de productividad en `commitActivityCard.ts`.
+  - **Refactorización Ciclomática y Clean Code (`S3776`, `S7723`)**: Extraídas las funciones auxiliares `calculatePersona`, `buildHeatmapSvg`, `fetchPagedRepositories` y `populateCommitCalendarMatrix` en `commitActivityCard.ts` y `ApiGitHubRepository.ts`. Reemplazadas todas las invocaciones `Array()` por `new Array()`.
+  - **Firma Type-Safe de Repositorio de Tokens (`S107`)**: Introducida la interfaz `SaveTokenParams` y sobrecarga de métodos en `ITokenRepository` y `TypeORMTokenRepository` reduciendo la firma a 1 parámetro objeto.
+  - **Gestión Robusta de Pruebas Unitarias (`S8968`)**: Actualizados los callbacks de pruebas en `history.test.ts`, `metrics.test.ts`, `purge.test.ts` y `viewsBadge.test.ts` para invocar `ctx.skip()` cuando la base de datos PostgreSQL no se encuentra inicializada.
+
+### 📦 Modularización de Utilidades Frontend
+- **Módulo Centralizado de Escapado HTML**: Creada la utilidad reutilizable `escapeHtml` en `frontend/src/utils/escape.ts` e importada dinámicamente en `index.astro` y `admin/metrics.astro` eliminando duplicación de código.
+
 ## [1.7.3] - 2026-07-31
 
 ### 🏷️ Estandarización de Marca & Placeholders de Usuario
 - **Limpieza de Referencias Legacy**: Reemplazadas de forma exhaustiva todas las cadenas y variables legacy (`github-helpers`) por `gitcard-studio` en los `User-Agent` del backend, almacenamiento de `sessionStorage`, scripts de pruebas unitarias y configuración de Playwright.
 - **Estandarización de Placeholders de Usuario**: Unificados todos los campos de entrada de usuario (`username-input`, `token-username`, `purge-username`) en `PrivateTokenModal.astro` para usar una única constante de ejemplo bilingüe (`ej. octocat` / `e.g. octocat`) mediante la clave de i18n `username_placeholder`.
+
+### ⚙️ Actualización de Entorno y Herramientas
+- **Actualización de Runtime y Package Manager**: Actualizado Node.js a `v24.19.0` y pnpm a `11.20.0` en `package.json` (`packageManager`) y `Dockerfile` (etapas `builder` y `runner`).
+
+### 🔒 Auditoría & Remediación de Seguridad OWASP
+- **Protección contra Broken Access Control (OWASP A01)**: Implementada verificación obligatoria de token y coincidencia de identidad con la API de GitHub en `deleteUserAccount` (`DELETE /api/users/me`) y `disconnectAccount` (`POST /api/auth/disconnect`) para prevenir la eliminación o desconexión no autorizada de cuentas por terceros.
+- **Prevención de Inyección de Atributos SVG / XSS (OWASP A03)**:
+  - Incorporada función `sanitizeColor` en `theme.ts` y `badge.presenter.ts` con validación estricta por expresiones regulares para formatos hex, RGB/RGBA y HSL/HSLA, filtrando cualquier payload malicioso de atributos SVG.
+  - Validación con expresiones regulares del parámetro `card_width` / `width` (`/^\d+(?:px|%)?$/i`) en `card-query.helpers.ts`.
 
 ## [1.7.2] - 2026-07-31
 
@@ -344,4 +366,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.7.3
+**Versión actualmente expuesta / en producción:** v1.7.4

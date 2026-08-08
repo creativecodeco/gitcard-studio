@@ -117,6 +117,22 @@ export const THEMES: Record<string, Theme> = {
   }
 };
 
+const HEX_REGEX = /^#?([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+const RGB_REGEX = /^rgba?\(\s*\d{1,3}(?:\s*,\s*\d{1,3}){2}(?:\s*,\s*[\d.]+)?\s*\)$/i;
+const HSL_REGEX = /^hsla?\(\s*\d{1,3}(?:\s*,\s*\d{1,3}%){2}(?:\s*,\s*[\d.]+)?\s*\)$/i;
+
+export function sanitizeColor(val?: string): string | undefined {
+  if (!val || typeof val !== 'string') return undefined;
+  const trimmed = val.trim();
+  if (HEX_REGEX.test(trimmed)) {
+    return trimmed.startsWith('#') ? trimmed : `#${trimmed}`;
+  }
+  if (RGB_REGEX.test(trimmed) || HSL_REGEX.test(trimmed)) {
+    return trimmed;
+  }
+  return undefined;
+}
+
 export function getTheme(themeName?: string, overrides?: Record<string, string>): Theme {
   let baseTheme = THEMES.dark;
   if (themeName) {
@@ -126,27 +142,13 @@ export function getTheme(themeName?: string, overrides?: Record<string, string>)
 
   if (!overrides) return baseTheme;
 
-  const formatColor = (val?: string) => {
-    if (!val) return undefined;
-    if (
-      val.startsWith('#') ||
-      val.startsWith('rgb') ||
-      val.startsWith('hsl') ||
-      val.startsWith('rgba')
-    )
-      return val;
-    // Assume hex code if it contains valid characters
-    if (/^[0-9a-fA-F]{3,8}$/.test(val)) return `#${val}`;
-    return val;
-  };
-
   return {
-    bg: formatColor(overrides.bg) || baseTheme.bg,
-    text: formatColor(overrides.text) || baseTheme.text,
-    title: formatColor(overrides.title) || baseTheme.title,
-    accent: formatColor(overrides.accent) || baseTheme.accent,
-    secondary: formatColor(overrides.secondary) || baseTheme.secondary,
-    border: formatColor(overrides.border) || baseTheme.border,
+    bg: sanitizeColor(overrides.bg) || baseTheme.bg,
+    text: sanitizeColor(overrides.text) || baseTheme.text,
+    title: sanitizeColor(overrides.title) || baseTheme.title,
+    accent: sanitizeColor(overrides.accent) || baseTheme.accent,
+    secondary: sanitizeColor(overrides.secondary) || baseTheme.secondary,
+    border: sanitizeColor(overrides.border) || baseTheme.border,
     bgGradient: overrides.bgGradient || baseTheme.bgGradient
   };
 }

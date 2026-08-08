@@ -7,14 +7,18 @@ This file documents workspace-specific rules, patterns, and guidelines that all 
 - **Codebase Memory**: This project uses `codebase-memory-mcp`. Always prefer using MCP graph tools (`search_graph`, `trace_path`, `get_code_snippet`, etc.) over raw grep/find commands for exploring the codebase.
 - **Mandatory Re-indexation**: After completing any task that creates, modifies, or deletes source files, you MUST re-index the repository by calling `index_repository` via `codebase-memory-mcp`. This keeps the knowledge graph in sync with the current codebase and ensures future graph queries remain accurate. Do this as the last step of every task before reporting completion.
 
-## Security Rules (OWASP Compliance)
+## Security Rules & Mandatory OWASP Review Workflow
 
-- **Secure by Default**: Never disable authorization or validation checks.
-- **XSS & Security Vulnerability Prevention**: No code must contain Cross-Site Scripting (XSS), Path Traversal, SQL Injection, or other OWASP vulnerabilities. Unsanitized user inputs or query parameters must NEVER be directly injected into HTML, SVG, metadata, or template responses. All inputs rendered in client-facing outputs must be strictly sanitized or HTML/XML-escaped.
-- **Input Validation**:
-  - Every endpoint receiving user parameters (`username`, `repo`, etc.) must strictly validate them using regular expressions before processing or forwarding.
-  - Username Regex: `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`
-  - Repo Regex: `/^[a-z\d-_.]{1,100}$/i`
+- **Mandatory Pre-Commit Security Self-Audit**: On EVERY task that creates or modifies source code (backend APIs, frontend Astro pages, SVG presenters, database entities, or scripts), the agent MUST perform a security review against OWASP Top 10 guidelines and security best practices BEFORE completing the task:
+  1. **OWASP A01 - Broken Access Control**: Verify authorization on sensitive endpoints (`/api/users/me`, `/api/auth/disconnect`, `/api/tokens/*`). Confirm token identity matches target resource owner before performing state changes or purges.
+  2. **OWASP A02 - Cryptographic Failures**: Confirm OAuth/PAT tokens are encrypted at rest using AES-GCM (`encryptToken`), IVs are unique, and plain-text tokens or secrets are NEVER output in response payloads or logger traces.
+  3. **OWASP A03 - Injection & XSS (DOM & SVG)**: All user inputs (`username`, `repo`, colors, custom labels, dynamic README strings) rendered in SVG cards, HTML templates, or DOM `innerHTML` MUST be strictly validated or escaped (`escapeXml`, `escapeHtml`, `sanitizeColor`). No raw user strings injected directly into HTML/SVG templates.
+  4. **OWASP A04 - Insecure Design & Input Validation**: Every request parameter MUST be validated with regular expressions before processing:
+     - Username Regex: `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`
+     - Repo Regex: `/^[a-z\d-_.]{1,100}$/i`
+     - Color Regex: Hex, RGB/RGBA, HSL/HSLA strictly validated via `sanitizeColor` in `theme.ts`.
+  5. **OWASP A05 - Security Misconfiguration**: Maintain secure Helmet headers and rate-limiting middleware (`express-rate-limit`).
+  6. **OWASP A10 - SSRF Prevention**: Validate all dynamic request target URLs and hostnames before making outbound HTTP calls.
 - **Metrics Security**: The metrics endpoints under `/api/metrics` must always require a valid `METRICS_KEY`. If `METRICS_KEY` is not set in the environment, the endpoints must respond with `403 Forbidden` rather than falling back to public access.
 - **Rate Limiting**: Rate limiting is configured at `/api/` using `express-rate-limit`. Do not bypass or remove this unless instructed. If adding new endpoints, ensure they are protected by the rate limiter.
 - **Security Headers**: `helmet` is used to enforce secure headers. Keep `contentSecurityPolicy: false` to allow inline CSS inside the generated SVG cards.

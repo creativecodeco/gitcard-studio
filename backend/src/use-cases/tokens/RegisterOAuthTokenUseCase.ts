@@ -31,19 +31,19 @@ export class RegisterOAuthTokenUseCase {
     const fingerprint = generateConsentFingerprint(ip, userAgent);
     const consentDate = new Date().toISOString();
 
-    await this.tokenRepo.saveToken(
+    await this.tokenRepo.saveToken({
       username,
       encryptedToken,
       iv,
-      true,
+      consentAccepted: true,
       consentDate,
-      fingerprint,
-      tokenType ?? 'app_user',
-      encRefresh?.encryptedToken,
-      encRefresh?.iv,
+      consentFingerprint: fingerprint,
+      tokenType: tokenType ?? 'app_user',
+      encryptedRefreshToken: encRefresh?.encryptedToken,
+      refreshTokenIv: encRefresh?.iv,
       expiresAt,
-      scope
-    );
+      scopes: scope
+    });
 
     // Clear caches to force reloading with the new OAuth token
     this.githubRepo.clearCache(username);

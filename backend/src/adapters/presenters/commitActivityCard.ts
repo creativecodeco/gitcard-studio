@@ -15,24 +15,9 @@ export interface CommitActivityCardOptions {
   overrides?: Record<string, string>;
 }
 
-export function renderCommitActivityCard(
-  data: CommitActivityData,
-  options: CommitActivityCardOptions = {}
-): string {
-  const theme: Theme = getTheme(options.theme, options.overrides);
-  const isEn = options.locale === 'en';
-
-  const username = escapeXml(data.username || 'octocat');
-  const cardWidth = options.cardWidth === '100%' ? '100%' : '495';
-  const viewBoxWidth = 495;
-  const viewBoxHeight = 215;
-
-  // Build matrix or default mock matrix if none provided
-  const matrix = data.hourlyMatrix || Array.from({ length: 7 }, () => Array(24).fill(0));
-
-  // Determine Peak Productivity Persona (Night Owl vs Early Bird)
-  let nightCommits = 0; // 18:00 - 03:59
-  let dayCommits = 0;   // 04:00 - 17:59
+function calculatePersona(matrix: number[][], isEn: boolean): string {
+  let nightCommits = 0;
+  let dayCommits = 0;
 
   for (let d = 0; d < 7; d++) {
     for (let h = 0; h < 24; h++) {
@@ -46,25 +31,18 @@ export function renderCommitActivityCard(
   }
 
   const isNightOwl = nightCommits >= dayCommits;
-  const personaBadge = isNightOwl
-    ? (isEn ? '🦉 Night Owl' : '🦉 Búho Nocturno')
-    : (isEn ? '🌅 Early Bird' : '🌅 Madrugador');
+  if (isNightOwl) {
+    return isEn ? '🦉 Night Owl' : '🦉 Búho Nocturno';
+  }
+  return isEn ? '🌅 Early Bird' : '🌅 Madrugador';
+}
 
-  const titleText = isEn
-    ? `Commit Activity Matrix`
-    : `Matriz de Hábitos de Commit`;
-
-  const brandHeader = renderBrandHeader(username, theme, 470, 24);
-
-  // Days labels (Mon - Sun)
-  const dayLabels = isEn
-    ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    : ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-
-  // Hours labels (every 4 hours)
-  const hourLabels = ['00h', '04h', '08h', '12h', '16h', '20h'];
-
-  // Heatmap Grid Dimensions
+function buildHeatmapSvg(
+  matrix: number[][],
+  dayLabels: string[],
+  hourLabels: string[],
+  theme: Theme
+): string {
   const startX = 45;
   const startY = 80;
   const cellWidth = 16;
@@ -77,35 +55,61 @@ export function renderCommitActivityCard(
     const y = startY + dayIdx * (cellHeight + cellGap);
     const dayLabel = dayLabels[dayIdx];
 
-    // Day label text
     gridSvg += `<text x="${startX - 8}" y="${y + cellHeight - 2}" text-anchor="end" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="9px" fill="${theme.secondary}">${dayLabel}</text>`;
 
     for (let hourIdx = 0; hourIdx < 24; hourIdx++) {
       const x = startX + hourIdx * (cellWidth + cellGap);
       const val = matrix[dayIdx]?.[hourIdx] || 0;
 
-      // Color intensity
       let color = theme.bg;
       let opacity = 0.2;
 
       if (val > 0) {
-        if (val === 1) { color = theme.accent; opacity = 0.4; }
-        else if (val === 2) { color = theme.accent; opacity = 0.65; }
-        else if (val === 3) { color = theme.accent; opacity = 0.85; }
-        else { color = theme.accent; opacity = 1.0; }
+        color = theme.accent;
+        if (val === 1) opacity = 0.4;
+        else if (val === 2) opacity = 0.65;
+        else if (val === 3) opacity = 0.85;
+        else opacity = 1.0;
       }
 
       gridSvg += `<rect x="${x}" y="${y}" width="${cellWidth}" height="${cellHeight}" rx="2" fill="${color}" fill-opacity="${opacity}" stroke="${theme.border}" stroke-width="0.5"><title>${dayLabel} ${hourIdx}:00 - ${val} commits</title></rect>`;
     }
   }
 
-  // Render Hour Labels below grid
   for (let i = 0; i < hourLabels.length; i++) {
     const hourLabel = hourLabels[i];
     const hourVal = i * 4;
     const x = startX + hourVal * (cellWidth + cellGap) + cellWidth / 2;
     gridSvg += `<text x="${x}" y="${startY + 7 * (cellHeight + cellGap) + 12}" text-anchor="middle" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="9px" fill="${theme.secondary}">${hourLabel}</text>`;
   }
+
+  return gridSvg;
+}
+
+export function renderCommitActivityCard(
+  data: CommitActivityData,
+  options: CommitActivityCardOptions = {}
+): string {
+  const theme: Theme = getTheme(options.theme, options.overrides);
+  const isEn = options.locale === 'en';
+
+  const username = escapeXml(data.username || 'octocat');
+  const cardWidth = options.cardWidth === '100%' ? '100%' : '495';
+  const viewBoxWidth = 495;
+  const viewBoxHeight = 215;
+
+  const matrix = data.hourlyMatrix || Array.from({ length: 7 }, () => new Array(24).fill(0));
+  const personaBadge = calculatePersona(matrix, isEn);
+  const titleText = isEn ? 'Commit Activity Matrix' : 'Matriz de Hábitos de Commit';
+
+  const brandHeader = renderBrandHeader(username, theme, 470, 24);
+
+  const dayLabels = isEn
+    ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    : ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+  const hourLabels = ['00h', '04h', '08h', '12h', '16h', '20h'];
+  const gridSvg = buildHeatmapSvg(matrix, dayLabels, hourLabels, theme);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${cardWidth}" height="${viewBoxHeight}" viewBox="0 0 ${viewBoxWidth} ${viewBoxHeight}" fill="none">
   <style>

@@ -156,6 +156,65 @@ export class ApiGitHubRepository implements IGitHubRepository {
     }
   }
 
+  private processRepositoryPage(
+    currentUser: any,
+    allRepoNodes: any[],
+    currentPublicCount: number
+  ): { totalPublicCount: number; hasNextPage: boolean; afterCursor: string | null } {
+    const reposData: any = currentUser?.repositories;
+    if (!reposData) {
+      return { totalPublicCount: currentPublicCount, hasNextPage: false, afterCursor: null };
+    }
+    const totalPublicCount = currentPublicCount === 0 ? (reposData.totalCount || 0) : currentPublicCount;
+    allRepoNodes.push(...(reposData.nodes ?? []));
+    return {
+      totalPublicCount,
+      hasNextPage: reposData.pageInfo?.hasNextPage ?? false,
+      afterCursor: reposData.pageInfo?.endCursor ?? null
+    };
+  }
+
+  private async fetchPagedRepositories(
+    query: string,
+    username: string,
+    userToken?: string,
+    isViewer: boolean = false
+  ): Promise<{ targetUser: any; allRepoNodes: any[]; totalPublicReposCount: number } | null> {
+    let hasNextPage = true;
+    let afterCursor: string | null = null;
+    let pagesFetched = 0;
+    const MAX_PAGES = 3;
+
+    let targetUser: any = null;
+    const allRepoNodes: any[] = [];
+    let totalPublicReposCount = 0;
+
+    while (hasNextPage && pagesFetched < MAX_PAGES) {
+      const variables: Record<string, unknown> = isViewer
+        ? { after: afterCursor }
+        : { username, after: afterCursor };
+
+      const data: { user?: any; viewer?: any } | null = await this.fetchGraphQL<{ user?: any; viewer?: any }>(
+        query,
+        variables,
+        userToken
+      );
+
+      const currentUser: any = isViewer ? data?.viewer : data?.user;
+      if (!currentUser) break;
+      if (!targetUser) targetUser = currentUser;
+
+      const res = this.processRepositoryPage(currentUser, allRepoNodes, totalPublicReposCount);
+      totalPublicReposCount = res.totalPublicCount;
+      hasNextPage = res.hasNextPage;
+      afterCursor = res.afterCursor;
+      pagesFetched++;
+    }
+
+    if (!targetUser) return null;
+    return { targetUser, allRepoNodes, totalPublicReposCount };
+  }
+
   private async getUserStatsViaGraphQL(
     username: string,
     userToken?: string
@@ -217,45 +276,10 @@ export class ApiGitHubRepository implements IGitHubRepository {
         }
       `;
 
-    let hasNextPage = true;
-    let afterCursor: string | null = null;
-    let pagesFetched = 0;
-    const MAX_PAGES = 3;
+    const pagedResult = await this.fetchPagedRepositories(query, username, userToken, isViewer);
+    if (!pagedResult) return null;
 
-    let targetUser: any = null;
-    const allRepoNodes: any[] = [];
-    let totalPublicReposCount = 0;
-
-    while (hasNextPage && pagesFetched < MAX_PAGES) {
-      const variables: Record<string, unknown> = isViewer
-        ? { after: afterCursor }
-        : { username, after: afterCursor };
-
-      const data: { user?: any; viewer?: any } | null = await this.fetchGraphQL<{ user?: any; viewer?: any }>(
-        query,
-        variables,
-        userToken
-      );
-
-      const currentUser: any = isViewer ? data?.viewer : data?.user;
-      if (!currentUser) break;
-      if (!targetUser) targetUser = currentUser;
-
-      const reposData: any = currentUser.repositories;
-      if (reposData) {
-        if (totalPublicReposCount === 0) {
-          totalPublicReposCount = reposData.totalCount || 0;
-        }
-        allRepoNodes.push(...(reposData.nodes ?? []));
-        hasNextPage = reposData.pageInfo?.hasNextPage ?? false;
-        afterCursor = reposData.pageInfo?.endCursor ?? null;
-      } else {
-        hasNextPage = false;
-      }
-      pagesFetched++;
-    }
-
-    if (!targetUser) return null;
+    const { targetUser, allRepoNodes, totalPublicReposCount } = pagedResult;
 
     const u = targetUser;
     let totalStars = 0;
@@ -1115,11 +1139,30 @@ export class ApiGitHubRepository implements IGitHubRepository {
     };
   }
 
+  private populateCommitCalendarMatrix(weeks: any[], hourlyMatrix: number[][]): void {
+    for (const week of weeks) {
+      for (const day of week.contributionDays ?? []) {
+        const count = day.contributionCount ?? 0;
+        if (count > 0) {
+          const rawDay = day.weekday ?? 0;
+          const dayIdx = rawDay === 0 ? 6 : rawDay - 1;
+
+          const dateSeed = day.date ? new Date(day.date).getDate() : 15;
+          const primaryHour = (9 + (dateSeed % 12)) % 24;
+          const secondaryHour = (primaryHour + 4) % 24;
+
+          hourlyMatrix[dayIdx][primaryHour] += Math.ceil(count / 2);
+          hourlyMatrix[dayIdx][secondaryHour] += Math.floor(count / 2);
+        }
+      }
+    }
+  }
+
   async getUserCommitActivity(
     username: string,
     userToken?: string
   ): Promise<{ username: string; totalCommitsThisYear: number; hourlyMatrix: number[][] }> {
-    const hourlyMatrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
+    const hourlyMatrix: number[][] = Array.from({ length: 7 }, () => new Array(24).fill(0));
     let totalCommitsThisYear = 0;
 
     const isViewer = Boolean(userToken);
@@ -1176,22 +1219,7 @@ export class ApiGitHubRepository implements IGitHubRepository {
         const cal = cc.contributionCalendar;
 
         if (cal?.weeks) {
-          for (const week of cal.weeks) {
-            for (const day of week.contributionDays ?? []) {
-              const count = day.contributionCount ?? 0;
-              if (count > 0) {
-                const rawDay = day.weekday ?? 0;
-                const dayIdx = rawDay === 0 ? 6 : rawDay - 1;
-
-                const dateSeed = day.date ? new Date(day.date).getDate() : 15;
-                const primaryHour = (9 + (dateSeed % 12)) % 24;
-                const secondaryHour = (primaryHour + 4) % 24;
-
-                hourlyMatrix[dayIdx][primaryHour] += Math.ceil(count / 2);
-                hourlyMatrix[dayIdx][secondaryHour] += Math.floor(count / 2);
-              }
-            }
-          }
+          this.populateCommitCalendarMatrix(cal.weeks, hourlyMatrix);
         }
       }
     } catch (err) {

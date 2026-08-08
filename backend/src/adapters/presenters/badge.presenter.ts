@@ -1,4 +1,5 @@
 import { escapeXml } from '@/utils/escape';
+import { sanitizeColor } from './theme';
 
 export interface BadgeOptions {
   label?: string;
@@ -13,8 +14,8 @@ export function renderBadgeSVG(options: BadgeOptions): string {
   const rawValue = String(options.value);
   const value = escapeXml(rawValue);
 
-  const labelBg = options.labelColor || '#555555';
-  const valueBg = options.valueColor || '#38bdf8';
+  const labelBg = sanitizeColor(options.labelColor) || '#555555';
+  const valueBg = sanitizeColor(options.valueColor) || '#38bdf8';
 
   // Calculate approximate text widths for crisp rendering
   const labelWidth = Math.max(30, label.length * 6.5 + 16);

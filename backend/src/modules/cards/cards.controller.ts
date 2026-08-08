@@ -267,7 +267,11 @@ export class CardsController {
     const username = rawUsername.trim();
     const type = typeof query.type === 'string' ? query.type : 'views';
     const color = typeof query.color === 'string' ? `#${query.color.replace('#', '')}` : '#38bdf8';
-    const label = typeof query.label === 'string' ? query.label : (type === 'views' ? 'profile views' : 'github helpers');
+    let defaultLabel = 'github helpers';
+    if (type === 'views') {
+      defaultLabel = 'profile views';
+    }
+    const label = typeof query.label === 'string' ? query.label : defaultLabel;
 
     let value = '1';
     if (type === 'views') {

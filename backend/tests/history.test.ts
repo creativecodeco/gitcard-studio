@@ -24,8 +24,11 @@ describe('User Stats History Tracking', () => {
     }
   });
 
-  it('should create a new history entry on the first record', async () => {
-    if (!AppDataSource.isInitialized) return;
+  it('should create a new history entry on the first record', async (ctx) => {
+    if (!AppDataSource.isInitialized) {
+      ctx.skip();
+      return;
+    }
 
     const historyRepo = AppDataSource.getRepository(UserStatsHistory);
 
@@ -52,8 +55,11 @@ describe('User Stats History Tracking', () => {
     expect(entries[0].languages).toEqual({});
   });
 
-  it('should update the same history entry when called within the frequency cutoff', async () => {
-    if (!AppDataSource.isInitialized) return;
+  it('should update the same history entry when called within the frequency cutoff', async (ctx) => {
+    if (!AppDataSource.isInitialized) {
+      ctx.skip();
+      return;
+    }
 
     const historyRepo = AppDataSource.getRepository(UserStatsHistory);
 
@@ -82,8 +88,11 @@ describe('User Stats History Tracking', () => {
     expect(entriesAfterUpdate[0].languages).toEqual({ TypeScript: 5000, JavaScript: 2000 });
   });
 
-  it('should create a new entry when frequency hours is configured to 0 (always record)', async () => {
-    if (!AppDataSource.isInitialized) return;
+  it('should create a new entry when frequency hours is configured to 0 (always record)', async (ctx) => {
+    if (!AppDataSource.isInitialized) {
+      ctx.skip();
+      return;
+    }
 
     const historyRepo = AppDataSource.getRepository(UserStatsHistory);
 

@@ -24,6 +24,10 @@ export class DisconnectAccountDto {
   username!: string;
 
   @IsOptional()
+  @IsString()
+  token?: string;
+
+  @IsOptional()
   @IsIn(['es', 'en'])
   locale?: 'es' | 'en';
 }
@@ -35,6 +39,10 @@ export class PurgeSelfAccountDto {
     message: 'username must be a valid GitHub username.',
   })
   username!: string;
+
+  @IsOptional()
+  @IsString()
+  token?: string;
 
   @IsOptional()
   @IsIn(['es', 'en'])

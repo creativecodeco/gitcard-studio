@@ -28,8 +28,11 @@ describe('Profile Views Counter Badge', () => {
     }
   });
 
-  it('should initialize profile_views to 0 and not increment if increment parameter is false', async () => {
-    if (!AppDataSource.isInitialized) return;
+  it('should initialize profile_views to 0 and not increment if increment parameter is false', async (ctx) => {
+    if (!AppDataSource.isInitialized) {
+      ctx.skip();
+      return;
+    }
     const initialViews = await metricsRepo.getOrIncrementProfileViews(testUser, false);
     expect(initialViews).toBe(0);
 
@@ -38,8 +41,11 @@ describe('Profile Views Counter Badge', () => {
     expect(secondCallViews).toBe(0);
   });
 
-  it('should increment profile_views atomic count by 1 and save request_log when increment is true', async () => {
-    if (!AppDataSource.isInitialized) return;
+  it('should increment profile_views atomic count by 1 and save request_log when increment is true', async (ctx) => {
+    if (!AppDataSource.isInitialized) {
+      ctx.skip();
+      return;
+    }
     const hitContext = {
       username: testUser,
       userAgent: 'GitHub-Camo/1.0 (camo-proxy)',

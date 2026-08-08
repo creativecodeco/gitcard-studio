@@ -1,23 +1,25 @@
-import { ITokenRepository } from '@/domain/repositories/ITokenRepository';
+import { ITokenRepository, SaveTokenParams } from '@/domain/repositories/ITokenRepository';
 import { UserToken } from '@/domain/entities/UserToken';
 import { AppDataSource } from '@/infrastructure/database/database';
 import { UserTokenEntity } from '@/infrastructure/database/entities/UserTokenEntity';
 import { logger } from '@/infrastructure/logging/logger';
 
 export class TypeORMTokenRepository implements ITokenRepository {
-  async saveToken(
-    username: string,
-    encryptedToken: string,
-    iv: string,
-    consentAccepted: boolean,
-    consentDate: string,
-    consentFingerprint: string,
-    tokenType: string = 'pat',
-    encryptedRefreshToken?: string,
-    refreshTokenIv?: string,
-    expiresAt?: string,
-    scopes?: string
-  ): Promise<void> {
+  async saveToken(params: SaveTokenParams): Promise<void> {
+    const {
+      username,
+      encryptedToken,
+      iv,
+      consentAccepted,
+      consentDate,
+      consentFingerprint,
+      tokenType = 'pat',
+      encryptedRefreshToken,
+      refreshTokenIv,
+      expiresAt,
+      scopes
+    } = params;
+
     try {
       const tokenRepo = AppDataSource.getRepository(UserTokenEntity);
 

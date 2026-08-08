@@ -18,7 +18,7 @@ import { escapeXml } from '@/utils/escape';
 import { getMessages, resolveLocale } from '@/infrastructure/i18n/backendI18n';
 import { RegisterTokenDto, RevokeTokenDto, PurgeUserDto } from './dto/tokens.dto';
 
-function extractBearerToken(authHeader?: string, bodyToken?: string): string | undefined {
+export function extractBearerToken(authHeader?: string, bodyToken?: string): string | undefined {
   const raw = authHeader ?? bodyToken;
   if (typeof raw !== 'string') return undefined;
   if (raw.startsWith('Bearer ')) return raw.slice(7);

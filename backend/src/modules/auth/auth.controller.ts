@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Headers,
   Inject,
@@ -11,6 +12,7 @@ import {
   Post,
   Query,
   Redirect,
+  UnauthorizedException,
 } from '@nestjs/common';
 import crypto from 'node:crypto';
 import { RegisterOAuthTokenUseCase } from '@/use-cases/tokens/RegisterOAuthTokenUseCase';
@@ -20,7 +22,9 @@ import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
 import { AppDataSource } from '@/infrastructure/database/database';
 import { UserMetric } from '@/infrastructure/database/entities/UserMetric';
 import { logger } from '@/infrastructure/logging/logger';
+import { escapeXml } from '@/utils/escape';
 import { getMessages, resolveLocale } from '@/infrastructure/i18n/backendI18n';
+import { extractBearerToken } from '@/modules/tokens/tokens.controller';
 import { DisconnectAccountDto, GetUserMetricsQueryDto, PurgeSelfAccountDto } from './dto/auth.dto';
 
 @Controller('api')
@@ -184,10 +188,48 @@ export class AuthController {
     }
   }
 
+  private async verifyTokenOwnership(
+    username: string,
+    authHeader?: string,
+    bodyToken?: string,
+    locale?: 'es' | 'en'
+  ): Promise<void> {
+    const m = getMessages(resolveLocale(locale));
+    const providedToken = extractBearerToken(authHeader, bodyToken);
+
+    if (!providedToken || providedToken.trim() === '') {
+      throw new UnauthorizedException(m.purgeTokenRequired);
+    }
+
+    const profileRes = await fetch('https://api.github.com/user', {
+      headers: {
+        'User-Agent': 'gitcard-studio-security',
+        Accept: 'application/vnd.github.v3+json',
+        Authorization: `token ${providedToken}`,
+      },
+    });
+
+    if (!profileRes.ok) {
+      throw new UnauthorizedException(m.tokenExpiredOrInvalid);
+    }
+
+    const githubUser = (await profileRes.json()) as { login: string };
+    const tokenOwner = githubUser.login;
+
+    if (tokenOwner.toLowerCase() !== username.toLowerCase()) {
+      throw new ForbiddenException(m.accessDenied(escapeXml(tokenOwner), escapeXml(username)));
+    }
+  }
+
   @Delete('users/me')
-  async deleteUserAccount(@Query() query: PurgeSelfAccountDto): Promise<{ message: string }> {
+  async deleteUserAccount(
+    @Query() query: PurgeSelfAccountDto,
+    @Headers('authorization') authHeader?: string
+  ): Promise<{ message: string }> {
     const m = getMessages(resolveLocale(query.locale));
     const username = query.username.toLowerCase();
+
+    await this.verifyTokenOwnership(username, authHeader, query.token, query.locale);
 
     try {
       await this.purgeUseCase.execute(username);
@@ -195,15 +237,23 @@ export class AuthController {
       logger.info(`User account ${query.username} purged self successfully via UI`, { username: query.username });
       return { message: m.purgeSuccess };
     } catch (error: unknown) {
+      if (error instanceof UnauthorizedException || error instanceof ForbiddenException) {
+        throw error;
+      }
       logger.error(`Error purging user account ${query.username}`, { username: query.username, error });
       throw new InternalServerErrorException(m.purgeDataError);
     }
   }
 
   @Post('auth/disconnect')
-  async disconnectAccount(@Body() dto: DisconnectAccountDto): Promise<{ message: string }> {
+  async disconnectAccount(
+    @Body() dto: DisconnectAccountDto,
+    @Headers('authorization') authHeader?: string
+  ): Promise<{ message: string }> {
     const m = getMessages(resolveLocale(dto.locale));
     const username = dto.username.toLowerCase();
+
+    await this.verifyTokenOwnership(username, authHeader, dto.token, dto.locale);
 
     try {
       await this.tokenRepo.deleteToken(username);
@@ -211,6 +261,9 @@ export class AuthController {
       logger.info(`Disconnected GitHub account for user ${dto.username}`, { username: dto.username });
       return { message: m.accountDisconnectSuccess };
     } catch (error: unknown) {
+      if (error instanceof UnauthorizedException || error instanceof ForbiddenException) {
+        throw error;
+      }
       logger.error(`Error disconnecting GitHub account for user ${dto.username}`, { username: dto.username, error });
       throw new InternalServerErrorException(m.tokenRevokeError);
     }
