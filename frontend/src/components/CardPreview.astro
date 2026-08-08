@@ -23,6 +23,7 @@ const {
 <div class="card-preview-wrapper" data-category={category}>
   <h3 class="card-title-label" data-i18n={`title_${id}`}>{title}</h3>
   <div class="image-frame" id={`${id}-frame`} style={frameStyle}>
+    <div class="skeleton-shimmer hidden" id={`${id}-shimmer`}></div>
     <img
       id={`${id}-img`}
       alt={`Vista previa de ${title.toLowerCase()}`}

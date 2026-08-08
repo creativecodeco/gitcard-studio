@@ -1,14 +1,23 @@
 {
   "cSpell.language": "en,es",
   "cSpell.words": [
+    "bezier",
     "camo",
     "creativecode",
     "creativecodeco",
+    "dasharray",
+    "dashoffset",
     "gitcard",
     "github",
     "Github",
+    "Glassmorphism",
     "gtag",
+    "linecap",
+    "Menlo",
+    "minmax",
     "nestjs",
+    "nowrap",
+    "rgba",
     "Segoe"
   ],
   "sonarlint.connectedMode.project": {

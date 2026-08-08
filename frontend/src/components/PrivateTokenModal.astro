@@ -104,32 +104,11 @@
   <div
     id="auth-tabs-nav"
     class="auth-tabs-nav"
-    style="
-      display: flex;
-      gap: 4px;
-      background: rgba(0, 0, 0, 0.35);
-      padding: 4px;
-      border-radius: 10px;
-      border: 1px solid var(--glass-border);
-    "
   >
     <button
       type="button"
       id="mode-tab-public"
       class="mode-tab-btn active"
-      style="
-        flex: 1;
-        padding: 8px 4px;
-        border-radius: 8px;
-        border: none;
-        background: rgba(88, 166, 255, 0.2);
-        color: var(--text-primary);
-        cursor: pointer;
-        font-size: 0.8rem;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        text-align: center;
-      "
     >
       🌐 Público
     </button>
@@ -137,19 +116,6 @@
       type="button"
       id="mode-tab-app"
       class="mode-tab-btn"
-      style="
-        flex: 1;
-        padding: 8px 4px;
-        border-radius: 8px;
-        border: none;
-        background: transparent;
-        color: var(--text-secondary);
-        cursor: pointer;
-        font-size: 0.8rem;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        text-align: center;
-      "
     >
       ⚡ GitHub App
     </button>
@@ -157,19 +123,6 @@
       type="button"
       id="mode-tab-pat"
       class="mode-tab-btn"
-      style="
-        flex: 1;
-        padding: 8px 4px;
-        border-radius: 8px;
-        border: none;
-        background: transparent;
-        color: var(--text-secondary);
-        cursor: pointer;
-        font-size: 0.8rem;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        text-align: center;
-      "
     >
       🔑 PAT
     </button>
@@ -501,8 +454,6 @@
       [modeTabPublic, modeTabApp, modeTabPat].forEach(btn => {
         if (btn) {
           btn.classList.remove('active');
-          btn.style.background = 'transparent';
-          btn.style.color = 'var(--text-secondary)';
         }
       });
       [modePanePublic, modePaneApp, modePanePat].forEach(pane => {
@@ -511,18 +462,12 @@
 
       if (targetTab === 'public' && modeTabPublic && modePanePublic) {
         modeTabPublic.classList.add('active');
-        modeTabPublic.style.background = 'rgba(88, 166, 255, 0.2)';
-        modeTabPublic.style.color = 'var(--text-primary)';
         modePanePublic.classList.remove('hidden');
       } else if (targetTab === 'app' && modeTabApp && modePaneApp) {
         modeTabApp.classList.add('active');
-        modeTabApp.style.background = 'rgba(88, 166, 255, 0.2)';
-        modeTabApp.style.color = 'var(--text-primary)';
         modePaneApp.classList.remove('hidden');
       } else if (targetTab === 'pat' && modeTabPat && modePanePat) {
         modeTabPat.classList.add('active');
-        modeTabPat.style.background = 'rgba(88, 166, 255, 0.2)';
-        modeTabPat.style.color = 'var(--text-primary)';
         modePanePat.classList.remove('hidden');
       }
     }

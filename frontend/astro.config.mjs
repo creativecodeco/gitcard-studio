@@ -8,6 +8,14 @@ export default defineConfig({
     format: 'file'
   },
   vite: {
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        }
+      }
+    },
     ssr: {
       noExternal: ['cookie']
     }

@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ThemeToggle from '@/components/ThemeToggle.astro';
-import PrivateTokenModal from '@/components/PrivateTokenModal.astro';
 import CardPreview from '@/components/CardPreview.astro';
+import ControlPanel from '@/components/ControlPanel.astro';
+import CardFilterBar from '@/components/CardFilterBar.astro';
+import SampleReadmeSection from '@/components/SampleReadmeSection.astro';
 import Footer from '@/components/Footer.astro';
 ---
 
@@ -37,218 +39,27 @@ import Footer from '@/components/Footer.astro';
     <p class="subtitle" data-i18n="header_subtitle">
       Potencia la visibilidad de tus proyectos. Genera métricas y tarjetas estéticas en caliente para tu README.md.
     </p>
-    <!-- Live Metrics counter -->
-    <div class="hidden metrics-badge" id="metrics-badge">
-      <span class="pulse-dot"></span>
-      <span style="display: inline-flex; align-items: center; gap: 4px;">
-        <span data-i18n="header_metrics_label">Usuarios usando las cards: </span>
-        <strong id="metrics-count">Cargando...</strong>
-      </span>
+    <!-- Header Badges Row -->
+    <div class="header-badges-row">
+      <div class="status-pill">
+        <span class="status-dot-pulse"></span>
+        <span>API Operational (Ultra-Fast Cache)</span>
+      </div>
+      <!-- Live Metrics counter -->
+      <div class="hidden metrics-badge" id="metrics-badge">
+        <span class="pulse-dot"></span>
+        <span style="display: inline-flex; align-items: center; gap: 4px;">
+          <span data-i18n="header_metrics_label">Usuarios usando las cards: </span>
+          <strong id="metrics-count">Cargando...</strong>
+        </span>
+      </div>
     </div>
   </header>
 
   <main class="main-content">
     <!-- Left Column Wrapper -->
     <div class="left-column" style="display: flex; flex-direction: column; gap: 24px; width: 100%">
-      <!-- Master Left Panel: Settings, Connection & Customization -->
-      <section class="settings-panel glass-card" style="width: 100%">
-        <h2 class="section-title" style="margin-bottom: 16px;" data-i18n="settings_title">Configuración e Identidad</h2>
-
-        <!-- Section 1: Identidad & Autenticación (Modos por Tabs) -->
-        <div style="margin-bottom: 20px;">
-          <PrivateTokenModal />
-        </div>
-
-        <!-- Section 3: Themes & Customization -->
-        <div style="border-top: 1px solid var(--glass-border); padding-top: 18px;">
-          <h3 class="section-title" style="font-size: 1.05rem; margin-bottom: 12px;" data-i18n="card_customization_title">Estilo & Personalización</h3>
-          <!-- Themes -->
-          <div class="themes-group">          <span class="input-label" data-i18n="theme_label">Selecciona un Estilo</span>
-          <div class="themes-grid" id="themes-container">
-            <button class="theme-option active" data-theme="dark" id="theme-dark">
-              <span class="theme-name">Dark</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #0d1117"></span>
-                <span class="color-dot" style="background: #58a6ff"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="light" id="theme-light">
-              <span class="theme-name">Light</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #ffffff"></span>
-                <span class="color-dot" style="background: #0969da"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="neon" id="theme-neon">
-              <span class="theme-name">Neon</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #050505"></span>
-                <span class="color-dot" style="background: #00ff66"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="glassmorphism" id="theme-glassmorphism">
-              <span class="theme-name">Glass</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: rgba(15, 23, 42, 0.65)"></span>
-                <span class="color-dot" style="background: #38bdf8"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="solarized" id="theme-solarized">
-              <span class="theme-name">Solarized</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #002b36"></span>
-                <span class="color-dot" style="background: #2aa198"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="radical" id="theme-radical">
-              <span class="theme-name">Radical</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #141321"></span>
-                <span class="color-dot" style="background: #fe428e"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="tokyonight" id="theme-tokyonight">
-              <span class="theme-name">Tokyo</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #1a1b26"></span>
-                <span class="color-dot" style="background: #79dac8"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="catppuccin_mocha" id="theme-catppuccin_mocha">
-              <span class="theme-name">Catppuccin</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #1e1e2e"></span>
-                <span class="color-dot" style="background: #cba6f7"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="nord" id="theme-nord">
-              <span class="theme-name">Nord</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #2e3440"></span>
-                <span class="color-dot" style="background: #88c0d0"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="cyberpunk" id="theme-cyberpunk">
-              <span class="theme-name">Cyberpunk</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #0d0221"></span>
-                <span class="color-dot" style="background: #f7c59f"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="gruvbox" id="theme-gruvbox">
-              <span class="theme-name">Gruvbox</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #282828"></span>
-                <span class="color-dot" style="background: #fabd2f"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="synthwave" id="theme-synthwave">
-              <span class="theme-name">Synthwave</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #1a0933"></span>
-                <span class="color-dot" style="background: #f97e72"></span>
-              </span>
-            </button>
-            <button class="theme-option" data-theme="custom" id="theme-custom">
-              <span class="theme-name">Custom 🎨</span>
-              <span class="theme-colors">
-                <span class="color-dot" style="background: #38bdf8"></span>
-                <span class="color-dot" style="background: #a855f7"></span>
-              </span>
-            </button>
-          </div>
-
-          <!-- Custom Theme Color Pickers Panel (Shown only when 'Custom 🎨' theme is active) -->
-          <div id="custom-theme-picker-panel" class="hidden" style="margin-top: 14px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 12px; background: rgba(0,0,0,0.3); transition: all 0.3s ease;">
-            <div style="font-size: 0.8rem; font-weight: 600; color: var(--accent-color); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-              🎨 <span>Personalizar Paleta de Colores</span>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-              <div>
-                <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">Fondo (BG)</label>
-                <input type="color" id="picker-bg" value="#0d1117" style="width: 100%; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
-              </div>
-              <div>
-                <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">Título</label>
-                <input type="color" id="picker-title" value="#58a6ff" style="width: 100%; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
-              </div>
-              <div>
-                <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">Texto</label>
-                <input type="color" id="picker-text" value="#c9d1d9" style="width: 100%; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
-              </div>
-              <div>
-                <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">Iconos / Acento</label>
-                <input type="color" id="picker-icon" value="#58a6ff" style="width: 100%; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
-              </div>
-              <div style="grid-column: span 2;">
-                <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">Borde</label>
-                <input type="color" id="picker-border" value="#30363d" style="width: 100%; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card Width Control -->
-        <div class="input-group" style="margin-top: 4px;">
-          <label class="input-label" data-i18n="card_width_label">Ancho de Tarjeta</label>
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <button
-              class="width-option active"
-              data-width="default"
-              id="width-default"
-              style="flex: 1; min-width: 100px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(88,166,255,0.12); color: var(--text-primary); cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.2s;"
-            >
-              <span data-i18n="width_standard">Estándar (495px)</span>
-            </button>
-            <button
-              class="width-option"
-              data-width="100%"
-              id="width-full"
-              style="flex: 1; min-width: 100px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.2s;"
-            >
-              <span data-i18n="width_full">Ancho Completo (100%)</span>
-            </button>
-          </div>
-          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
-            <div class="input-wrapper" style="flex: 1; height: 36px;">
-              <input
-                type="text"
-                id="custom-width-input"
-                placeholder="Personalizado, ej: 600"
-                data-i18n-placeholder="custom_width_placeholder"
-                autocomplete="off"
-                style="font-size: 0.85rem;"
-              />
-            </div>
-            <button
-              id="btn-apply-width"
-              style="padding: 0 14px; height: 36px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(56,189,248,0.08); color: var(--text-primary); cursor: pointer; font-size: 0.82rem; font-weight: 600; white-space: nowrap;"
-            >
-              <span data-i18n="btn_apply">Aplicar</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Idioma de Tarjetas (i18n) -->
-        <div class="input-group" style="margin-top: 16px;">
-          <label for="locale-select" class="input-label" data-i18n="locale_label">Idioma de Tarjetas</label>
-          <div class="input-wrapper" style="height: 38px;">
-            <select
-              id="locale-select"
-              style="width: 100%; height: 100%; background: transparent; border: none; color: var(--text-primary); font-family: var(--font-family); font-size: 0.85rem; padding-left: 12px; cursor: pointer; outline: none;"
-            >
-              <option value="es" style="background: var(--bg-color); color: var(--text-primary);" data-i18n="locale_es">
-                Español (es)
-              </option>
-              <option value="en" style="background: var(--bg-color); color: var(--text-primary);" data-i18n="locale_en">
-                English (en)
-              </option>
-            </select>
-          </div>
-        </div>
-        </div>
-      </section>
+      <ControlPanel />
     </div>
 
     <!-- Right Panel: Live Preview & Code -->
@@ -257,34 +68,7 @@ import Footer from '@/components/Footer.astro';
       <div class="preview-card glass-card">
         <h2 class="section-title" data-i18n="preview_title">Vista Previa</h2>
 
-        <!-- Card Category Filter Bar -->
-        <div class="card-filter-bar" id="card-filter-bar">
-          <button class="filter-tab active" data-filter="all" type="button">
-            <span class="tab-icon">🌟</span>
-            <span class="tab-label" data-i18n="cat_all">Todas</span>
-            <span class="filter-badge">12</span>
-          </button>
-          <button class="filter-tab" data-filter="stats" type="button">
-            <span class="tab-icon">📊</span>
-            <span class="tab-label" data-i18n="cat_stats">Estadísticas</span>
-            <span class="filter-badge">4</span>
-          </button>
-          <button class="filter-tab" data-filter="activity" type="button">
-            <span class="tab-icon">🔥</span>
-            <span class="tab-label" data-i18n="cat_activity">Actividad</span>
-            <span class="filter-badge">4</span>
-          </button>
-          <button class="filter-tab" data-filter="repos" type="button">
-            <span class="tab-icon">📦</span>
-            <span class="tab-label" data-i18n="cat_repos">Repositorios</span>
-            <span class="filter-badge">3</span>
-          </button>
-          <button class="filter-tab" data-filter="badges" type="button">
-            <span class="tab-icon">🏷️</span>
-            <span class="tab-label" data-i18n="cat_badges">Badges</span>
-            <span class="filter-badge">1</span>
-          </button>
-        </div>
+        <CardFilterBar />
 
         <div class="cards-preview-container">
           <!-- Profile Views Badge Preview -->
@@ -632,110 +416,7 @@ import Footer from '@/components/Footer.astro';
         </div>
       </div>
 
-      <!-- Sample README.md Card / Generator Block -->
-      <div class="sample-readme-card glass-card" style="margin-top: 24px; padding: 24px; border-radius: 16px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
-          <div>
-            <h2 class="section-title" style="margin-bottom: 4px;" data-i18n="sample_readme_title">README.md de Ejemplo</h2>
-            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0;" data-i18n="sample_readme_desc">
-              Plantilla completa lista para copiar e insertar en tu repositorio de perfil.
-            </p>
-          </div>
-          <a
-            href="/help/github-profile"
-            class="help-link-btn"
-            style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent-color); font-size: 0.82rem; font-weight: 600; text-decoration: none; padding: 8px 14px; border-radius: 8px; background: rgba(56,189,248,0.08); border: 1px solid var(--glass-border); transition: all 0.2s;"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-            <span data-i18n="profile_help_link">¿Cómo crear tu perfil en GitHub?</span> →
-          </a>
-        </div>
-
-        <!-- Layout Controls & View Mode Tabs -->
-        <div class="readme-controls-bar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--glass-border);">
-          <!-- Layout Selector -->
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;" data-i18n="readme_layout_label">Diseño:</span>
-            <button
-              id="btn-readme-layout-vertical"
-              class="readme-layout-btn active"
-              data-layout="vertical"
-              style="padding: 4px 10px; border-radius: 6px; border: 1px solid var(--glass-border); cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.2s;"
-            >
-              📱 <span data-i18n="readme_layout_vertical">Vertical</span>
-            </button>
-            <button
-              id="btn-readme-layout-grid"
-              class="readme-layout-btn"
-              data-layout="grid"
-              style="padding: 4px 10px; border-radius: 6px; border: 1px solid var(--glass-border); cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.2s;"
-            >
-              📊 <span data-i18n="readme_layout_grid">Tabla (2 Col)</span>
-            </button>
-          </div>
-
-          <!-- View Mode Tabs (Code vs Live Preview) -->
-          <div class="readme-tabs-wrapper" style="display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.3); padding: 3px; border-radius: 8px; border: 1px solid var(--glass-border);">
-            <button
-              id="tab-readme-code"
-              class="readme-tab-btn active"
-              style="padding: 4px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.78rem; font-weight: 700; transition: all 0.2s;"
-            >
-              📝 <span data-i18n="tab_readme_code">Código Markdown</span>
-            </button>
-            <button
-              id="tab-readme-preview"
-              class="readme-tab-btn"
-              style="padding: 4px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.2s;"
-            >
-              👁️ <span data-i18n="tab_readme_preview">Vista Previa Live</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="sample-readme-container" style="position: relative;">
-          <!-- Markdown Code Box -->
-          <textarea
-            id="sample-readme-textarea"
-            readonly
-            rows="8"
-            placeholder="Genera tus tarjetas para ver el README.md de ejemplo..."
-            data-i18n-placeholder="sample_readme_placeholder"
-            style="width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: 10px; padding: 14px; color: #f1f5f9; font-family: monospace; font-size: 0.82rem; line-height: 1.5; resize: vertical; outline: none;"
-          ></textarea>
-
-          <!-- Live Preview Render Box (Hidden by default) -->
-          <div
-            id="sample-readme-rendered"
-            class="hidden"
-            style="width: 100%; min-height: 180px; max-height: 400px; overflow-y: auto; background: rgba(13, 17, 23, 0.9); border: 1px solid var(--glass-border); border-radius: 10px; padding: 18px; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.9rem; line-height: 1.6;"
-          >
-            <div id="rendered-readme-content">
-              <p style="color: var(--text-secondary); text-align: center; margin-top: 40px;" data-i18n="sample_readme_placeholder">
-                Genera tus tarjetas para ver el README.md de ejemplo...
-              </p>
-            </div>
-          </div>
-
-          <button
-            id="btn-copy-sample-readme"
-            class="primary-btn full-width-btn"
-            style="margin-top: 12px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;"
-          >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            <span data-i18n="btn_copy_sample_readme">Copiar README.md Completo</span>
-          </button>
-        </div>
-      </div>
+      <SampleReadmeSection />
     </section>
   </main>
 
@@ -745,9 +426,9 @@ import Footer from '@/components/Footer.astro';
 </BaseLayout>
 
 <script>
-  import { generateSampleReadme, type CardItem } from '@/utils/readmeGenerator';
+  import { generateSampleReadme, renderLiveReadmeHtml, type CardItem } from '@/utils/readmeGenerator';
+  import { buildCardUrls } from '@/utils/cardUrls';
   import { t, updateDomTranslations } from '@/utils/i18n';
-  import { escapeHtml } from '@/utils/escape';
 
   // Elements
   const usernameInput = document.getElementById('username-input') as HTMLInputElement | null;
@@ -856,7 +537,7 @@ import Footer from '@/components/Footer.astro';
     }
   });
 
-  // --- Card Category Filter Tabs ---
+  // --- Card Category Filter Tabs with Stagger Animation ---
   const filterTabs = document.querySelectorAll('.filter-tab') as NodeListOf<HTMLButtonElement>;
 
   filterTabs.forEach((tab) => {
@@ -866,18 +547,25 @@ import Footer from '@/components/Footer.astro';
       const selectedCategory = tab.getAttribute('data-filter') || 'all';
 
       const cardWrappers = document.querySelectorAll('.card-preview-wrapper');
+      let visibleIdx = 0;
       cardWrappers.forEach((wrapper) => {
+        const htmlEl = wrapper as HTMLElement;
         const cat = wrapper.getAttribute('data-category');
         if (selectedCategory === 'all' || cat === selectedCategory) {
-          wrapper.classList.remove('cat-hidden');
-          wrapper.classList.add('cat-visible');
+          htmlEl.classList.remove('cat-hidden');
+          htmlEl.classList.add('cat-visible', 'stagger-in');
+          htmlEl.style.animationDelay = `${visibleIdx * 0.04}s`;
+          visibleIdx++;
         } else {
-          wrapper.classList.add('cat-hidden');
-          wrapper.classList.remove('cat-visible');
+          htmlEl.classList.add('cat-hidden');
+          htmlEl.classList.remove('cat-visible', 'stagger-in');
+          htmlEl.style.animationDelay = '0s';
         }
       });
     });
   });
+
+
   // --- Card Width Control ---
   const widthOptions = document.querySelectorAll('.width-option') as NodeListOf<HTMLButtonElement>;
   const customWidthInput = document.getElementById('custom-width-input') as HTMLInputElement | null;
@@ -1165,72 +853,6 @@ import Footer from '@/components/Footer.astro';
     [...successCards, ...errorCards].forEach((wrapper) => container.appendChild(wrapper));
   }
 
-  function renderLiveReadmeHtml(username: string, activeCards: CardItem[], locale: string, layout: 'vertical' | 'grid', generatorUrl?: string): string {
-    const cleanUser = escapeHtml(username.trim() || 'username');
-    const rawPageUrl = generatorUrl || window.location.href;
-    const safePageUrl = escapeHtml(rawPageUrl);
-
-    if (activeCards.length === 0) {
-      return `<h1 style="font-size: 1.4rem; color: #fff; border-bottom: 1px solid #30363d; padding-bottom: 8px; margin-top: 0;">${t('readme_preview_greeting', locale, { username: cleanUser })}</h1>
-      <p style="color: #8b949e; margin-bottom: 0;">${t('readme_preview_welcome', locale)}</p>`;
-    }
-
-    const titleText = t('readme_preview_greeting', locale, { username: cleanUser });
-    const descText = t('readme_preview_desc', locale);
-    const sectionTitle = t('readme_preview_section_title', locale);
-
-    let cardsHtml: string;
-
-    if (layout === 'grid') {
-      const rows: string[] = [];
-      for (let i = 0; i < activeCards.length; i += 2) {
-        const c1 = activeCards[i];
-        const c2 = activeCards[i + 1];
-        const url1 = escapeHtml(c1.url);
-        const title1 = escapeHtml(c1.title);
-        if (c2) {
-          const url2 = escapeHtml(c2.url);
-          const title2 = escapeHtml(c2.title);
-          rows.push(`<tr>
-            <td valign="top" style="padding: 6px; width: 50%;">
-              <img src="${url1}" alt="${title1}" style="width: 100%; border-radius: 6px; display: block;" />
-            </td>
-            <td valign="top" style="padding: 6px; width: 50%;">
-              <img src="${url2}" alt="${title2}" style="width: 100%; border-radius: 6px; display: block;" />
-            </td>
-          </tr>`);
-        } else {
-          rows.push(`<tr>
-            <td valign="top" style="padding: 6px; width: 50%;">
-              <img src="${url1}" alt="${title1}" style="width: 100%; border-radius: 6px; display: block;" />
-            </td>
-            <td style="width: 50%;"></td>
-          </tr>`);
-        }
-      }
-      cardsHtml = `<table style="width: 100%; border-collapse: collapse;">${rows.join('')}</table>`;
-    } else {
-      cardsHtml = activeCards
-        .map(
-          (c) => `<div style="margin-bottom: 12px;">
-          <img src="${escapeHtml(c.url)}" alt="${escapeHtml(c.title)}" style="max-width: 100%; border-radius: 6px; display: block;" />
-        </div>`
-        )
-        .join('');
-    }
-
-    const footerText = t('readme_preview_footer', locale);
-
-    return `
-      <h1 style="font-size: 1.4rem; color: #fff; border-bottom: 1px solid #30363d; padding-bottom: 8px; margin-top: 0; margin-bottom: 12px;">${titleText}</h1>
-      <p style="color: #8b949e; font-size: 0.9rem; margin-bottom: 16px;">${descText}</p>
-      <h3 style="font-size: 1.1rem; color: #e6edf3; margin-bottom: 10px;">${sectionTitle}</h3>
-      ${cardsHtml}
-      <hr style="border: 0; border-top: 1px solid #30363d; margin: 20px 0 10px 0;" />
-      <p style="font-size: 0.8rem; color: #8b949e; font-style: italic; margin: 0;">${footerText} &bull; <a href="${safePageUrl}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none;">${safePageUrl}</a></p>
-    `;
-  }
-
   function updateSampleReadmeText() {
     const textarea = document.getElementById('sample-readme-textarea') as HTMLTextAreaElement | null;
     const renderedContainer = document.getElementById('rendered-readme-content');
@@ -1242,51 +864,32 @@ import Footer from '@/components/Footer.astro';
       return;
     }
 
-    const origin = window.location.origin;
-    const widthParam = currentCardWidth
-      ? `&card_width=${encodeURIComponent(currentCardWidth)}`
-      : '';
-    const localeParam = currentLocale ? `&locale=${encodeURIComponent(currentLocale)}` : '';
-    const customColors = getCustomThemeQueryParams();
-
-    const statsUrl = `${origin}/api/stats?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const languagesUrl = `${origin}/api/languages?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const rankUrl = `${origin}/api/rank?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const streakUrl = `${origin}/api/streak?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const trophiesUrl = `${origin}/api/trophies?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const topReposUrl = `${origin}/api/top-repos?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const sponsorsUrl = `${origin}/api/sponsors?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const commitActivityUrl = `${origin}/api/commit-activity?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const todayStatusUrl = `${origin}/api/today-status?username=${currentUsername}&theme=${currentTheme}${localeParam}${customColors}`;
-    const timelineMatrixUrl = `${origin}/api/timeline-matrix?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-
-    let repoUrl = `${origin}/api/repo?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    if (currentRepo) {
-      repoUrl += `&repo=${encodeURIComponent(currentRepo)}`;
-    }
-
-    const labelVal = viewsLabel ? viewsLabel.value.trim() : '';
-    const colorVal = viewsColor ? viewsColor.value.trim() : '';
-    const styleVal = viewsStyle ? viewsStyle.value : '';
-
-    let viewsUrl = `${origin}/api/views?username=${currentUsername}&theme=${currentTheme}`;
-    if (labelVal) viewsUrl += `&label=${encodeURIComponent(labelVal)}`;
-    if (colorVal) viewsUrl += `&color=${encodeURIComponent(colorVal)}`;
-    if (styleVal) viewsUrl += `&style=${encodeURIComponent(styleVal)}`;
+    const cardUrls = buildCardUrls({
+      origin: window.location.origin,
+      username: currentUsername,
+      theme: currentTheme,
+      cardWidth: currentCardWidth,
+      locale: currentLocale,
+      customColors: getCustomThemeQueryParams(),
+      repo: currentRepo,
+      viewsLabel: viewsLabel?.value,
+      viewsColor: viewsColor?.value,
+      viewsStyle: viewsStyle?.value,
+    });
 
     const cardsConfig = [
-      { id: 'today-status', title: t('code_label_today_status', currentLocale), cleanUrl: todayStatusUrl, getPreviewUrl: () => (document.getElementById('today-status-img') as HTMLImageElement | null)?.src },
-      { id: 'views', title: t('code_label_views', currentLocale), cleanUrl: viewsUrl, getPreviewUrl: () => viewsImg?.src },
-      { id: 'stats', title: t('code_label_stats', currentLocale), cleanUrl: statsUrl, getPreviewUrl: () => statsImg?.src },
-      { id: 'languages', title: t('code_label_languages', currentLocale), cleanUrl: languagesUrl, getPreviewUrl: () => languagesImg?.src },
-      { id: 'streak', title: t('code_label_streak', currentLocale), cleanUrl: streakUrl, getPreviewUrl: () => streakImg?.src },
-      { id: 'rank', title: t('title_rank', currentLocale), cleanUrl: rankUrl, getPreviewUrl: () => rankImg?.src },
-      { id: 'trophies', title: t('code_label_trophies', currentLocale), cleanUrl: trophiesUrl, getPreviewUrl: () => trophiesImg?.src },
-      { id: 'top-repos', title: t('code_label_top_repos', currentLocale), cleanUrl: topReposUrl, getPreviewUrl: () => topReposImg?.src },
-      { id: 'sponsors', title: t('code_label_sponsors', currentLocale), cleanUrl: sponsorsUrl, getPreviewUrl: () => sponsorsImg?.src },
-      { id: 'commit-activity', title: t('code_label_commit_activity', currentLocale), cleanUrl: commitActivityUrl, getPreviewUrl: () => commitActivityImg?.src },
-      { id: 'timeline-matrix', title: t('code_label_timeline_matrix', currentLocale), cleanUrl: timelineMatrixUrl, getPreviewUrl: () => (document.getElementById('timeline-matrix-img') as HTMLImageElement | null)?.src },
-      { id: 'repo', title: t('title_repo', currentLocale), cleanUrl: repoUrl, getPreviewUrl: () => repoImg?.src },
+      { id: 'today-status', title: t('code_label_today_status', currentLocale), cleanUrl: cardUrls.todayStatusUrl, getPreviewUrl: () => (document.getElementById('today-status-img') as HTMLImageElement | null)?.src },
+      { id: 'views', title: t('code_label_views', currentLocale), cleanUrl: cardUrls.viewsUrl, getPreviewUrl: () => viewsImg?.src },
+      { id: 'stats', title: t('code_label_stats', currentLocale), cleanUrl: cardUrls.statsUrl, getPreviewUrl: () => statsImg?.src },
+      { id: 'languages', title: t('code_label_languages', currentLocale), cleanUrl: cardUrls.languagesUrl, getPreviewUrl: () => languagesImg?.src },
+      { id: 'streak', title: t('code_label_streak', currentLocale), cleanUrl: cardUrls.streakUrl, getPreviewUrl: () => streakImg?.src },
+      { id: 'rank', title: t('title_rank', currentLocale), cleanUrl: cardUrls.rankUrl, getPreviewUrl: () => rankImg?.src },
+      { id: 'trophies', title: t('code_label_trophies', currentLocale), cleanUrl: cardUrls.trophiesUrl, getPreviewUrl: () => trophiesImg?.src },
+      { id: 'top-repos', title: t('code_label_top_repos', currentLocale), cleanUrl: cardUrls.topReposUrl, getPreviewUrl: () => topReposImg?.src },
+      { id: 'sponsors', title: t('code_label_sponsors', currentLocale), cleanUrl: cardUrls.sponsorsUrl, getPreviewUrl: () => sponsorsImg?.src },
+      { id: 'commit-activity', title: t('code_label_commit_activity', currentLocale), cleanUrl: cardUrls.commitActivityUrl, getPreviewUrl: () => commitActivityImg?.src },
+      { id: 'timeline-matrix', title: t('code_label_timeline_matrix', currentLocale), cleanUrl: cardUrls.timelineMatrixUrl, getPreviewUrl: () => (document.getElementById('timeline-matrix-img') as HTMLImageElement | null)?.src },
+      { id: 'repo', title: t('title_repo', currentLocale), cleanUrl: cardUrls.repoUrl, getPreviewUrl: () => repoImg?.src },
     ];
 
     const activeCardsForMarkdown: CardItem[] = [];
@@ -1337,37 +940,24 @@ import Footer from '@/components/Footer.astro';
       globalLoading.classList.remove('hidden');
     }
 
-    const origin = window.location.origin;
-    const widthParam = currentCardWidth
-      ? `&card_width=${encodeURIComponent(currentCardWidth)}`
-      : '';
-    const localeParam = currentLocale ? `&locale=${encodeURIComponent(currentLocale)}` : '';
-    const customColors = getCustomThemeQueryParams();
+    const cardUrls = buildCardUrls({
+      origin: window.location.origin,
+      username: currentUsername,
+      theme: currentTheme,
+      cardWidth: currentCardWidth,
+      locale: currentLocale,
+      customColors: getCustomThemeQueryParams(),
+      repo: currentRepo,
+      viewsLabel: viewsLabel?.value,
+      viewsColor: viewsColor?.value,
+      viewsStyle: viewsStyle?.value,
+    });
 
-    const statsUrl = `${origin}/api/stats?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const languagesUrl = `${origin}/api/languages?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const rankUrl = `${origin}/api/rank?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const streakUrl = `${origin}/api/streak?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const trophiesUrl = `${origin}/api/trophies?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const topReposUrl = `${origin}/api/top-repos?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const sponsorsUrl = `${origin}/api/sponsors?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const commitActivityUrl = `${origin}/api/commit-activity?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    const todayStatusUrl = `${origin}/api/today-status?username=${currentUsername}&theme=${currentTheme}${localeParam}${customColors}`;
-    const timelineMatrixUrl = `${origin}/api/timeline-matrix?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-
-    let repoUrl = `${origin}/api/repo?username=${currentUsername}&theme=${currentTheme}${widthParam}${localeParam}${customColors}`;
-    if (currentRepo) {
-      repoUrl += `&repo=${encodeURIComponent(currentRepo)}`;
-    }
-
-    const labelVal = viewsLabel ? viewsLabel.value.trim() : '';
-    const colorVal = viewsColor ? viewsColor.value.trim() : '';
-    const styleVal = viewsStyle ? viewsStyle.value : '';
-
-    let viewsUrl = `${origin}/api/views?username=${currentUsername}&theme=${currentTheme}`;
-    if (labelVal) viewsUrl += `&label=${encodeURIComponent(labelVal)}`;
-    if (colorVal) viewsUrl += `&color=${encodeURIComponent(colorVal)}`;
-    if (styleVal) viewsUrl += `&style=${encodeURIComponent(styleVal)}`;
+    const {
+      statsUrl, languagesUrl, rankUrl, streakUrl, trophiesUrl,
+      topReposUrl, sponsorsUrl, commitActivityUrl, todayStatusUrl,
+      timelineMatrixUrl, repoUrl, viewsUrl
+    } = cardUrls;
 
     // 1. Show Loading State
     showImageLoading(statsImg, statsPlaceholder);
@@ -1511,9 +1101,11 @@ import Footer from '@/components/Footer.astro';
     imgElement.classList.add('hidden');
     placeholderElement.classList.remove('hidden');
 
-    const codeBlock = imgElement
-      .closest('.card-preview-wrapper')
-      ?.querySelector('.code-block-wrapper');
+    const wrapper = imgElement.closest('.card-preview-wrapper');
+    const shimmer = wrapper?.querySelector('.skeleton-shimmer');
+    if (shimmer) shimmer.classList.remove('hidden');
+
+    const codeBlock = wrapper?.querySelector('.code-block-wrapper');
     if (codeBlock && !isAlreadyLoaded) {
       codeBlock.classList.add('hidden');
     }
@@ -1577,9 +1169,11 @@ import Footer from '@/components/Footer.astro';
       placeholderElement.classList.add('hidden');
       imgElement.classList.remove('hidden');
 
-      const codeBlock = imgElement
-        .closest('.card-preview-wrapper')
-        ?.querySelector('.code-block-wrapper');
+      const wrapper = imgElement.closest('.card-preview-wrapper');
+      const shimmer = wrapper?.querySelector('.skeleton-shimmer');
+      if (shimmer) shimmer.classList.add('hidden');
+
+      const codeBlock = wrapper?.querySelector('.code-block-wrapper');
       if (codeBlock) {
         codeBlock.classList.remove('hidden');
       }
@@ -1587,6 +1181,10 @@ import Footer from '@/components/Footer.astro';
     });
 
     imgElement.addEventListener('error', () => {
+      const wrapper = imgElement.closest('.card-preview-wrapper');
+      const shimmer = wrapper?.querySelector('.skeleton-shimmer');
+      if (shimmer) shimmer.classList.add('hidden');
+
       const pulseIcon = placeholderElement.querySelector('.pulse-icon');
       const pText = placeholderElement.querySelector('p');
 
@@ -1601,9 +1199,7 @@ import Footer from '@/components/Footer.astro';
       }
       if (pText) pText.textContent = errorText;
 
-      const codeBlock = imgElement
-        .closest('.card-preview-wrapper')
-        ?.querySelector('.code-block-wrapper');
+      const codeBlock = wrapper?.querySelector('.code-block-wrapper');
       if (codeBlock) {
         codeBlock.classList.add('hidden');
       }
@@ -1651,6 +1247,14 @@ import Footer from '@/components/Footer.astro';
     if (!sampleReadmeTextarea || !sampleReadmeTextarea.value) return;
     try {
       await navigator.clipboard.writeText(sampleReadmeTextarea.value);
+      btnCopySampleReadme.classList.add('copied');
+      const origText = btnCopySampleReadme.querySelector('span')?.textContent || '';
+      const span = btnCopySampleReadme.querySelector('span');
+      if (span) span.textContent = '¡README.md Copiado!';
+      setTimeout(() => {
+        btnCopySampleReadme.classList.remove('copied');
+        if (span) span.textContent = origText;
+      }, 2000);
       showToast(t('msg_copy_readme_success', currentLocale), 'success');
     } catch (err) {
       console.error('Error copying sample README:', err);
@@ -2092,6 +1696,22 @@ import Footer from '@/components/Footer.astro';
       if (!codeText) return;
       try {
         await navigator.clipboard.writeText(codeText);
+        button.classList.add('copied');
+        const iconCopy = button.querySelector('.icon-copy');
+        const iconCheck = button.querySelector('.icon-check');
+        const copyTextSpan = button.querySelector('.copy-text');
+
+        if (iconCopy) iconCopy.classList.add('hidden');
+        if (iconCheck) iconCheck.classList.remove('hidden');
+        if (copyTextSpan) copyTextSpan.textContent = '¡Copiado!';
+
+        setTimeout(() => {
+          button.classList.remove('copied');
+          if (iconCopy) iconCopy.classList.remove('hidden');
+          if (iconCheck) iconCheck.classList.add('hidden');
+          if (copyTextSpan) copyTextSpan.textContent = t('copy_btn', currentLocale) || 'Copiar';
+        }, 2000);
+
         showToast(t('msg_copy_code_success', currentLocale), 'success');
       } catch (err) {
         console.error('Error al copiar al portapapeles:', err);

@@ -2,6 +2,16 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.8.1] - 2026-08-08
+
+### 🎯 Sistema de Filtrado de Tarjetas por Categoría & UI Reactiva
+- **Filtrado Dinámico por Categorías (`CardFilterBar.astro`)**: Añadida barra de navegación por pestañas (*Todas*, *Estadísticas Principales*, *Repositorios*, *Productividad & Racha*, *Premios & Insignias*) con conteo de tarjetas e insignias animadas.
+- **Modularización del Panel de Control (`ControlPanel.astro`, `SampleReadmeSection.astro`, `cardUrls.ts`)**: Desacoplada la interfaz del frontend en componentes aislados con helper dedicado para la construcción de URLs de tarjetas.
+
+### 🎨 Mejoras de Accesibilidad (WCAG 2.2 AA) & Estilos
+- **Optimización de Ratios de Contraste**: Corregidos colores de texto y fondos en insignias activas de filtro (`.filter-tab.active .filter-badge`), estado copiado en botones (`.copy-btn.copied`), y selectores en modo claro.
+- **Correcciones de Tipado y Limpieza**: Ajustados tipos implícitos de Astro/JSX (`Astro.props`) y eliminadas referencias y variables sin uso.
+
 ## [1.8.0] - 2026-08-08
 
 ### 🚀 Nuevas Tarjetas SVG de Gamificación & Productividad
@@ -389,4 +399,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.8.0
+**Versión actualmente expuesta / en producción:** v1.8.1
