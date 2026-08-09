@@ -32,7 +32,7 @@ export class MemoryCacheAdapter implements CacheStore {
   }
 
   async flushPattern(pattern: string): Promise<void> {
-    const cleanPattern = pattern.replace('*', '');
+    const cleanPattern = pattern.replaceAll('*', '');
     for (const k of this.store.keys()) {
       if (k.includes(cleanPattern)) {
         this.store.delete(k);

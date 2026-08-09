@@ -121,6 +121,8 @@ const HEX_REGEX = /^#?([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 const RGB_REGEX = /^rgba?\(\s*\d{1,3}(?:\s*,\s*\d{1,3}){2}(?:\s*,\s*[\d.]+)?\s*\)$/i;
 const HSL_REGEX = /^hsla?\(\s*\d{1,3}(?:\s*,\s*\d{1,3}%){2}(?:\s*,\s*[\d.]+)?\s*\)$/i;
 
+const GRADIENT_REGEX = /^(?:linear|radial)-gradient\([^<>"'\r\n;]+\)$/i;
+
 export function sanitizeColor(val?: string): string | undefined {
   if (!val || typeof val !== 'string') return undefined;
   const trimmed = val.trim();
@@ -128,6 +130,15 @@ export function sanitizeColor(val?: string): string | undefined {
     return trimmed.startsWith('#') ? trimmed : `#${trimmed}`;
   }
   if (RGB_REGEX.test(trimmed) || HSL_REGEX.test(trimmed)) {
+    return trimmed;
+  }
+  return undefined;
+}
+
+export function sanitizeGradient(val?: string): string | undefined {
+  if (!val || typeof val !== 'string') return undefined;
+  const trimmed = val.trim();
+  if (GRADIENT_REGEX.test(trimmed)) {
     return trimmed;
   }
   return undefined;
@@ -149,7 +160,7 @@ export function getTheme(themeName?: string, overrides?: Record<string, string>)
     accent: sanitizeColor(overrides.accent) || baseTheme.accent,
     secondary: sanitizeColor(overrides.secondary) || baseTheme.secondary,
     border: sanitizeColor(overrides.border) || baseTheme.border,
-    bgGradient: overrides.bgGradient || baseTheme.bgGradient
+    bgGradient: sanitizeGradient(overrides.bgGradient) || baseTheme.bgGradient
   };
 }
 
