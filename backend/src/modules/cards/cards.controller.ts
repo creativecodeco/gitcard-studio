@@ -15,11 +15,16 @@ import { renderErrorCard } from '@/adapters/presenters/errorCard';
 import { renderBadgeSVG } from '@/adapters/presenters/badge.presenter';
 import { renderTodayStatusBadge } from '@/adapters/presenters/todayStatusBadge.presenter';
 import { renderTimelineMatrixCard } from '@/adapters/presenters/timelineMatrixCard';
-import { GITHUB_USERNAME_REGEX, GITHUB_REPO_REGEX, sanitizeBadgeLabel } from '@/domain/entities/Validation';
+import {
+  GITHUB_USERNAME_REGEX,
+  GITHUB_REPO_REGEX,
+  sanitizeBadgeLabel
+} from '@/domain/entities/Validation';
 import { HitContext } from '@/domain/entities/Metrics';
 import { logger } from '@/infrastructure/logging/logger';
 import { sanitizeColor } from '@/adapters/presenters/theme';
 import { extractThemeOverrides, extractCardWidth } from './card-query.helpers';
+import { escapeXml } from '@/utils/escape';
 
 @Controller('api')
 export class CardsController {
@@ -63,24 +68,26 @@ export class CardsController {
       const cardWidth = extractCardWidth(query);
       const overrides = {
         ...extractThemeOverrides(query),
-        ...(cardWidth ? { cardWidth } : {}),
+        ...(cardWidth ? { cardWidth } : {})
       };
       const hitContext: HitContext = {
         username,
         userAgent,
         referer,
-        ip,
+        ip
       };
 
       const svg = await executeUseCase(username, theme as string, overrides, hitContext);
 
-      res
-        .header('Cache-Control', 'public, max-age=7200')
-        .status(200);
+      res.header('Cache-Control', 'public, max-age=7200').status(200);
       return svg;
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al obtener datos';
-      logger.error(`Error rendering card ${cardName} for user ${username}`, { cardName, username, error });
+      logger.error(`Error rendering card ${cardName} for user ${username}`, {
+        cardName,
+        username,
+        error
+      });
       res.status(500);
       return renderErrorCard(message);
     }
@@ -192,7 +199,13 @@ export class CardsController {
       const isPreview = preview === 'true' || preview === '1';
       const hitContext: HitContext = { username, userAgent, referer, ip };
 
-      const viewsCount = await this.recordProfileViewUseCase.execute(username, userAgent, referer, isPreview, hitContext);
+      const viewsCount = await this.recordProfileViewUseCase.execute(
+        username,
+        userAgent,
+        referer,
+        isPreview,
+        hitContext
+      );
 
       const cleanLabel = sanitizeBadgeLabel(label, 'Profile views');
       const cleanColor = typeof color === 'string' ? color : undefined;
@@ -251,8 +264,14 @@ export class CardsController {
     @Res({ passthrough: true }) res: FastifyReply
   ): Promise<string> {
     const cardWidth = extractCardWidth(query);
-    return this.handleCardRequest(query, userAgent, referer, ip, res, 'CommitActivity', (u, t, o, h) =>
-      this.commitActivityCardUseCase.execute(u, t, o, cardWidth, h)
+    return this.handleCardRequest(
+      query,
+      userAgent,
+      referer,
+      ip,
+      res,
+      'CommitActivity',
+      (u, t, o, h) => this.commitActivityCardUseCase.execute(u, t, o, cardWidth, h)
     );
   }
 
@@ -264,9 +283,17 @@ export class CardsController {
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
   ): Promise<string> {
-    return this.handleCardRequest(query, userAgent, referer, ip, res, 'TodayStatus', async (u, t, o) => {
-      return renderTodayStatusBadge({ username: u, commitsToday: 3 }, { theme: t, overrides: o });
-    });
+    return this.handleCardRequest(
+      query,
+      userAgent,
+      referer,
+      ip,
+      res,
+      'TodayStatus',
+      async (u, t, o) => {
+        return renderTodayStatusBadge({ username: u, commitsToday: 3 }, { theme: t, overrides: o });
+      }
+    );
   }
 
   @Get('timeline-matrix')
@@ -278,9 +305,17 @@ export class CardsController {
     @Res({ passthrough: true }) res: FastifyReply
   ): Promise<string> {
     const cardWidth = extractCardWidth(query);
-    return this.handleCardRequest(query, userAgent, referer, ip, res, 'TimelineMatrix', async (u, t, o) => {
-      return renderTimelineMatrixCard({ username: u }, { theme: t, overrides: o, cardWidth });
-    });
+    return this.handleCardRequest(
+      query,
+      userAgent,
+      referer,
+      ip,
+      res,
+      'TimelineMatrix',
+      async (u, t, o) => {
+        return renderTimelineMatrixCard({ username: u }, { theme: t, overrides: o, cardWidth });
+      }
+    );
   }
 
   @Get('badge')
@@ -293,11 +328,18 @@ export class CardsController {
 
     if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
       res.status(400);
-      return renderBadgeSVG({ label: 'gitcard studio', value: 'invalid user', valueColor: '#ef4444' });
+      return renderBadgeSVG({
+        label: 'gitcard studio',
+        value: 'invalid user',
+        valueColor: '#ef4444'
+      });
     }
 
     try {
-      const type = typeof query.type === 'string' && /^(views)$/i.test(query.type) ? query.type.toLowerCase() : 'views';
+      const type =
+        typeof query.type === 'string' && /^(views)$/i.test(query.type)
+          ? query.type.toLowerCase()
+          : 'views';
       const rawColor = typeof query.color === 'string' ? query.color : undefined;
       const color = sanitizeColor(rawColor) || '#38bdf8';
 
@@ -309,15 +351,22 @@ export class CardsController {
 
       let value = '1';
       if (type === 'views') {
-        const views = await this.recordProfileViewUseCase.execute(username, undefined, undefined, true);
+        const views = await this.recordProfileViewUseCase.execute(
+          username,
+          undefined,
+          undefined,
+          true
+        );
         value = String(views);
       }
 
-      res
-        .header('Cache-Control', 'public, max-age=3600, s-maxage=3600')
-        .status(200);
+      const safeColor = escapeXml(color);
+      const safeLabel = escapeXml(label);
+      const safeValue = escapeXml(value);
 
-      return renderBadgeSVG({ label, value, valueColor: color });
+      res.header('Cache-Control', 'public, max-age=3600, s-maxage=3600').status(200);
+
+      return renderBadgeSVG({ label: safeLabel, value: safeValue, valueColor: safeColor });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al obtener insignia';
       logger.error(`Error in getBadge for user ${username}: ${message}`, { username, error });
