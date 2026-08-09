@@ -1,4 +1,7 @@
-export function escapeXml(unsafe: string): string {
+export function escapeXml(unsafe: unknown): string {
+  if (typeof unsafe !== 'string') {
+    return String(unsafe ?? '');
+  }
   return unsafe.replace(/[<>&'"]/g, (c) => {
     switch (c) {
       case '<': return '&lt;';
@@ -10,3 +13,4 @@ export function escapeXml(unsafe: string): string {
     }
   });
 }
+

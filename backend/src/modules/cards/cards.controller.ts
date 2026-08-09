@@ -15,11 +15,10 @@ import { renderErrorCard } from '@/adapters/presenters/errorCard';
 import { renderBadgeSVG } from '@/adapters/presenters/badge.presenter';
 import { renderTodayStatusBadge } from '@/adapters/presenters/todayStatusBadge.presenter';
 import { renderTimelineMatrixCard } from '@/adapters/presenters/timelineMatrixCard';
-import { GITHUB_USERNAME_REGEX, GITHUB_REPO_REGEX } from '@/domain/entities/Validation';
+import { GITHUB_USERNAME_REGEX, GITHUB_REPO_REGEX, sanitizeBadgeLabel } from '@/domain/entities/Validation';
 import { HitContext } from '@/domain/entities/Metrics';
 import { logger } from '@/infrastructure/logging/logger';
 import { sanitizeColor } from '@/adapters/presenters/theme';
-import { escapeXml } from '@/utils/escape';
 import { extractThemeOverrides, extractCardWidth } from './card-query.helpers';
 
 @Controller('api')
@@ -195,7 +194,7 @@ export class CardsController {
 
       const viewsCount = await this.recordProfileViewUseCase.execute(username, userAgent, referer, isPreview, hitContext);
 
-      const cleanLabel = typeof label === 'string' ? label : undefined;
+      const cleanLabel = sanitizeBadgeLabel(label, 'Profile views');
       const cleanColor = typeof color === 'string' ? color : undefined;
       const cleanTheme = typeof theme === 'string' ? theme : undefined;
       const cleanStyle = typeof style === 'string' ? style : undefined;
@@ -298,7 +297,7 @@ export class CardsController {
     }
 
     try {
-      const type = typeof query.type === 'string' ? query.type : 'views';
+      const type = typeof query.type === 'string' && /^(views)$/i.test(query.type) ? query.type.toLowerCase() : 'views';
       const rawColor = typeof query.color === 'string' ? query.color : undefined;
       const color = sanitizeColor(rawColor) || '#38bdf8';
 
@@ -306,8 +305,7 @@ export class CardsController {
       if (type === 'views') {
         defaultLabel = 'profile views';
       }
-      const rawLabel = typeof query.label === 'string' ? query.label.trim() : defaultLabel;
-      const label = escapeXml(rawLabel);
+      const label = sanitizeBadgeLabel(query.label, defaultLabel);
 
       let value = '1';
       if (type === 'views') {
@@ -322,7 +320,7 @@ export class CardsController {
       return renderBadgeSVG({ label, value, valueColor: color });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al obtener insignia';
-      logger.error(`Error in getBadge for user ${username}`, { username, error });
+      logger.error(`Error in getBadge for user ${username}: ${message}`, { username, error });
       res.status(500);
       return renderBadgeSVG({ label: 'gitcard studio', value: 'error', valueColor: '#ef4444' });
     }

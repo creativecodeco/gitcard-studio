@@ -22,11 +22,12 @@ export function renderTodayStatusBadge(
   const count = data.commitsToday || 0;
 
   const isActive = count > 0;
-  let statusText = '';
+  let statusText: string;
   if (isActive) {
+    const plural = count === 1 ? '' : 's';
     statusText = isEn
-      ? `Active Today • ${count} commit${count === 1 ? '' : 's'}`
-      : `Activo hoy • ${count} commit${count === 1 ? '' : 's'}`;
+      ? `Active Today • ${count} commit${plural}`
+      : `Activo hoy • ${count} commit${plural}`;
   } else {
     statusText = isEn ? 'Resting Today' : 'Descansando hoy';
   }

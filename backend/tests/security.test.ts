@@ -7,6 +7,7 @@ import {
 } from '@/infrastructure/security/security';
 import { sanitizeColor } from '@/adapters/presenters/theme';
 import { extractCardWidth } from '@/modules/cards/card-query.helpers';
+import { sanitizeBadgeLabel } from '@/domain/entities/Validation';
 
 // Mock global fetch
 const mockFetch = vi.fn();
@@ -128,5 +129,17 @@ describe('security.ts tests', () => {
       expect(extractCardWidth({ width: '500px" onload="alert(1)' })).toBeUndefined();
       expect(extractCardWidth({ card_width: '100% font-size:100px' })).toBeUndefined();
     });
+
+    it('should validate badge labels and reject XSS or invalid label payloads', () => {
+      expect(sanitizeBadgeLabel('profile views', 'gitcard studio')).toBe('profile views');
+      expect(sanitizeBadgeLabel('my-custom_badge.v1', 'default')).toBe('my-custom_badge.v1');
+      
+      // Invalid / XSS payloads fall back to default label
+      expect(sanitizeBadgeLabel('<script>alert(1)</script>', 'default')).toBe('default');
+      expect(sanitizeBadgeLabel('label" onload="alert(1)', 'default')).toBe('default');
+      expect(sanitizeBadgeLabel('a'.repeat(60), 'default')).toBe('default');
+      expect(sanitizeBadgeLabel(12345, 'default')).toBe('default');
+    });
   });
 });
+
