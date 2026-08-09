@@ -949,7 +949,7 @@ select:focus-visible {
 /* Card Category Filter Bar */
 .card-filter-bar {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   margin-bottom: 24px;
   padding: 6px;
@@ -957,11 +957,20 @@ select:focus-visible {
   border: 1px solid var(--glass-border);
   border-radius: 14px;
   backdrop-filter: blur(12px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.card-filter-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .filter-tab {
-  flex: 1;
-  min-width: 0;
+  flex: 1 0 auto;
+  min-width: max-content;
   display: inline-flex;
   align-items: center;
   justify-content: center;
