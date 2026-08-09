@@ -1,3 +1,5 @@
+import { sanitizeColor, sanitizeGradient } from '@/adapters/presenters/theme';
+
 /**
  * Parses theme color overrides and locale from a card query string map.
  * Supports both canonical keys and GitHub-style aliases (e.g. bg_color, icon_color).
@@ -19,7 +21,14 @@ export function extractThemeOverrides(query: Record<string, unknown>): Record<st
     for (const key of paramKeys) {
       const val = query[key];
       if (typeof val === 'string' && val.trim() !== '') {
-        overrides[targetKey] = val;
+        const trimmed = val.trim();
+        if (targetKey === 'bgGradient') {
+          const cleanGradient = sanitizeGradient(trimmed);
+          if (cleanGradient) overrides[targetKey] = cleanGradient;
+        } else {
+          const cleanColor = sanitizeColor(trimmed);
+          if (cleanColor) overrides[targetKey] = cleanColor;
+        }
         break;
       }
     }

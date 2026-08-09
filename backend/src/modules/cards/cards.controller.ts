@@ -265,22 +265,9 @@ export class CardsController {
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
   ): Promise<string> {
-    res.type('image/svg+xml');
-    const rawUsername = query.username;
-    if (!rawUsername || typeof rawUsername !== 'string' || !GITHUB_USERNAME_REGEX.test(rawUsername.trim())) {
-      res.status(400);
-      return renderErrorCard('Usuario de GitHub inválido');
-    }
-
-    const username = rawUsername.trim();
-    const rawTheme = typeof query.theme === 'string' ? query.theme : 'dark';
-    const theme = escapeXml(rawTheme.trim());
-    const overrides = extractThemeOverrides(query);
-
-    res.header('Content-Type', 'image/svg+xml')
-       .header('Cache-Control', 'public, max-age=7200, s-maxage=7200');
-
-    return renderTodayStatusBadge({ username, commitsToday: 3 }, { theme, overrides });
+    return this.handleCardRequest(query, userAgent, referer, ip, res, 'TodayStatus', async (u, t, o) => {
+      return renderTodayStatusBadge({ username: u, commitsToday: 3 }, { theme: t, overrides: o });
+    });
   }
 
   @Get('timeline-matrix')
@@ -303,33 +290,41 @@ export class CardsController {
     @Res({ passthrough: true }) res: FastifyReply
   ): Promise<string> {
     res.type('image/svg+xml');
-    const rawUsername = query.username;
-    if (!rawUsername || typeof rawUsername !== 'string' || !GITHUB_USERNAME_REGEX.test(rawUsername.trim())) {
+    const username = query.username;
+
+    if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
       res.status(400);
       return renderBadgeSVG({ label: 'gitcard studio', value: 'invalid user', valueColor: '#ef4444' });
     }
 
-    const username = rawUsername.trim();
-    const type = typeof query.type === 'string' ? query.type : 'views';
-    const rawColor = typeof query.color === 'string' ? query.color : undefined;
-    const color = sanitizeColor(rawColor) || '#38bdf8';
+    try {
+      const type = typeof query.type === 'string' ? query.type : 'views';
+      const rawColor = typeof query.color === 'string' ? query.color : undefined;
+      const color = sanitizeColor(rawColor) || '#38bdf8';
 
-    let defaultLabel = 'gitcard studio';
-    if (type === 'views') {
-      defaultLabel = 'profile views';
+      let defaultLabel = 'gitcard studio';
+      if (type === 'views') {
+        defaultLabel = 'profile views';
+      }
+      const rawLabel = typeof query.label === 'string' ? query.label.trim() : defaultLabel;
+      const label = escapeXml(rawLabel);
+
+      let value = '1';
+      if (type === 'views') {
+        const views = await this.recordProfileViewUseCase.execute(username, undefined, undefined, true);
+        value = String(views);
+      }
+
+      res
+        .header('Cache-Control', 'public, max-age=3600, s-maxage=3600')
+        .status(200);
+
+      return renderBadgeSVG({ label, value, valueColor: color });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al obtener insignia';
+      logger.error(`Error in getBadge for user ${username}`, { username, error });
+      res.status(500);
+      return renderBadgeSVG({ label: 'gitcard studio', value: 'error', valueColor: '#ef4444' });
     }
-    const rawLabel = typeof query.label === 'string' ? query.label.trim() : defaultLabel;
-    const label = escapeXml(rawLabel);
-
-    let value = '1';
-    if (type === 'views') {
-      const views = await this.recordProfileViewUseCase.execute(username, undefined, undefined, true);
-      value = String(views);
-    }
-
-    res.header('Content-Type', 'image/svg+xml')
-       .header('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-
-    return renderBadgeSVG({ label, value, valueColor: color });
   }
 }
