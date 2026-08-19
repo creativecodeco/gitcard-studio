@@ -1,4 +1,5 @@
 import { UserStats } from '@/domain/entities/UserStats';
+import { escapeXml } from '@/utils/escape';
 import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 import { getTranslations } from './i18n';
 import { fetchAvatarBase64 } from './avatar';
@@ -22,6 +23,9 @@ export async function renderStatsCard(
   const t = getTranslations(overrides?.locale);
   const avatarBase64 = await fetchAvatarBase64(stats.avatarUrl);
 
+  const safeName = escapeXml(stats.name || '');
+  const safeUsername = escapeXml(stats.username || '');
+
   const cardWidth = 495;
   const cardHeight = 195;
   const widthAttr = overrides?.cardWidth || `${cardWidth}`;
@@ -33,19 +37,19 @@ export async function renderStatsCard(
   const avatarSvg = avatarBase64
     ? `<image href="${avatarBase64}" x="25" y="25" width="70" height="70" clip-path="url(#circle-clip)" />`
     : `<circle cx="60" cy="60" r="35" fill="${theme.secondary}" opacity="0.3"/>
-       <path d="M60 45a10 10 0 100 20 10 10 0 000-20zm0 25c-11.67 0-21 5.33-21 12v3h42v-3c0-6.67-9.33-12-21-12z" fill="${theme.text}" />`;
+       <path d="M60 45a10 10 0 100 20 10 10 0 000-20zm0 25c-11.5 0-21 5.2-21 12v3h42v-3c0-6.8-9.5-12-21-12z" fill="${theme.text}" />`;
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
-      <title>${stats.name} - GitHub Stats</title>
-      <desc>GitHub stats card for ${stats.name}</desc>
+      <title>${safeName} - GitHub Stats</title>
+      <desc>GitHub Profile Statistics card for ${safeUsername}</desc>
       <defs>
         ${backgroundDef}
         <clipPath id="circle-clip">
           <circle cx="60" cy="60" r="35" />
         </clipPath>
         <style>
-          .title { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 700; font-size: 16px; fill: ${theme.title}; }
+          .title { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 700; font-size: 18px; fill: ${theme.title}; }
           .username { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 400; font-size: 13px; fill: ${theme.secondary}; }
           .label { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 500; font-size: 13.5px; fill: ${theme.text}; }
           .value { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 700; font-size: 14px; fill: ${theme.accent}; }
@@ -60,8 +64,8 @@ export async function renderStatsCard(
       <!-- Avatar & Name -->
       <g>
         ${avatarSvg}
-        <text x="110" y="55" class="title">${stats.name}</text>
-        <text x="110" y="73" class="username">@${stats.username}</text>
+        <text x="110" y="55" class="title">${safeName}</text>
+        <text x="110" y="73" class="username">@${safeUsername}</text>
       </g>
 
       <!-- Decorative Divider -->

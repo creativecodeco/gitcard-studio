@@ -1,4 +1,5 @@
 import { RepoStats } from '@/domain/entities/RepoStats';
+import { escapeXml } from '@/utils/escape';
 import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 
 const ICONS = {
@@ -37,11 +38,18 @@ export function renderRepoCard(
   const cardHeight = 195;
   const widthAttr = overrides?.cardWidth || `${cardWidth}`;
 
+  // Escape dynamic text properties
+  const safeName = escapeXml(repo.name);
+  const safeOwner = escapeXml(repo.owner);
+  const safeLanguage = escapeXml(repo.language || '');
+  const safeLicense = escapeXml(repo.license || '');
+  const safeDescription = escapeXml(repo.description || '');
+
   // Background style: gradient support
   const backgroundDef = getBackgroundDef(theme, 'bg');
 
   // Wrap description text
-  const descLines = wrapText(repo.description, 64).slice(0, 2); // max 2 lines
+  const descLines = wrapText(safeDescription, 64).slice(0, 2); // max 2 lines
   const descTextElements = descLines.map((line, idx) => {
     return `<text x="25" y="${80 + idx * 20}" class="desc">${line}</text>`;
   });
@@ -70,8 +78,8 @@ export function renderRepoCard(
         <svg class="icon" viewBox="0 0 24 24" width="20" height="20" x="0" y="0">
           ${ICONS.repo}
         </svg>
-        <text x="28" y="15" class="title">${repo.name}</text>
-        <text x="28" y="-2" class="owner">${repo.owner} /</text>
+        <text x="28" y="15" class="title">${safeName}</text>
+        <text x="28" y="-2" class="owner">${safeOwner} /</text>
       </g>
 
       <!-- Description Section -->
@@ -87,7 +95,7 @@ export function renderRepoCard(
         <!-- Language -->
         <g transform="translate(0, 0)">
           <circle cx="6" cy="6" r="5" fill="${repo.languageColor}" />
-          <text x="16" y="10" class="label">${repo.language}</text>
+          <text x="16" y="10" class="label">${safeLanguage}</text>
         </g>
 
         <!-- Stars -->
@@ -113,7 +121,7 @@ export function renderRepoCard(
           <svg class="icon" viewBox="0 0 24 24" width="14" height="14" x="0" y="-2">
             ${ICONS.license}
           </svg>
-          <text x="18" y="10" class="value" font-size="11.5">${repo.license}</text>
+          <text x="18" y="10" class="value" font-size="11.5">${safeLicense}</text>
         </g>
       </g>
 

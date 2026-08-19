@@ -2,6 +2,14 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.8.2] - 2026-08-19
+
+### 🛡️ Agente de Ciberseguridad & Auditorías de Seguridad Automatizadas
+- **Integración del Agente de Ciberseguridad (`.agents/skills/cybersecurity-agent/SKILL.md`)**: Creada habilidad especializada para auditorías pre-commit alineadas con las directrices OWASP Top 10.
+- **Herramienta de Análisis Estático Automatizado (`security-scan.js`)**: Creado el script de escaneo `.agents/skills/cybersecurity-agent/scripts/security-scan.js` e integrado en `package.json` mediante el comando `pnpm security:scan`.
+- **Regla Global de Workspace (`.agents/rules/security-agent.md`)**: Añadida directiva obligatoria de revisión de ciberseguridad para todo cambio de código.
+- **Sanitización de Tarjetas SVG**: Sanitizados los campos dinámicos de entrada (`name`, `username`, `owner`, `repo`, `language`, `license`) mediante `escapeXml()` en los presentadores de tarjetas `repoCard.ts`, `sponsorsCard.ts` y `statsCard.ts`.
+
 ## [1.8.1] - 2026-08-08
 
 ### 🎯 Sistema de Filtrado de Tarjetas por Categoría & UI Reactiva
@@ -399,4 +407,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.8.1
+**Versión actualmente expuesta / en producción:** v1.8.2

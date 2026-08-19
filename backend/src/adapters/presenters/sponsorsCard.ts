@@ -1,4 +1,5 @@
 import { SponsorStats } from '@/domain/entities/SponsorStats';
+import { escapeXml } from '@/utils/escape';
 import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 import { getTranslations } from './i18n';
 import { fetchAvatarBase64 } from './avatar';
@@ -13,6 +14,9 @@ export async function renderSponsorsCard(
   const theme = getTheme(themeName, overrides);
   const t = getTranslations(overrides?.locale);
   const avatarBase64 = await fetchAvatarBase64(stats.avatarUrl);
+
+  const safeName = escapeXml(stats.name || '');
+  const safeUsername = escapeXml(stats.username || '');
 
   const cardWidth = 495;
   const cardHeight = 220;
@@ -47,7 +51,7 @@ export async function renderSponsorsCard(
           ? `<image href="${sp.b64}" x="${x}" y="${y}" width="26" height="26" clip-path="url(#${clipId})" />`
           : `<circle cx="${x + 13}" cy="${y + 13}" r="13" fill="${theme.secondary}" opacity="0.4" />`;
 
-        const displayName = sp.name.length > 14 ? `${sp.name.slice(0, 13)}…` : sp.name;
+        const displayName = escapeXml(sp.name.length > 14 ? `${sp.name.slice(0, 13)}…` : sp.name);
 
         return `
           <g>
@@ -61,7 +65,7 @@ export async function renderSponsorsCard(
           </g>
         `;
       })
-      .join('');
+      .join('\n');
 
     sponsorsContent = `<g>${avatarItems}</g>`;
   } else {
@@ -75,7 +79,7 @@ export async function renderSponsorsCard(
           ${t.sponsors.noSponsors}
         </text>
         <text x="50" y="42" font-family="'Segoe UI', Ubuntu, Sans-Serif" font-size="11px" fill="${theme.secondary}">
-          https://github.com/sponsors/${stats.username}
+          https://github.com/sponsors/${safeUsername}
         </text>
       </g>
     `;
@@ -83,8 +87,8 @@ export async function renderSponsorsCard(
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
-      <title>${stats.name} - GitHub Sponsors</title>
-      <desc>GitHub Sponsors card for ${stats.name}</desc>
+      <title>${safeName} - GitHub Sponsors</title>
+      <desc>GitHub Sponsors card for ${safeName}</desc>
       <defs>
         ${backgroundDef}
         <clipPath id="circle-clip-main">
@@ -105,8 +109,8 @@ export async function renderSponsorsCard(
       <!-- Maintainer Header -->
       <g>
         ${mainAvatarSvg}
-        <text x="95" y="48" class="title">${stats.name}</text>
-        <text x="95" y="66" class="username">@${stats.username}</text>
+        <text x="95" y="48" class="title">${safeName}</text>
+        <text x="95" y="66" class="username">@${safeUsername}</text>
         
         <!-- Sponsor Badge Header -->
         <g transform="translate(340, 48)">
