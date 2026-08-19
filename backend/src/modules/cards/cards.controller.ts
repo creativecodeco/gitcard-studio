@@ -55,7 +55,8 @@ export class CardsController {
       hitContext?: HitContext
     ) => Promise<string>
   ): Promise<string> {
-    res.type('image/svg+xml');
+    res.header('Content-Type', 'image/svg+xml; charset=utf-8');
+    res.header('X-Content-Type-Options', 'nosniff');
     const username = query.username;
     const theme = query.theme;
 
@@ -79,7 +80,11 @@ export class CardsController {
 
       const svg = await executeUseCase(username, theme as string, overrides, hitContext);
 
-      res.header('Cache-Control', 'public, max-age=7200').status(200);
+      res
+        .header('Content-Type', 'image/svg+xml; charset=utf-8')
+        .header('X-Content-Type-Options', 'nosniff')
+        .header('Cache-Control', 'public, max-age=7200')
+        .status(200);
       return svg;
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al obtener datos';
@@ -88,7 +93,10 @@ export class CardsController {
         username,
         error
       });
-      res.status(500);
+      res
+        .header('Content-Type', 'image/svg+xml; charset=utf-8')
+        .header('X-Content-Type-Options', 'nosniff')
+        .status(500);
       return renderErrorCard(message);
     }
   }
@@ -127,7 +135,8 @@ export class CardsController {
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
   ): Promise<string> {
-    res.type('image/svg+xml');
+    res.header('Content-Type', 'image/svg+xml; charset=utf-8');
+    res.header('X-Content-Type-Options', 'nosniff');
     const repo = query.repo;
 
     if (repo && (typeof repo !== 'string' || !GITHUB_REPO_REGEX.test(repo))) {
@@ -187,7 +196,8 @@ export class CardsController {
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
   ): Promise<string> {
-    res.type('image/svg+xml');
+    res.header('Content-Type', 'image/svg+xml; charset=utf-8');
+    res.header('X-Content-Type-Options', 'nosniff');
     const { username, theme, color, label, style, preview } = query;
 
     if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
@@ -215,6 +225,8 @@ export class CardsController {
       const svg = renderViewsBadge(viewsCount, cleanLabel, cleanColor, cleanTheme, cleanStyle);
 
       res
+        .header('Content-Type', 'image/svg+xml; charset=utf-8')
+        .header('X-Content-Type-Options', 'nosniff')
         .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
         .header('Pragma', 'no-cache')
         .header('Expires', '0')
@@ -224,7 +236,10 @@ export class CardsController {
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al obtener visitas';
       logger.error(`Error in getProfileViews for user ${username}`, { username, error });
-      res.status(500);
+      res
+        .header('Content-Type', 'image/svg+xml; charset=utf-8')
+        .header('X-Content-Type-Options', 'nosniff')
+        .status(500);
       return renderErrorCard(message);
     }
   }
@@ -323,10 +338,11 @@ export class CardsController {
     @Query() query: Record<string, unknown>,
     @Res({ passthrough: true }) res: FastifyReply
   ): Promise<string> {
-    res.type('image/svg+xml');
-    const username = query.username;
+    res.header('Content-Type', 'image/svg+xml; charset=utf-8');
+    res.header('X-Content-Type-Options', 'nosniff');
 
-    if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
+    const rawUsername = query.username;
+    if (!rawUsername || typeof rawUsername !== 'string' || !GITHUB_USERNAME_REGEX.test(rawUsername)) {
       res.status(400);
       return renderBadgeSVG({
         label: 'gitcard studio',
@@ -334,6 +350,7 @@ export class CardsController {
         valueColor: '#ef4444'
       });
     }
+    const username = rawUsername;
 
     try {
       const type =
@@ -347,7 +364,8 @@ export class CardsController {
       if (type === 'views') {
         defaultLabel = 'profile views';
       }
-      const label = sanitizeBadgeLabel(query.label, defaultLabel);
+      const rawLabel = typeof query.label === 'string' ? query.label : undefined;
+      const label = sanitizeBadgeLabel(rawLabel, defaultLabel);
 
       let value = '1';
       if (type === 'views') {
@@ -364,13 +382,20 @@ export class CardsController {
       const safeLabel = escapeXml(label);
       const safeValue = escapeXml(value);
 
-      res.header('Cache-Control', 'public, max-age=3600, s-maxage=3600').status(200);
+      res
+        .header('Content-Type', 'image/svg+xml; charset=utf-8')
+        .header('X-Content-Type-Options', 'nosniff')
+        .header('Cache-Control', 'public, max-age=3600, s-maxage=3600')
+        .status(200);
 
       return renderBadgeSVG({ label: safeLabel, value: safeValue, valueColor: safeColor });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al obtener insignia';
       logger.error(`Error in getBadge for user ${username}: ${message}`, { username, error });
-      res.status(500);
+      res
+        .header('Content-Type', 'image/svg+xml; charset=utf-8')
+        .header('X-Content-Type-Options', 'nosniff')
+        .status(500);
       return renderBadgeSVG({ label: 'gitcard studio', value: 'error', valueColor: '#ef4444' });
     }
   }
