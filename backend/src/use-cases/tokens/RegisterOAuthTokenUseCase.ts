@@ -18,7 +18,8 @@ export class RegisterOAuthTokenUseCase {
     ip: string;
     userAgent: string;
   }): Promise<{ message: string; username: string }> {
-    const { username, accessToken, refreshToken, expiresIn, scope, tokenType, ip, userAgent } = params;
+    const { username, accessToken, refreshToken, expiresIn, scope, tokenType, ip, userAgent } =
+      params;
 
     const { encryptedToken, iv } = encryptToken(accessToken);
     let encRefresh: { encryptedToken: string; iv: string } | undefined;
@@ -49,7 +50,8 @@ export class RegisterOAuthTokenUseCase {
     this.githubRepo.clearCache(username);
 
     return {
-      message: 'Cuenta de GitHub vinculada exitosamente. Tus métricas públicas y privadas se actualizarán en tus tarjetas.',
+      message:
+        'Cuenta de GitHub vinculada exitosamente. Tus métricas públicas y privadas se actualizarán en tus tarjetas.',
       username
     };
   }

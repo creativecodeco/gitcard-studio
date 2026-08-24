@@ -58,7 +58,8 @@ function formatAndOutput(level: LogLevel, message: string, meta?: Record<string,
       console.log(jsonStr);
     }
   } else {
-    const metaStr = cleanMeta && Object.keys(cleanMeta).length > 0 ? ` ${JSON.stringify(cleanMeta)}` : '';
+    const metaStr =
+      cleanMeta && Object.keys(cleanMeta).length > 0 ? ` ${JSON.stringify(cleanMeta)}` : '';
     const formatted = `[${timestamp}] [${level.toUpperCase()}]: ${message}${metaStr}`;
     if (level === 'error') {
       console.error(formatted);
@@ -102,7 +103,9 @@ export function requestLoggerMiddleware(req: any, res: any, next: () => void) {
       url,
       status: statusCode,
       duration_ms: durationMs,
-      user_agent: (typeof req.get === 'function' ? req.get('user-agent') : req.headers?.['user-agent']) || 'unknown'
+      user_agent:
+        (typeof req.get === 'function' ? req.get('user-agent') : req.headers?.['user-agent']) ||
+        'unknown'
     };
 
     if (statusCode >= 500) {

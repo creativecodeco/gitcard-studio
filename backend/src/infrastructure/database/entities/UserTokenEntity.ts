@@ -38,4 +38,3 @@ export class UserTokenEntity {
   @UpdateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   updated_at!: Date;
 }
-

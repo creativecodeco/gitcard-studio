@@ -71,7 +71,7 @@ export async function bootstrap(): Promise<NestFastifyApplication> {
     new ValidationPipe({
       whitelist: true,
       transform: true,
-      forbidNonWhitelisted: true,
+      forbidNonWhitelisted: true
     })
   );
 

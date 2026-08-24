@@ -30,7 +30,9 @@ describe('theme.ts', () => {
     it('should handle target with leading github.com or https:// without duplication', () => {
       expect(renderBrandHeader('octocat')).toContain('github.com/octocat');
       expect(renderBrandHeader('github.com/octocat')).toContain('github.com/octocat');
-      expect(renderBrandHeader('https://github.com/octocat/repo')).toContain('github.com/octocat/repo');
+      expect(renderBrandHeader('https://github.com/octocat/repo')).toContain(
+        'github.com/octocat/repo'
+      );
     });
 
     it('should XML escape target names to prevent XSS injection', () => {

@@ -342,7 +342,11 @@ export class CardsController {
     res.header('X-Content-Type-Options', 'nosniff');
 
     const rawUsername = query.username;
-    if (!rawUsername || typeof rawUsername !== 'string' || !GITHUB_USERNAME_REGEX.test(rawUsername)) {
+    if (
+      !rawUsername ||
+      typeof rawUsername !== 'string' ||
+      !GITHUB_USERNAME_REGEX.test(rawUsername)
+    ) {
       res.status(400);
       return renderBadgeSVG({
         label: 'gitcard studio',

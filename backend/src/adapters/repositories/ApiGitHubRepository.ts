@@ -165,7 +165,8 @@ export class ApiGitHubRepository implements IGitHubRepository {
     if (!reposData) {
       return { totalPublicCount: currentPublicCount, hasNextPage: false, afterCursor: null };
     }
-    const totalPublicCount = currentPublicCount === 0 ? (reposData.totalCount || 0) : currentPublicCount;
+    const totalPublicCount =
+      currentPublicCount === 0 ? reposData.totalCount || 0 : currentPublicCount;
     allRepoNodes.push(...(reposData.nodes ?? []));
     return {
       totalPublicCount,
@@ -194,11 +195,10 @@ export class ApiGitHubRepository implements IGitHubRepository {
         ? { after: afterCursor }
         : { username, after: afterCursor };
 
-      const data: { user?: any; viewer?: any } | null = await this.fetchGraphQL<{ user?: any; viewer?: any }>(
-        query,
-        variables,
-        userToken
-      );
+      const data: { user?: any; viewer?: any } | null = await this.fetchGraphQL<{
+        user?: any;
+        viewer?: any;
+      }>(query, variables, userToken);
 
       const currentUser: any = isViewer ? data?.viewer : data?.user;
       if (!currentUser) break;
@@ -1084,7 +1084,8 @@ export class ApiGitHubRepository implements IGitHubRepository {
       if (!sponsorEntity) continue;
 
       const tier = node.tier;
-      const dollars = tier?.monthlyPriceInDollars ?? Math.round((tier?.monthlyPriceInCents ?? 0) / 100);
+      const dollars =
+        tier?.monthlyPriceInDollars ?? Math.round((tier?.monthlyPriceInCents ?? 0) / 100);
       const isOneTime = Boolean(tier?.isOneTime);
 
       if (isOneTime) {
@@ -1223,7 +1224,10 @@ export class ApiGitHubRepository implements IGitHubRepository {
         }
       }
     } catch (err) {
-      logger.warn(`Could not fetch commit activity for user ${username}:`, { username, error: err });
+      logger.warn(`Could not fetch commit activity for user ${username}:`, {
+        username,
+        error: err
+      });
     }
 
     return {

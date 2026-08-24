@@ -22,7 +22,9 @@ export class GetUserCommitActivityCardUseCase {
   ): Promise<string> {
     validateUsername(username);
 
-    const userToken = this.tokenRepo ? await getDecryptedToken(username, this.tokenRepo) : undefined;
+    const userToken = this.tokenRepo
+      ? await getDecryptedToken(username, this.tokenRepo)
+      : undefined;
     const activityData = await this.githubRepo.getUserCommitActivity(username, userToken);
 
     const svg = renderCommitActivityCard(activityData, {

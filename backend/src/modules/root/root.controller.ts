@@ -50,7 +50,7 @@ export class RootController {
       status: 'ok',
       version: process.env.npm_package_version ?? '1.4.6',
       uptime: Math.floor(process.uptime()),
-      environment: process.env.NODE_ENV ?? 'development',
+      environment: process.env.NODE_ENV ?? 'development'
     };
   }
 
@@ -92,24 +92,54 @@ export class RootController {
     return '';
   }
 
-  private injectSocialMetaTags(html: string, targetUsername: string, targetTheme: string, baseUrl: string): string {
+  private injectSocialMetaTags(
+    html: string,
+    targetUsername: string,
+    targetTheme: string,
+    baseUrl: string
+  ): string {
     const encodedUser = encodeURIComponent(targetUsername);
     const encodedTheme = encodeURIComponent(targetTheme);
 
-    const safeImageUrl = escapeXml(`${baseUrl}/api/stats?username=${encodedUser}&theme=${encodedTheme}`);
-    const safeTitle = escapeXml(`Tarjetas de estadísticas para @${targetUsername} | GitCard Studio`);
+    const safeImageUrl = escapeXml(
+      `${baseUrl}/api/stats?username=${encodedUser}&theme=${encodedTheme}`
+    );
+    const safeTitle = escapeXml(
+      `Tarjetas de estadísticas para @${targetUsername} | GitCard Studio`
+    );
     const safeDescription = escapeXml(
       `Mira las estadísticas, lenguajes más usados y trofeos de GitHub para @${targetUsername} generados dinámicamente.`
     );
 
     return html
-      .replace(/<meta property="og:image" content="[^"]*"\/?>/gi, () => `<meta property="og:image" content="${safeImageUrl}" />`)
-      .replace(/<meta property="twitter:image" content="[^"]*"\/?>/gi, () => `<meta property="twitter:image" content="${safeImageUrl}" />`)
-      .replace(/<meta property="og:title" content="[^"]*"\/?>/gi, () => `<meta property="og:title" content="${safeTitle}" />`)
-      .replace(/<meta property="twitter:title" content="[^"]*"\/?>/gi, () => `<meta property="twitter:title" content="${safeTitle}" />`)
-      .replace(/<meta property="og:description" content="[^"]*"\/?>/gi, () => `<meta property="og:description" content="${safeDescription}" />`)
-      .replace(/<meta property="twitter:description" content="[^"]*"\/?>/gi, () => `<meta property="twitter:description" content="${safeDescription}" />`)
-      .replace(/<meta name="description" content="[^"]*"\/?>/gi, () => `<meta name="description" content="${safeDescription}" />`)
+      .replace(
+        /<meta property="og:image" content="[^"]*"\/?>/gi,
+        () => `<meta property="og:image" content="${safeImageUrl}" />`
+      )
+      .replace(
+        /<meta property="twitter:image" content="[^"]*"\/?>/gi,
+        () => `<meta property="twitter:image" content="${safeImageUrl}" />`
+      )
+      .replace(
+        /<meta property="og:title" content="[^"]*"\/?>/gi,
+        () => `<meta property="og:title" content="${safeTitle}" />`
+      )
+      .replace(
+        /<meta property="twitter:title" content="[^"]*"\/?>/gi,
+        () => `<meta property="twitter:title" content="${safeTitle}" />`
+      )
+      .replace(
+        /<meta property="og:description" content="[^"]*"\/?>/gi,
+        () => `<meta property="og:description" content="${safeDescription}" />`
+      )
+      .replace(
+        /<meta property="twitter:description" content="[^"]*"\/?>/gi,
+        () => `<meta property="twitter:description" content="${safeDescription}" />`
+      )
+      .replace(
+        /<meta name="description" content="[^"]*"\/?>/gi,
+        () => `<meta name="description" content="${safeDescription}" />`
+      )
       .replace(/<title>[^<]*<\/title>/gi, () => `<title>${safeTitle}</title>`);
   }
 }

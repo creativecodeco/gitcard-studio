@@ -45,17 +45,21 @@ import Footer from '../../components/Footer.astro';
     <div class="help-header">
       <h2>Cómo Mostrar Contribuciones de Organizaciones y Repos Privados</h2>
       <p style="color: var(--text-secondary); margin-top: 10px">
-        Guía paso a paso para autorizar el acceso de la aplicación a tus organizaciones en GitHub y sumar todas tus métricas de trabajo.
+        Guía paso a paso para autorizar el acceso de la aplicación a tus organizaciones en GitHub y
+        sumar todas tus métricas de trabajo.
       </p>
     </div>
 
     <section class="help-section">
       <h3>1. Habilitar Contribuciones Privadas en tu Perfil de GitHub</h3>
       <p>
-        Por defecto, la API GraphQL de GitHub solo reporta métricas públicas a menos que indiques explícitamente en tu cuenta de GitHub que deseas incluir tu actividad privada.
+        Por defecto, la API GraphQL de GitHub solo reporta métricas públicas a menos que indiques
+        explícitamente en tu cuenta de GitHub que deseas incluir tu actividad privada.
       </p>
       <ol class="steps-list">
-        <li>Ingresa a tu cuenta de GitHub y dirígete a <strong>Settings &rarr; Profile</strong>.</li>
+        <li>
+          Ingresa a tu cuenta de GitHub y dirígete a <strong>Settings &rarr; Profile</strong>.
+        </li>
         <li>Baja hasta la sección <strong>Contributions & Activity</strong>.</li>
         <li>Marca la casilla <strong>Include private contributions on my profile</strong>.</li>
         <li>Haz clic en <strong>Update profile</strong> para guardar los cambios.</li>
@@ -65,38 +69,73 @@ import Footer from '../../components/Footer.astro';
     <section class="help-section">
       <h3>2. Autorizar Acceso a Organizaciones en GitHub App</h3>
       <p>
-        Si formas parte de una o más Organizaciones en GitHub (como propietario o miembro), la GitHub App de <strong>GitCard Studio</strong> solicitará acceso de solo lectura para listar tus métricas agregadas:
+        Si formas parte de una o más Organizaciones en GitHub (como propietario o miembro), la
+        GitHub App de <strong>GitCard Studio</strong> solicitará acceso de solo lectura para listar tus
+        métricas agregadas:
       </p>
       <ol class="steps-list">
-        <li>Al hacer clic en <strong>Conectar con GitHub App</strong> en nuestra plataforma, serás redirigido a la pantalla oficial de autorización de GitHub.</li>
-        <li>En la sección <strong>Organization Access</strong>, verás el listado de tus organizaciones.</li>
-        <li>Junto a cada organización a la que perteneces, haz clic en el botón <strong>Grant</strong> (Conceder) o <strong>Request</strong> (Solicitar acceso al administrador).</li>
-        <li>Si eres propietario de la organización, el acceso se otorgará inmediatamente. Si eres miembro, se enviará una notificación a los administradores para su aprobación.</li>
+        <li>
+          Al hacer clic en <strong>Conectar con GitHub App</strong> en nuestra plataforma, serás redirigido
+          a la pantalla oficial de autorización de GitHub.
+        </li>
+        <li>
+          En la sección <strong>Organization Access</strong>, verás el listado de tus
+          organizaciones.
+        </li>
+        <li>
+          Junto a cada organización a la que perteneces, haz clic en el botón <strong>Grant</strong> (Conceder)
+          o <strong>Request</strong> (Solicitar acceso al administrador).
+        </li>
+        <li>
+          Si eres propietario de la organización, el acceso se otorgará inmediatamente. Si eres
+          miembro, se enviará una notificación a los administradores para su aprobación.
+        </li>
       </ol>
     </section>
 
     <section class="help-section">
       <h3>3. Configuración para Personal Access Tokens (PAT)</h3>
-      <p>
-        Si prefieres usar un token PAT Fine-grained manual en lugar de GitHub App:
-      </p>
+      <p>Si prefieres usar un token PAT Fine-grained manual en lugar de GitHub App:</p>
       <ol class="steps-list">
-        <li>Al generar tu token en <strong>GitHub Settings &rarr; Developer Settings &rarr; Personal access tokens &rarr; Fine-grained tokens</strong>.</li>
-        <li>En el campo <strong>Resource owner</strong>, selecciona la Organización específica que deseas autorizar.</li>
-        <li>En <strong>Repository access</strong>, marca <em>All repositories</em> o selecciona los repositorios privados específicos.</li>
-        <li>En <strong>Permissions &rarr; Repository permissions</strong>, asigna únicamente <code>Metadata: Read-only</code>.</li>
+        <li>
+          Al generar tu token en <strong
+            >GitHub Settings &rarr; Developer Settings &rarr; Personal access tokens &rarr;
+            Fine-grained tokens</strong
+          >.
+        </li>
+        <li>
+          En el campo <strong>Resource owner</strong>, selecciona la Organización específica que
+          deseas autorizar.
+        </li>
+        <li>
+          En <strong>Repository access</strong>, marca <em>All repositories</em> o selecciona los repositorios
+          privados específicos.
+        </li>
+        <li>
+          En <strong>Permissions &rarr; Repository permissions</strong>, asigna únicamente <code
+            >Metadata: Read-only</code
+          >.
+        </li>
       </ol>
     </section>
 
-    <section class="help-section" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); padding: 20px; border-radius: 12px;">
+    <section
+      class="help-section"
+      style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); padding: 20px; border-radius: 12px;"
+    >
       <h3 style="margin-top: 0; color: #38bdf8;">¿Preguntas Frecuentes?</h3>
       <p><strong>¿GitCard Studio tiene acceso al código fuente de mis organizaciones?</strong></p>
       <p style="color: var(--text-secondary); margin-bottom: 0;">
-        <strong>No.</strong> Nuestra aplicación solo solicita permisos de metadatos (conteo de estrellas, forks, commits e idiomas utilizados). Nunca leemos, almacenamos ni descargamos código fuente de tus repositorios.
+        <strong>No.</strong> Nuestra aplicación solo solicita permisos de metadatos (conteo de estrellas,
+        forks, commits e idiomas utilizados). Nunca leemos, almacenamos ni descargamos código fuente de
+        tus repositorios.
       </p>
     </section>
 
-    <div class="help-footer-nav" style="margin-top: 40px; display: flex; justify-content: space-between; gap: 16px;">
+    <div
+      class="help-footer-nav"
+      style="margin-top: 40px; display: flex; justify-content: space-between; gap: 16px;"
+    >
       <a href="/help/security" class="secondary-btn">&larr; Seguridad y Cifrado</a>
       <a href="/help/tokens" class="primary-btn">Guía de Tokens PAT &rarr;</a>
     </div>

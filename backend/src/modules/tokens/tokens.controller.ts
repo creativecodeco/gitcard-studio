@@ -8,7 +8,7 @@ import {
   InternalServerErrorException,
   Ip,
   Post,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { RegisterUserTokenUseCase } from '@/use-cases/tokens/RegisterUserTokenUseCase';
 import { RevokeUserTokenUseCase } from '@/use-cases/tokens/RevokeUserTokenUseCase';
@@ -52,11 +52,22 @@ export class TokensController {
       // which is the authoritative source and cannot be spoofed by client headers.
       const ip = clientIp ?? '';
       const agent = userAgent ?? '';
-      const result = await this.registerUseCase.execute(dto.username, dto.token, dto.consentAccepted, ip, agent);
-      logger.info(`Token registered successfully for user ${dto.username}`, { username: dto.username });
+      const result = await this.registerUseCase.execute(
+        dto.username,
+        dto.token,
+        dto.consentAccepted,
+        ip,
+        agent
+      );
+      logger.info(`Token registered successfully for user ${dto.username}`, {
+        username: dto.username
+      });
       return result as Record<string, unknown>;
     } catch (error: unknown) {
-      logger.error(`Error registering token for user ${dto.username}`, { username: dto.username, error });
+      logger.error(`Error registering token for user ${dto.username}`, {
+        username: dto.username,
+        error
+      });
       throw new InternalServerErrorException(m.tokenRegisterError);
     }
   }
@@ -75,10 +86,15 @@ export class TokensController {
 
     try {
       const result = await this.revokeUseCase.execute(dto.username, providedToken);
-      logger.info(`Token revoked successfully for user ${dto.username}`, { username: dto.username });
+      logger.info(`Token revoked successfully for user ${dto.username}`, {
+        username: dto.username
+      });
       return result as Record<string, unknown>;
     } catch (error: unknown) {
-      logger.error(`Error revoking token for user ${dto.username}`, { username: dto.username, error });
+      logger.error(`Error revoking token for user ${dto.username}`, {
+        username: dto.username,
+        error
+      });
       throw new InternalServerErrorException(m.tokenRevokeError);
     }
   }
@@ -99,8 +115,8 @@ export class TokensController {
       headers: {
         'User-Agent': 'gitcard-studio-security',
         Accept: 'application/vnd.github.v3+json',
-        Authorization: `token ${providedToken}`,
-      },
+        Authorization: `token ${providedToken}`
+      }
     });
 
     if (!profileRes.ok) {
@@ -119,7 +135,10 @@ export class TokensController {
       logger.info(`GDPR data purge completed for user ${dto.username}`, { username: dto.username });
       return { message: m.purgeSuccess };
     } catch (error: unknown) {
-      logger.error(`Error purging data for user ${dto.username}`, { username: dto.username, error });
+      logger.error(`Error purging data for user ${dto.username}`, {
+        username: dto.username,
+        error
+      });
       throw new InternalServerErrorException(m.purgeDataError);
     }
   }

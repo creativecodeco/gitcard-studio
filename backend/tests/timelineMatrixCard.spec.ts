@@ -11,7 +11,10 @@ describe('Timeline Matrix Card Presenter', () => {
   });
 
   it('should render in English when locale=en', () => {
-    const svg = renderTimelineMatrixCard({ username: 'octocat' }, { locale: 'en', theme: 'cyberpunk' });
+    const svg = renderTimelineMatrixCard(
+      { username: 'octocat' },
+      { locale: 'en', theme: 'cyberpunk' }
+    );
     expect(svg).toContain('Coding Productivity Timeline');
     expect(svg).toContain('Morning');
     expect(svg).toContain('Evening');

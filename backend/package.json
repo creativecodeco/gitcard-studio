@@ -1,6 +1,6 @@
 {
   "name": "gitcard-studio-backend",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "High-performance NestJS & Fastify API backend server for GitCard Studio SVG stats card generation, OAuth integration, and metrics tracking.",
   "main": "dist/server.js",
   "scripts": {

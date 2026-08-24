@@ -6,7 +6,7 @@ import {
   Inject,
   InternalServerErrorException,
   Query,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { IMetricsRepository } from '@/domain/repositories/IMetricsRepository';
 import { safeTimingEqual } from '@/infrastructure/security/security';
@@ -16,11 +16,13 @@ import { MetricsHistoryQueryDto, MetricsKeyQueryDto } from './dto/metrics.dto';
 
 @Controller('api')
 export class MetricsController {
-  constructor(
-    @Inject('IMetricsRepository') private readonly metricsRepo: IMetricsRepository
-  ) {}
+  constructor(@Inject('IMetricsRepository') private readonly metricsRepo: IMetricsRepository) {}
 
-  private validateMetricsKey(queryKey?: string, headerKey?: string, locale?: SupportedLocale): void {
+  private validateMetricsKey(
+    queryKey?: string,
+    headerKey?: string,
+    locale?: SupportedLocale
+  ): void {
     const m = getMessages(resolveLocale(locale));
     const expectedKey = process.env.METRICS_KEY;
 
@@ -88,7 +90,7 @@ export class MetricsController {
   @Get('config')
   getConfig(): { privateStatsComingSoon: boolean } {
     return {
-      privateStatsComingSoon: false,
+      privateStatsComingSoon: false
     };
   }
 }

@@ -46,7 +46,8 @@ import Footer from '../../components/Footer.astro';
     <div class="help-header">
       <h2>¿Cómo Puedo Revocar o Eliminar mi Token Almacenado?</h2>
       <p style="color: var(--text-secondary); margin-top: 10px">
-        Tienes el control absoluto sobre tus datos en todo momento. Ofrecemos tres métodos sencillos para revocar o borrar tus registros.
+        Tienes el control absoluto sobre tus datos en todo momento. Ofrecemos tres métodos sencillos
+        para revocar o borrar tus registros.
       </p>
     </div>
 
@@ -57,7 +58,9 @@ import Footer from '../../components/Footer.astro';
           <h3>Revocación Rápida desde la Web (Navegador Activo)</h3>
         </div>
         <p>
-          Si estás utilizando el mismo navegador desde el cual registraste tu token, abre la sección de Estadísticas Privadas y simplemente haz clic en el botón <strong>Revocar Token</strong>. El servidor eliminará tu token cifrado de la base de datos de manera inmediata.
+          Si estás utilizando el mismo navegador desde el cual registraste tu token, abre la sección
+          de Estadísticas Privadas y simplemente haz clic en el botón <strong>Revocar Token</strong
+          >. El servidor eliminará tu token cifrado de la base de datos de manera inmediata.
         </p>
       </div>
 
@@ -69,10 +72,19 @@ import Footer from '../../components/Footer.astro';
         <p>
           Si has perdido el token original o deseas borrar tus datos desde un navegador diferente:
         </p>
-        <ol style="margin-left: 20px; display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+        <ol
+          style="margin-left: 20px; display: flex; flex-direction: column; gap: 8px; margin-top: 8px;"
+        >
           <li>Genera un token temporal rápido en GitHub (incluso sin otorgarle ningún permiso).</li>
-          <li>En la sección "Eliminar Token" del panel web, escribe tu usuario de GitHub y pega el token temporal.</li>
-          <li>El backend consultará a la API de GitHub para autenticar la propiedad de la cuenta. Al confirmar que coinciden, eliminará tu registro cifrado de nuestros servidores inmediatamente.</li>
+          <li>
+            En la sección "Eliminar Token" del panel web, escribe tu usuario de GitHub y pega el
+            token temporal.
+          </li>
+          <li>
+            El backend consultará a la API de GitHub para autenticar la propiedad de la cuenta. Al
+            confirmar que coinciden, eliminará tu registro cifrado de nuestros servidores
+            inmediatamente.
+          </li>
           <li>Elimina o desecha el token temporal en GitHub.</li>
         </ol>
       </div>
@@ -83,7 +95,11 @@ import Footer from '../../components/Footer.astro';
           <h3>Desactivación Remota Inmediata desde GitHub</h3>
         </div>
         <p>
-          Puedes invalidar el acceso de forma remota en cualquier momento. Ve a tu lista de tokens en la configuración de GitHub y haz clic en <strong>Revoke</strong> o <strong>Delete</strong> al lado del token. A partir de ese milisegundo, cualquier consulta enviada a nuestro servidor fallará por parte de GitHub y tus estadísticas privadas dejarán de mostrarse automáticamente.
+          Puedes invalidar el acceso de forma remota en cualquier momento. Ve a tu lista de tokens
+          en la configuración de GitHub y haz clic en <strong>Revoke</strong> o <strong
+            >Delete</strong
+          > al lado del token. A partir de ese milisegundo, cualquier consulta enviada a nuestro servidor
+          fallará por parte de GitHub y tus estadísticas privadas dejarán de mostrarse automáticamente.
         </p>
       </div>
 
@@ -93,7 +109,10 @@ import Footer from '../../components/Footer.astro';
           <h3>Eliminación Definitiva y Purga Total de Datos</h3>
         </div>
         <p>
-          Si deseas borrar de forma permanente tu token cifrado, tu historial de estadísticas, tus registros de consumo de métricas y todos los logs asociados de tu usuario, presiona el botón <strong>"Eliminar todos mis datos"</strong> en el modal de la aplicación e introduce tu token para autorizar la purga irreversibles.
+          Si deseas borrar de forma permanente tu token cifrado, tu historial de estadísticas, tus
+          registros de consumo de métricas y todos los logs asociados de tu usuario, presiona el
+          botón <strong>"Eliminar todos mis datos"</strong> en el modal de la aplicación e introduce tu
+          token para autorizar la purga irreversibles.
         </p>
       </div>
     </section>
@@ -101,15 +120,22 @@ import Footer from '../../components/Footer.astro';
     <!-- Navigation Buttons -->
     <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px;">
       <a href="/help" class="btn-back">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
         Volver al Centro de Ayuda
       </a>
-      <a href="/" class="btn-primary-link">
-        Ir al Generador de Tarjetas →
-      </a>
+      <a href="/" class="btn-primary-link"> Ir al Generador de Tarjetas → </a>
     </div>
   </main>
 
@@ -192,7 +218,8 @@ import Footer from '../../components/Footer.astro';
     color: var(--text-primary);
     margin: 0;
   }
-  .method-box p, .method-box li {
+  .method-box p,
+  .method-box li {
     font-size: 0.95rem;
     color: var(--text-secondary);
     line-height: 1.6;

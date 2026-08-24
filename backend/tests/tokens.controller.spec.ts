@@ -1,12 +1,21 @@
 import 'reflect-metadata';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, ForbiddenException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  InternalServerErrorException,
+  UnauthorizedException
+} from '@nestjs/common';
 import { TokensController } from '../src/modules/tokens/tokens.controller';
 import { RegisterUserTokenUseCase } from '../src/use-cases/tokens/RegisterUserTokenUseCase';
 import { RevokeUserTokenUseCase } from '../src/use-cases/tokens/RevokeUserTokenUseCase';
 import { PurgeUserDataUseCase } from '../src/use-cases/users/PurgeUserDataUseCase';
-import { RegisterTokenDto, RevokeTokenDto, PurgeUserDto } from '../src/modules/tokens/dto/tokens.dto';
+import {
+  RegisterTokenDto,
+  RevokeTokenDto,
+  PurgeUserDto
+} from '../src/modules/tokens/dto/tokens.dto';
 
 describe('TokensController', () => {
   let controller: TokensController;
@@ -21,8 +30,8 @@ describe('TokensController', () => {
       providers: [
         { provide: RegisterUserTokenUseCase, useValue: mockRegisterUseCase },
         { provide: RevokeUserTokenUseCase, useValue: mockRevokeUseCase },
-        { provide: PurgeUserDataUseCase, useValue: mockPurgeUseCase },
-      ],
+        { provide: PurgeUserDataUseCase, useValue: mockPurgeUseCase }
+      ]
     }).compile();
 
     controller = module.get<TokensController>(TokensController);
@@ -34,7 +43,7 @@ describe('TokensController', () => {
       const dto: RegisterTokenDto = {
         username: 'testuser',
         token: 'ghp_test',
-        consentAccepted: false,
+        consentAccepted: false
       };
 
       await expect(controller.register(dto)).rejects.toThrow(BadRequestException);
@@ -44,7 +53,7 @@ describe('TokensController', () => {
       const dto: RegisterTokenDto = {
         username: 'testuser',
         token: 'ghp_test',
-        consentAccepted: true,
+        consentAccepted: true
       };
       const mockResult = { success: true };
       mockRegisterUseCase.execute.mockResolvedValue(mockResult);
@@ -52,7 +61,11 @@ describe('TokensController', () => {
       const result = await controller.register(dto, undefined, undefined, '127.0.0.1');
 
       expect(mockRegisterUseCase.execute).toHaveBeenCalledWith(
-        'testuser', 'ghp_test', true, '127.0.0.1', ''
+        'testuser',
+        'ghp_test',
+        true,
+        '127.0.0.1',
+        ''
       );
       expect(result).toEqual(mockResult);
     });
@@ -61,7 +74,7 @@ describe('TokensController', () => {
       const dto: RegisterTokenDto = {
         username: 'testuser',
         token: 'ghp_test',
-        consentAccepted: true,
+        consentAccepted: true
       };
       mockRegisterUseCase.execute.mockRejectedValue(new Error('DB error'));
 
@@ -73,7 +86,7 @@ describe('TokensController', () => {
         username: 'testuser',
         token: 'ghp_test',
         consentAccepted: false,
-        locale: 'en',
+        locale: 'en'
       };
 
       const error = await controller.register(dto).catch((e) => e);
@@ -128,10 +141,13 @@ describe('TokensController', () => {
     it('should throw ForbiddenException when token owner does not match target username', async () => {
       const dto: PurgeUserDto = { username: 'targetuser', token: 'ghp_valid' };
 
-      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-        ok: true,
-        json: vi.fn().mockResolvedValue({ login: 'otheruser' }),
-      }));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          json: vi.fn().mockResolvedValue({ login: 'otheruser' })
+        })
+      );
 
       await expect(controller.purge(dto)).rejects.toThrow(ForbiddenException);
 
@@ -142,10 +158,13 @@ describe('TokensController', () => {
       const dto: PurgeUserDto = { username: 'testuser', token: 'ghp_valid' };
       mockPurgeUseCase.execute.mockResolvedValue(undefined);
 
-      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-        ok: true,
-        json: vi.fn().mockResolvedValue({ login: 'testuser' }),
-      }));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          json: vi.fn().mockResolvedValue({ login: 'testuser' })
+        })
+      );
 
       const result = await controller.purge(dto);
 

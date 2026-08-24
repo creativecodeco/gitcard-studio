@@ -19,4 +19,3 @@ export interface ITokenRepository {
   getToken(username: string): Promise<UserToken | null>;
   deleteToken(username: string): Promise<void>;
 }
-

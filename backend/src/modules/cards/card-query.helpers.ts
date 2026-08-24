@@ -14,7 +14,7 @@ export function extractThemeOverrides(query: Record<string, unknown>): Record<st
     accent: ['accent', 'icon_color', 'accent_color'],
     secondary: ['secondary', 'secondary_color'],
     border: ['border', 'border_color'],
-    bgGradient: ['bgGradient', 'bg_gradient'],
+    bgGradient: ['bgGradient', 'bg_gradient']
   };
 
   for (const [targetKey, paramKeys] of Object.entries(mappings)) {

@@ -37,7 +37,8 @@ import Footer from '@/components/Footer.astro';
       <ThemeToggle />
     </div>
     <p class="subtitle" data-i18n="header_subtitle">
-      Potencia la visibilidad de tus proyectos. Genera métricas y tarjetas estéticas en caliente para tu README.md.
+      Potencia la visibilidad de tus proyectos. Genera métricas y tarjetas estéticas en caliente
+      para tu README.md.
     </p>
     <!-- Header Badges Row -->
     <div class="header-badges-row">
@@ -204,7 +205,12 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- Languages Card Preview -->
-          <CardPreview id="languages" title="Tarjeta de Lenguajes" codeLabel="Lenguajes Más Usados" category="stats">
+          <CardPreview
+            id="languages"
+            title="Tarjeta de Lenguajes"
+            codeLabel="Lenguajes Más Usados"
+            category="stats"
+          >
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -294,7 +300,12 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- Trophies Card Preview -->
-          <CardPreview id="trophies" title="Tarjeta de Trofeos" codeLabel="Trofeos de GitHub" category="stats">
+          <CardPreview
+            id="trophies"
+            title="Tarjeta de Trofeos"
+            codeLabel="Trofeos de GitHub"
+            category="stats"
+          >
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -316,7 +327,12 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- Top Repositories Card Preview -->
-          <CardPreview id="top-repos" title="Top Repositorios" codeLabel="Top Repositorios" category="repos">
+          <CardPreview
+            id="top-repos"
+            title="Top Repositorios"
+            codeLabel="Top Repositorios"
+            category="repos"
+          >
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -336,7 +352,12 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- GitHub Sponsors Card Preview -->
-          <CardPreview id="sponsors" title="GitHub Sponsors" codeLabel="GitHub Sponsors" category="repos">
+          <CardPreview
+            id="sponsors"
+            title="GitHub Sponsors"
+            codeLabel="GitHub Sponsors"
+            category="repos"
+          >
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -349,12 +370,19 @@ import Footer from '@/components/Footer.astro';
               stroke-linecap="round"
               stroke-linejoin="round"
             >
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              ></path>
             </svg>
           </CardPreview>
 
           <!-- Commit Activity Grid Card Preview -->
-          <CardPreview id="commit-activity" title="Matriz de Hábitos de Commit" codeLabel="Matriz de Hábitos" category="activity">
+          <CardPreview
+            id="commit-activity"
+            title="Matriz de Hábitos de Commit"
+            codeLabel="Matriz de Hábitos"
+            category="activity"
+          >
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -376,7 +404,12 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- Today's Commit Status Badge Preview -->
-          <CardPreview id="today-status" title="Estado de Actividad de Hoy" codeLabel="Estado de Actividad Hoy" category="activity">
+          <CardPreview
+            id="today-status"
+            title="Estado de Actividad de Hoy"
+            codeLabel="Estado de Actividad Hoy"
+            category="activity"
+          >
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -395,7 +428,12 @@ import Footer from '@/components/Footer.astro';
           </CardPreview>
 
           <!-- Coding Productivity Timeline Card Preview -->
-          <CardPreview id="timeline-matrix" title="Línea de Tiempo de Productividad" codeLabel="Línea de Tiempo" category="activity">
+          <CardPreview
+            id="timeline-matrix"
+            title="Línea de Tiempo de Productividad"
+            codeLabel="Línea de Tiempo"
+            category="activity"
+          >
             <svg
               slot="placeholder-icon"
               class="placeholder-svg"
@@ -426,7 +464,11 @@ import Footer from '@/components/Footer.astro';
 </BaseLayout>
 
 <script>
-  import { generateSampleReadme, renderLiveReadmeHtml, type CardItem } from '@/utils/readmeGenerator';
+  import {
+    generateSampleReadme,
+    renderLiveReadmeHtml,
+    type CardItem
+  } from '@/utils/readmeGenerator';
   import { buildCardUrls } from '@/utils/cardUrls';
   import { t, updateDomTranslations } from '@/utils/i18n';
 
@@ -460,13 +502,17 @@ import Footer from '@/components/Footer.astro';
   const sponsorsImg = document.getElementById('sponsors-img') as HTMLImageElement | null;
   const sponsorsPlaceholder = document.getElementById('sponsors-placeholder');
 
-  const commitActivityImg = document.getElementById('commit-activity-img') as HTMLImageElement | null;
+  const commitActivityImg = document.getElementById(
+    'commit-activity-img'
+  ) as HTMLImageElement | null;
   const commitActivityPlaceholder = document.getElementById('commit-activity-placeholder');
 
   const todayStatusImg = document.getElementById('today-status-img') as HTMLImageElement | null;
   const todayStatusPlaceholder = document.getElementById('today-status-placeholder');
 
-  const timelineMatrixImg = document.getElementById('timeline-matrix-img') as HTMLImageElement | null;
+  const timelineMatrixImg = document.getElementById(
+    'timeline-matrix-img'
+  ) as HTMLImageElement | null;
   const timelineMatrixPlaceholder = document.getElementById('timeline-matrix-placeholder');
 
   const viewsImg = document.getElementById('views-img') as HTMLImageElement | null;
@@ -564,7 +610,6 @@ import Footer from '@/components/Footer.astro';
       });
     });
   });
-
 
   // --- Card Width Control ---
   const widthOptions = document.querySelectorAll('.width-option') as NodeListOf<HTMLButtonElement>;
@@ -700,11 +745,16 @@ import Footer from '@/components/Footer.astro';
   function getCustomThemeQueryParams(): string {
     if (!isUsingCustomTheme) return '';
     let params = '';
-    if (pickerBg && pickerBg.value) params += `&bg_color=${encodeURIComponent(pickerBg.value.replace('#', ''))}`;
-    if (pickerTitle && pickerTitle.value) params += `&title_color=${encodeURIComponent(pickerTitle.value.replace('#', ''))}`;
-    if (pickerText && pickerText.value) params += `&text_color=${encodeURIComponent(pickerText.value.replace('#', ''))}`;
-    if (pickerIcon && pickerIcon.value) params += `&icon_color=${encodeURIComponent(pickerIcon.value.replace('#', ''))}`;
-    if (pickerBorder && pickerBorder.value) params += `&border_color=${encodeURIComponent(pickerBorder.value.replace('#', ''))}`;
+    if (pickerBg && pickerBg.value)
+      params += `&bg_color=${encodeURIComponent(pickerBg.value.replace('#', ''))}`;
+    if (pickerTitle && pickerTitle.value)
+      params += `&title_color=${encodeURIComponent(pickerTitle.value.replace('#', ''))}`;
+    if (pickerText && pickerText.value)
+      params += `&text_color=${encodeURIComponent(pickerText.value.replace('#', ''))}`;
+    if (pickerIcon && pickerIcon.value)
+      params += `&icon_color=${encodeURIComponent(pickerIcon.value.replace('#', ''))}`;
+    if (pickerBorder && pickerBorder.value)
+      params += `&border_color=${encodeURIComponent(pickerBorder.value.replace('#', ''))}`;
     return params;
   }
   // Generate button handler with Event Delegation
@@ -729,10 +779,11 @@ import Footer from '@/components/Footer.astro';
   });
 
   function submitUsername() {
-    const uInput = (document.getElementById('username-input') as HTMLInputElement | null) || usernameInput;
+    const uInput =
+      (document.getElementById('username-input') as HTMLInputElement | null) || usernameInput;
     const rInput = (document.getElementById('repo-input') as HTMLInputElement | null) || repoInput;
 
-    const usernameVal = (uInput?.value.trim()) || currentUsername;
+    const usernameVal = uInput?.value.trim() || currentUsername;
     if (!usernameVal) {
       if (uInput) uInput.focus();
       return;
@@ -779,9 +830,11 @@ import Footer from '@/components/Footer.astro';
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        window.dispatchEvent(new CustomEvent('app:toast', {
-          detail: { message: '¡Imagen SVG vectorial descargada!', type: 'success' }
-        }));
+        window.dispatchEvent(
+          new CustomEvent('app:toast', {
+            detail: { message: '¡Imagen SVG vectorial descargada!', type: 'success' }
+          })
+        );
       } catch (err) {
         console.error('Error downloading SVG:', err);
       }
@@ -816,9 +869,11 @@ import Footer from '@/components/Footer.astro';
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                window.dispatchEvent(new CustomEvent('app:toast', {
-                  detail: { message: '¡Imagen PNG (Retina 2x) descargada!', type: 'success' }
-                }));
+                window.dispatchEvent(
+                  new CustomEvent('app:toast', {
+                    detail: { message: '¡Imagen PNG (Retina 2x) descargada!', type: 'success' }
+                  })
+                );
               }
             }, 'image/png');
           }
@@ -854,7 +909,9 @@ import Footer from '@/components/Footer.astro';
   }
 
   function updateSampleReadmeText() {
-    const textarea = document.getElementById('sample-readme-textarea') as HTMLTextAreaElement | null;
+    const textarea = document.getElementById(
+      'sample-readme-textarea'
+    ) as HTMLTextAreaElement | null;
     const renderedContainer = document.getElementById('rendered-readme-content');
     if (!textarea || !currentUsername) {
       if (textarea) textarea.value = '';
@@ -874,22 +931,84 @@ import Footer from '@/components/Footer.astro';
       repo: currentRepo,
       viewsLabel: viewsLabel?.value,
       viewsColor: viewsColor?.value,
-      viewsStyle: viewsStyle?.value,
+      viewsStyle: viewsStyle?.value
     });
 
     const cardsConfig = [
-      { id: 'today-status', title: t('code_label_today_status', currentLocale), cleanUrl: cardUrls.todayStatusUrl, getPreviewUrl: () => (document.getElementById('today-status-img') as HTMLImageElement | null)?.src },
-      { id: 'views', title: t('code_label_views', currentLocale), cleanUrl: cardUrls.viewsUrl, getPreviewUrl: () => viewsImg?.src },
-      { id: 'stats', title: t('code_label_stats', currentLocale), cleanUrl: cardUrls.statsUrl, getPreviewUrl: () => statsImg?.src },
-      { id: 'languages', title: t('code_label_languages', currentLocale), cleanUrl: cardUrls.languagesUrl, getPreviewUrl: () => languagesImg?.src },
-      { id: 'streak', title: t('code_label_streak', currentLocale), cleanUrl: cardUrls.streakUrl, getPreviewUrl: () => streakImg?.src },
-      { id: 'rank', title: t('title_rank', currentLocale), cleanUrl: cardUrls.rankUrl, getPreviewUrl: () => rankImg?.src },
-      { id: 'trophies', title: t('code_label_trophies', currentLocale), cleanUrl: cardUrls.trophiesUrl, getPreviewUrl: () => trophiesImg?.src },
-      { id: 'top-repos', title: t('code_label_top_repos', currentLocale), cleanUrl: cardUrls.topReposUrl, getPreviewUrl: () => topReposImg?.src },
-      { id: 'sponsors', title: t('code_label_sponsors', currentLocale), cleanUrl: cardUrls.sponsorsUrl, getPreviewUrl: () => sponsorsImg?.src },
-      { id: 'commit-activity', title: t('code_label_commit_activity', currentLocale), cleanUrl: cardUrls.commitActivityUrl, getPreviewUrl: () => commitActivityImg?.src },
-      { id: 'timeline-matrix', title: t('code_label_timeline_matrix', currentLocale), cleanUrl: cardUrls.timelineMatrixUrl, getPreviewUrl: () => (document.getElementById('timeline-matrix-img') as HTMLImageElement | null)?.src },
-      { id: 'repo', title: t('title_repo', currentLocale), cleanUrl: cardUrls.repoUrl, getPreviewUrl: () => repoImg?.src },
+      {
+        id: 'today-status',
+        title: t('code_label_today_status', currentLocale),
+        cleanUrl: cardUrls.todayStatusUrl,
+        getPreviewUrl: () =>
+          (document.getElementById('today-status-img') as HTMLImageElement | null)?.src
+      },
+      {
+        id: 'views',
+        title: t('code_label_views', currentLocale),
+        cleanUrl: cardUrls.viewsUrl,
+        getPreviewUrl: () => viewsImg?.src
+      },
+      {
+        id: 'stats',
+        title: t('code_label_stats', currentLocale),
+        cleanUrl: cardUrls.statsUrl,
+        getPreviewUrl: () => statsImg?.src
+      },
+      {
+        id: 'languages',
+        title: t('code_label_languages', currentLocale),
+        cleanUrl: cardUrls.languagesUrl,
+        getPreviewUrl: () => languagesImg?.src
+      },
+      {
+        id: 'streak',
+        title: t('code_label_streak', currentLocale),
+        cleanUrl: cardUrls.streakUrl,
+        getPreviewUrl: () => streakImg?.src
+      },
+      {
+        id: 'rank',
+        title: t('title_rank', currentLocale),
+        cleanUrl: cardUrls.rankUrl,
+        getPreviewUrl: () => rankImg?.src
+      },
+      {
+        id: 'trophies',
+        title: t('code_label_trophies', currentLocale),
+        cleanUrl: cardUrls.trophiesUrl,
+        getPreviewUrl: () => trophiesImg?.src
+      },
+      {
+        id: 'top-repos',
+        title: t('code_label_top_repos', currentLocale),
+        cleanUrl: cardUrls.topReposUrl,
+        getPreviewUrl: () => topReposImg?.src
+      },
+      {
+        id: 'sponsors',
+        title: t('code_label_sponsors', currentLocale),
+        cleanUrl: cardUrls.sponsorsUrl,
+        getPreviewUrl: () => sponsorsImg?.src
+      },
+      {
+        id: 'commit-activity',
+        title: t('code_label_commit_activity', currentLocale),
+        cleanUrl: cardUrls.commitActivityUrl,
+        getPreviewUrl: () => commitActivityImg?.src
+      },
+      {
+        id: 'timeline-matrix',
+        title: t('code_label_timeline_matrix', currentLocale),
+        cleanUrl: cardUrls.timelineMatrixUrl,
+        getPreviewUrl: () =>
+          (document.getElementById('timeline-matrix-img') as HTMLImageElement | null)?.src
+      },
+      {
+        id: 'repo',
+        title: t('title_repo', currentLocale),
+        cleanUrl: cardUrls.repoUrl,
+        getPreviewUrl: () => repoImg?.src
+      }
     ];
 
     const activeCardsForMarkdown: CardItem[] = [];
@@ -908,10 +1027,22 @@ import Footer from '@/components/Footer.astro';
     });
 
     const pageUrl = window.location.href;
-    textarea.value = generateSampleReadme(currentUsername, activeCardsForMarkdown, currentLocale, currentReadmeLayout, pageUrl);
+    textarea.value = generateSampleReadme(
+      currentUsername,
+      activeCardsForMarkdown,
+      currentLocale,
+      currentReadmeLayout,
+      pageUrl
+    );
 
     if (renderedContainer) {
-      renderedContainer.innerHTML = renderLiveReadmeHtml(currentUsername, activeCardsForPreview, currentLocale, currentReadmeLayout, pageUrl);
+      renderedContainer.innerHTML = renderLiveReadmeHtml(
+        currentUsername,
+        activeCardsForPreview,
+        currentLocale,
+        currentReadmeLayout,
+        pageUrl
+      );
     }
   }
 
@@ -950,13 +1081,22 @@ import Footer from '@/components/Footer.astro';
       repo: currentRepo,
       viewsLabel: viewsLabel?.value,
       viewsColor: viewsColor?.value,
-      viewsStyle: viewsStyle?.value,
+      viewsStyle: viewsStyle?.value
     });
 
     const {
-      statsUrl, languagesUrl, rankUrl, streakUrl, trophiesUrl,
-      topReposUrl, sponsorsUrl, commitActivityUrl, todayStatusUrl,
-      timelineMatrixUrl, repoUrl, viewsUrl
+      statsUrl,
+      languagesUrl,
+      rankUrl,
+      streakUrl,
+      trophiesUrl,
+      topReposUrl,
+      sponsorsUrl,
+      commitActivityUrl,
+      todayStatusUrl,
+      timelineMatrixUrl,
+      repoUrl,
+      viewsUrl
     } = cardUrls;
 
     // 1. Show Loading State
@@ -1216,9 +1356,17 @@ import Footer from '@/components/Footer.astro';
   setupImageEvents(trophiesImg, trophiesPlaceholder, 'Error al cargar trofeos.');
   setupImageEvents(topReposImg, topReposPlaceholder, 'Error al cargar repositorios.');
   setupImageEvents(sponsorsImg, sponsorsPlaceholder, 'Error al cargar sponsors.');
-  setupImageEvents(commitActivityImg, commitActivityPlaceholder, 'Error al cargar matriz de hábitos.');
+  setupImageEvents(
+    commitActivityImg,
+    commitActivityPlaceholder,
+    'Error al cargar matriz de hábitos.'
+  );
   setupImageEvents(todayStatusImg, todayStatusPlaceholder, 'Error al cargar estado de hoy.');
-  setupImageEvents(timelineMatrixImg, timelineMatrixPlaceholder, 'Error al cargar línea de tiempo.');
+  setupImageEvents(
+    timelineMatrixImg,
+    timelineMatrixPlaceholder,
+    'Error al cargar línea de tiempo.'
+  );
   setupImageEvents(viewsImg, viewsPlaceholder, 'Error al cargar contador de visitas.');
 
   // Setup Clipboard Copy handlers
@@ -1241,7 +1389,9 @@ import Footer from '@/components/Footer.astro';
 
   // Setup Sample README.md copy button
   const btnCopySampleReadme = document.getElementById('btn-copy-sample-readme');
-  const sampleReadmeTextarea = document.getElementById('sample-readme-textarea') as HTMLTextAreaElement | null;
+  const sampleReadmeTextarea = document.getElementById(
+    'sample-readme-textarea'
+  ) as HTMLTextAreaElement | null;
 
   btnCopySampleReadme?.addEventListener('click', async () => {
     if (!sampleReadmeTextarea || !sampleReadmeTextarea.value) return;
@@ -1388,15 +1538,28 @@ import Footer from '@/components/Footer.astro';
     currentRepo = '';
 
     if (window.history && window.history.replaceState) {
-      window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.origin + window.location.pathname
+      );
     }
 
     updateThemeSelectorsState();
 
     const imgs = [
-      statsImg, languagesImg, repoImg, rankImg, streakImg,
-      trophiesImg, topReposImg, sponsorsImg, commitActivityImg,
-      todayStatusImg, timelineMatrixImg, viewsImg
+      statsImg,
+      languagesImg,
+      repoImg,
+      rankImg,
+      streakImg,
+      trophiesImg,
+      topReposImg,
+      sponsorsImg,
+      commitActivityImg,
+      todayStatusImg,
+      timelineMatrixImg,
+      viewsImg
     ];
     imgs.forEach((img) => {
       if (img) {
@@ -1407,9 +1570,18 @@ import Footer from '@/components/Footer.astro';
     });
 
     const placeholders = [
-      statsPlaceholder, languagesPlaceholder, repoPlaceholder, rankPlaceholder, streakPlaceholder,
-      trophiesPlaceholder, topReposPlaceholder, sponsorsPlaceholder, commitActivityPlaceholder,
-      todayStatusPlaceholder, timelineMatrixPlaceholder, viewsPlaceholder
+      statsPlaceholder,
+      languagesPlaceholder,
+      repoPlaceholder,
+      rankPlaceholder,
+      streakPlaceholder,
+      trophiesPlaceholder,
+      topReposPlaceholder,
+      sponsorsPlaceholder,
+      commitActivityPlaceholder,
+      todayStatusPlaceholder,
+      timelineMatrixPlaceholder,
+      viewsPlaceholder
     ];
     placeholders.forEach((ph) => {
       if (ph) {
@@ -1428,9 +1600,18 @@ import Footer from '@/components/Footer.astro';
     });
 
     const markdownCodes = [
-      markdownStatsCode, markdownLanguagesCode, markdownRepoCode, markdownRankCode, markdownStreakCode,
-      markdownTrophiesCode, markdownTopReposCode, markdownSponsorsCode, markdownCommitActivityCode,
-      markdownTodayStatusCode, markdownTimelineMatrixCode, markdownViewsCode
+      markdownStatsCode,
+      markdownLanguagesCode,
+      markdownRepoCode,
+      markdownRankCode,
+      markdownStreakCode,
+      markdownTrophiesCode,
+      markdownTopReposCode,
+      markdownSponsorsCode,
+      markdownCommitActivityCode,
+      markdownTodayStatusCode,
+      markdownTimelineMatrixCode,
+      markdownViewsCode
     ];
     markdownCodes.forEach((mc) => {
       if (mc) mc.textContent = '';
@@ -1771,7 +1952,11 @@ import Footer from '@/components/Footer.astro';
       cleanUrl.searchParams.delete('auth_success');
       cleanUrl.searchParams.delete('username');
       cleanUrl.searchParams.delete('reset');
-      window.history.replaceState({}, document.title, cleanUrl.pathname + (cleanUrl.search ? cleanUrl.search : ''));
+      window.history.replaceState(
+        {},
+        document.title,
+        cleanUrl.pathname + (cleanUrl.search ? cleanUrl.search : '')
+      );
     }
 
     if (isReset) {
@@ -1779,7 +1964,10 @@ import Footer from '@/components/Footer.astro';
       return;
     }
 
-    const userParam = urlParams.get('user') || localStorage.getItem('gh_active_user') || localStorage.getItem('registered-github-username');
+    const userParam =
+      urlParams.get('user') ||
+      localStorage.getItem('gh_active_user') ||
+      localStorage.getItem('registered-github-username');
     const themeParam = urlParams.get('theme');
     const localeParam = urlParams.get('locale');
 

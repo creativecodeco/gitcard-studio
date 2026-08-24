@@ -15,7 +15,7 @@ describe('RecordProfileViewUseCase', () => {
       getAllUserMetrics: vi.fn(),
       getUniqueUsersCount: vi.fn(),
       getOrIncrementProfileViews: vi.fn().mockResolvedValue(10),
-      getRendersHistory: vi.fn(),
+      getRendersHistory: vi.fn()
     };
     useCase = new RecordProfileViewUseCase(mockMetricsRepo);
   });
@@ -35,7 +35,11 @@ describe('RecordProfileViewUseCase', () => {
     expect(mockMetricsRepo.getOrIncrementProfileViews).toHaveBeenCalledWith(
       'validuser',
       false,
-      expect.objectContaining({ username: 'validuser', userAgent: 'Mozilla/5.0', referer: 'http://localhost:3000' })
+      expect.objectContaining({
+        username: 'validuser',
+        userAgent: 'Mozilla/5.0',
+        referer: 'http://localhost:3000'
+      })
     );
     expect(result).toBe(10);
   });

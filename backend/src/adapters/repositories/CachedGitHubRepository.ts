@@ -65,7 +65,11 @@ export class CachedGitHubRepository implements IGitHubRepository {
     return data;
   }
 
-  async getUserTopRepos(username: string, limit: number = 4, userToken?: string): Promise<RepoStats[]> {
+  async getUserTopRepos(
+    username: string,
+    limit: number = 4,
+    userToken?: string
+  ): Promise<RepoStats[]> {
     const cacheKey = `${username.toLowerCase()}:top:${limit}:${userToken ? 'private' : 'public'}`;
     const cached = this.topReposCache.get(cacheKey);
 
@@ -91,7 +95,13 @@ export class CachedGitHubRepository implements IGitHubRepository {
     return data;
   }
 
-  private readonly commitActivityCache = new Map<string, { data: { username: string; totalCommitsThisYear: number; hourlyMatrix: number[][] }; timestamp: number }>();
+  private readonly commitActivityCache = new Map<
+    string,
+    {
+      data: { username: string; totalCommitsThisYear: number; hourlyMatrix: number[][] };
+      timestamp: number;
+    }
+  >();
 
   async getUserSponsors(username: string, userToken?: string): Promise<SponsorStats> {
     const cacheKey = `${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;

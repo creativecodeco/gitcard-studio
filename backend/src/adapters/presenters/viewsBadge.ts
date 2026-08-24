@@ -35,7 +35,6 @@ function resolveColor(colorParam?: string, themeParam?: string): string {
   return theme.accent;
 }
 
-
 export function renderViewsBadge(
   count: number,
   label?: string,

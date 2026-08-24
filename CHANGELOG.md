@@ -2,6 +2,21 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.8.3] - 2026-08-24
+
+### 🤖 Ecosistema de Agentes Especializados & Auditoría Automatizada (`pnpm scan:all`)
+- **Sistema de Agentes Dedicados**: Creación e integración de 4 agentes especializados para garantizar la calidad del repositorio:
+  - **`cybersecurity-agent`**: Auditorías OWASP Top 10, sanitización XSS/SVG, prevención de SSRF/Inyección SQL y control de credenciales (`pnpm security:scan`).
+  - **`code-integrity-agent`**: Cumplimiento estricto de ESLint, Prettier, detección de código muerto y tipado inmutable (`pnpm integrity:scan`).
+  - **`architecture-agent`**: Verificación de límites de capa Clean Architecture, aislamiento del dominio y sincronización de documentación/versiones (`pnpm architecture:scan`).
+  - **`best-practices-agent`**: Programación defensiva con cláusulas de guardia (negación primero), modificadores `readonly` y versiones fijas exactas (`pnpm best-practices:scan`).
+- **Comando Unificado de Escaneo**: Añadido `pnpm scan:all` para ejecutar de forma consecutiva la suite completa de agentes antes de cada commit.
+
+### 📦 Gestor de Paquetes & Actualizaciones de Dependencias
+- **Sincronización de pnpm**: Actualizado el gestor de paquetes a `pnpm@11.24.0` en el `Dockerfile` (etapas builder y runner) y alineado con `packageManager` en `package.json`.
+- **Remediación de Seguridad en Dependencias (`pnpm audit`)**: Actualizado la anulación de `brace-expansion` a `5.0.9` en `pnpm-workspace.yaml`, logrando 0 vulnerabilidades reportadas.
+- **Actualización de Dependencias Frontend**: Actualizado `astro` a `7.2.5` y `happy-dom` a `20.11.6` en `frontend/package.json`.
+
 ## [1.8.2] - 2026-08-19
 
 ### 🛡️ Agente de Ciberseguridad & Auditorías de Seguridad Automatizadas
@@ -407,4 +422,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.8.2
+**Versión actualmente expuesta / en producción:** v1.8.3

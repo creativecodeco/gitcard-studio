@@ -54,11 +54,19 @@ describe('Profile Views Counter Badge', () => {
     };
 
     // Call with increment: true
-    const viewsAfterIncrement = await metricsRepo.getOrIncrementProfileViews(testUser, true, hitContext);
+    const viewsAfterIncrement = await metricsRepo.getOrIncrementProfileViews(
+      testUser,
+      true,
+      hitContext
+    );
     expect(viewsAfterIncrement).toBe(1);
 
     // Call again with increment: true
-    const viewsAfterSecondIncrement = await metricsRepo.getOrIncrementProfileViews(testUser, true, hitContext);
+    const viewsAfterSecondIncrement = await metricsRepo.getOrIncrementProfileViews(
+      testUser,
+      true,
+      hitContext
+    );
     expect(viewsAfterSecondIncrement).toBe(2);
 
     // Verify request_log entries were created in database

@@ -31,20 +31,23 @@ const messages: Record<SupportedLocale, BackendMessages> = {
     consentRequired: 'Debes aceptar los términos y condiciones de almacenamiento de datos.',
     tokenRegisterError: 'Error interno del servidor al registrar el token.',
     tokenRevokeError: 'Error interno del servidor al revocar el token.',
-    tokenIdentityRequired: 'Se requiere proveer un token de GitHub válido para confirmar tu identidad.',
+    tokenIdentityRequired:
+      'Se requiere proveer un token de GitHub válido para confirmar tu identidad.',
     purgeTokenRequired:
       'Se requiere proveer tu token de GitHub válido para confirmar y autorizar la purga de datos.',
     purgeDataError: 'Error interno del servidor al procesar la purga de datos.',
     tokenExpiredOrInvalid: 'El token de GitHub provisto no es válido o ha expirado.',
     accessDenied: (tokenOwner: string, target: string) =>
       `Acceso denegado. El token proporcionado pertenece al usuario '${tokenOwner}', pero estás intentando purgar los datos de '${target}'.`,
-    purgeSuccess: 'Todos tus datos (token, historial, métricas de uso y logs) han sido eliminados de forma definitiva.',
+    purgeSuccess:
+      'Todos tus datos (token, historial, métricas de uso y logs) han sido eliminados de forma definitiva.',
     metricsDisabled: 'Las métricas no están configuradas o el acceso está deshabilitado.',
     metricsUnauthorized: 'Acceso no autorizado. Se requiere una clave de métrica válida.',
     metricsHistoryError: 'Error interno al obtener el historial de métricas.',
     userMetricsError: 'Error interno al obtener las métricas de usuarios.',
     userCountError: 'Error interno al obtener el conteo de usuarios.',
-    githubAppNotConfigured: 'La aplicación de GitHub no está configurada en el servidor (GITHUB_CLIENT_ID).',
+    githubAppNotConfigured:
+      'La aplicación de GitHub no está configurada en el servidor (GITHUB_CLIENT_ID).',
     oauthStateMismatch: 'Error de verificación de estado (CSRF state mismatch). Intenta de nuevo.',
     oauthExchangeError: 'Error al intercambiar el código de autorización con GitHub.',
     userMetricsFetchError: 'Error al obtener las métricas personales del usuario.',
@@ -62,7 +65,8 @@ const messages: Record<SupportedLocale, BackendMessages> = {
     tokenExpiredOrInvalid: 'The provided GitHub token is invalid or has expired.',
     accessDenied: (tokenOwner: string, target: string) =>
       `Access denied. The provided token belongs to user '${tokenOwner}', but you are trying to purge data for '${target}'.`,
-    purgeSuccess: 'All your data (token, history, usage metrics, and logs) have been permanently deleted.',
+    purgeSuccess:
+      'All your data (token, history, usage metrics, and logs) have been permanently deleted.',
     metricsDisabled: 'Metrics are not configured or access is disabled.',
     metricsUnauthorized: 'Unauthorized access. A valid metrics key is required.',
     metricsHistoryError: 'Internal error while fetching metrics history.',
@@ -73,7 +77,7 @@ const messages: Record<SupportedLocale, BackendMessages> = {
     oauthExchangeError: 'Error exchanging authorization code with GitHub.',
     userMetricsFetchError: 'Error fetching personal user metrics.',
     accountDisconnectSuccess: 'Your GitHub account has been disconnected successfully.'
-  },
+  }
 };
 
 /**

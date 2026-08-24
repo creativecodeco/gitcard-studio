@@ -21,7 +21,9 @@ export class GetUserStreakCardUseCase {
   ): Promise<string> {
     validateUsername(username);
 
-    const userToken = this.tokenRepo ? await getDecryptedToken(username, this.tokenRepo) : undefined;
+    const userToken = this.tokenRepo
+      ? await getDecryptedToken(username, this.tokenRepo)
+      : undefined;
     const streak = await this.githubRepo.getUserStreak(username, userToken);
     const svg = renderStreakCard(streak, theme, overrides);
 

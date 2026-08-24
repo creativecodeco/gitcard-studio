@@ -2,7 +2,7 @@
 FROM node:24-alpine AS builder
 
 # Install pnpm globally
-RUN npm install -g pnpm@11.20.0 --ignore-scripts
+RUN npm install -g pnpm@11.24.0 --ignore-scripts
 
 WORKDIR /usr/src/app
 
@@ -27,7 +27,7 @@ RUN pnpm run build
 FROM node:24-alpine AS runner
 
 # Install pnpm
-RUN npm install -g pnpm@11.20.0 --ignore-scripts
+RUN npm install -g pnpm@11.24.0 --ignore-scripts
 
 WORKDIR /usr/src/app
 

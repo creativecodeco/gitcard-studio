@@ -12,7 +12,7 @@ import {
   Post,
   Query,
   Redirect,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import crypto from 'node:crypto';
 import { RegisterOAuthTokenUseCase } from '@/use-cases/tokens/RegisterOAuthTokenUseCase';
@@ -47,7 +47,8 @@ export class AuthController {
     }
 
     const state = crypto.randomBytes(16).toString('hex');
-    const redirectUri = process.env.GITHUB_CALLBACK_URL || 'http://localhost:3000/api/auth/github/callback';
+    const redirectUri =
+      process.env.GITHUB_CALLBACK_URL || 'http://localhost:3000/api/auth/github/callback';
     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=read:user,repo&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&state=${state}`;
@@ -82,13 +83,13 @@ export class AuthController {
         method: 'POST',
         headers: {
           Accept: 'application/json',
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           client_id: clientId,
           client_secret: clientSecret,
-          code,
-        }),
+          code
+        })
       });
 
       if (!tokenRes.ok) {
@@ -114,8 +115,8 @@ export class AuthController {
         headers: {
           'User-Agent': 'gitcard-studio-app',
           Accept: 'application/vnd.github.v3+json',
-          Authorization: `Bearer ${tokenData.access_token}`,
-        },
+          Authorization: `Bearer ${tokenData.access_token}`
+        }
       });
 
       if (!userRes.ok) {
@@ -141,7 +142,7 @@ export class AuthController {
         scope: tokenData.scope,
         tokenType: 'app_user',
         ip,
-        userAgent: agent,
+        userAgent: agent
       });
 
       logger.info(`GitHub App OAuth login successful for user ${username}`, { username });
@@ -172,18 +173,25 @@ export class AuthController {
         metrics: {
           profile_views: metricEntity?.profile_views ?? 0,
           stats_renders: (metricEntity?.stats_web ?? 0) + (metricEntity?.stats_github ?? 0),
-          languages_renders: (metricEntity?.languages_web ?? 0) + (metricEntity?.languages_github ?? 0),
+          languages_renders:
+            (metricEntity?.languages_web ?? 0) + (metricEntity?.languages_github ?? 0),
           repo_renders: (metricEntity?.repo_web ?? 0) + (metricEntity?.repo_github ?? 0),
           rank_renders: (metricEntity?.rank_web ?? 0) + (metricEntity?.rank_github ?? 0),
           streak_renders: (metricEntity?.streak_web ?? 0) + (metricEntity?.streak_github ?? 0),
-          trophies_renders: (metricEntity?.trophies_web ?? 0) + (metricEntity?.trophies_github ?? 0),
-          sponsors_renders: (metricEntity?.sponsors_web ?? 0) + (metricEntity?.sponsors_github ?? 0),
-          commit_activity_renders: (metricEntity?.commit_activity_web ?? 0) + (metricEntity?.commit_activity_github ?? 0),
-          last_updated: metricEntity?.last_updated ?? null,
-        },
+          trophies_renders:
+            (metricEntity?.trophies_web ?? 0) + (metricEntity?.trophies_github ?? 0),
+          sponsors_renders:
+            (metricEntity?.sponsors_web ?? 0) + (metricEntity?.sponsors_github ?? 0),
+          commit_activity_renders:
+            (metricEntity?.commit_activity_web ?? 0) + (metricEntity?.commit_activity_github ?? 0),
+          last_updated: metricEntity?.last_updated ?? null
+        }
       };
     } catch (error: unknown) {
-      logger.error(`Error fetching metrics for user ${query.username}`, { username: query.username, error });
+      logger.error(`Error fetching metrics for user ${query.username}`, {
+        username: query.username,
+        error
+      });
       throw new InternalServerErrorException(m.userMetricsFetchError);
     }
   }
@@ -205,8 +213,8 @@ export class AuthController {
       headers: {
         'User-Agent': 'gitcard-studio-security',
         Accept: 'application/vnd.github.v3+json',
-        Authorization: `token ${providedToken}`,
-      },
+        Authorization: `token ${providedToken}`
+      }
     });
 
     if (!profileRes.ok) {
@@ -234,13 +242,18 @@ export class AuthController {
     try {
       await this.purgeUseCase.execute(username);
       this.githubRepo.clearCache(username);
-      logger.info(`User account ${query.username} purged self successfully via UI`, { username: query.username });
+      logger.info(`User account ${query.username} purged self successfully via UI`, {
+        username: query.username
+      });
       return { message: m.purgeSuccess };
     } catch (error: unknown) {
       if (error instanceof UnauthorizedException || error instanceof ForbiddenException) {
         throw error;
       }
-      logger.error(`Error purging user account ${query.username}`, { username: query.username, error });
+      logger.error(`Error purging user account ${query.username}`, {
+        username: query.username,
+        error
+      });
       throw new InternalServerErrorException(m.purgeDataError);
     }
   }
@@ -258,13 +271,18 @@ export class AuthController {
     try {
       await this.tokenRepo.deleteToken(username);
       this.githubRepo.clearCache(username);
-      logger.info(`Disconnected GitHub account for user ${dto.username}`, { username: dto.username });
+      logger.info(`Disconnected GitHub account for user ${dto.username}`, {
+        username: dto.username
+      });
       return { message: m.accountDisconnectSuccess };
     } catch (error: unknown) {
       if (error instanceof UnauthorizedException || error instanceof ForbiddenException) {
         throw error;
       }
-      logger.error(`Error disconnecting GitHub account for user ${dto.username}`, { username: dto.username, error });
+      logger.error(`Error disconnecting GitHub account for user ${dto.username}`, {
+        username: dto.username,
+        error
+      });
       throw new InternalServerErrorException(m.tokenRevokeError);
     }
   }

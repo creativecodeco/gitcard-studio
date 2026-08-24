@@ -10,7 +10,11 @@ export class ApiV1Controller {
   async getUserStatsJson(
     @Query('username') rawUsername: string
   ): Promise<{ username: string; timestamp: string; format: string; message: string }> {
-    if (!rawUsername || typeof rawUsername !== 'string' || !GITHUB_USERNAME_REGEX.test(rawUsername.trim())) {
+    if (
+      !rawUsername ||
+      typeof rawUsername !== 'string' ||
+      !GITHUB_USERNAME_REGEX.test(rawUsername.trim())
+    ) {
       throw new BadRequestException('Usuario de GitHub inválido');
     }
 

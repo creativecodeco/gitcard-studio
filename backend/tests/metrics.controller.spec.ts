@@ -1,7 +1,11 @@
 import 'reflect-metadata';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ForbiddenException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  UnauthorizedException
+} from '@nestjs/common';
 import { MetricsController } from '../src/modules/metrics/metrics.controller';
 import { IMetricsRepository } from '../src/domain/repositories/IMetricsRepository';
 import { MetricsHistoryQueryDto, MetricsKeyQueryDto } from '../src/modules/metrics/dto/metrics.dto';
@@ -18,7 +22,7 @@ describe('MetricsController', () => {
     getAllUserMetrics: vi.fn().mockResolvedValue([]),
     getUniqueUsersCount: vi.fn().mockResolvedValue(5),
     getOrIncrementProfileViews: vi.fn(),
-    getRendersHistory: vi.fn().mockResolvedValue([{ date: '2026-07-24', count: 10 }]),
+    getRendersHistory: vi.fn().mockResolvedValue([{ date: '2026-07-24', count: 10 }])
   };
 
   beforeEach(async () => {
@@ -27,9 +31,7 @@ describe('MetricsController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MetricsController],
-      providers: [
-        { provide: 'IMetricsRepository', useValue: mockMetricsRepo },
-      ],
+      providers: [{ provide: 'IMetricsRepository', useValue: mockMetricsRepo }]
     }).compile();
 
     controller = module.get<MetricsController>(MetricsController);
@@ -102,7 +104,9 @@ describe('MetricsController', () => {
       const query: MetricsHistoryQueryDto = { key: VALID_KEY };
       vi.mocked(mockMetricsRepo.getRendersHistory).mockRejectedValue(new Error('DB error'));
 
-      await expect(controller.getRendersHistory(query)).rejects.toThrow(InternalServerErrorException);
+      await expect(controller.getRendersHistory(query)).rejects.toThrow(
+        InternalServerErrorException
+      );
     });
   });
 

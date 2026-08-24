@@ -11,7 +11,6 @@ import { WebhooksController } from './modules/webhooks/webhooks.controller';
 @Module({
   imports: [CardsModule, TokensModule, MetricsModule, AuthModule],
   controllers: [RootController, WebhooksController],
-  providers: [HtmlFileService],
+  providers: [HtmlFileService]
 })
 export class AppModule {}
-

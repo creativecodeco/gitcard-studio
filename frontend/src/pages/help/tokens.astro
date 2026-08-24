@@ -46,14 +46,16 @@ import Footer from '../../components/Footer.astro';
     <div class="help-header">
       <h2>Paso a Paso: Crear un Token Seguro y de Solo Lectura</h2>
       <p style="color: var(--text-secondary); margin-top: 10px">
-        Aprende a configurar los permisos mínimos necesarios en GitHub para incluir tus repositorios privados de manera hermética y segura.
+        Aprende a configurar los permisos mínimos necesarios en GitHub para incluir tus repositorios
+        privados de manera hermética y segura.
       </p>
     </div>
 
     <section class="help-section">
       <p>
         Por estricta política de seguridad,
-        <strong>nuestro sistema no acepta tokens con permisos de escritura o administración</strong>. Sigue estos pasos para generar el token Fine-grained de solo lectura correcto:
+        <strong>nuestro sistema no acepta tokens con permisos de escritura o administración</strong
+        >. Sigue estos pasos para generar el token Fine-grained de solo lectura correcto:
       </p>
 
       <ol class="steps-list">
@@ -62,7 +64,9 @@ import Footer from '../../components/Footer.astro';
             <span class="step-badge">1</span> Acceder a la Configuración de Usuario
           </div>
           <p>
-            Ve a tu cuenta de GitHub, haz clic en tu foto de perfil arriba a la derecha y entra a <strong>Settings</strong>.
+            Ve a tu cuenta de GitHub, haz clic en tu foto de perfil arriba a la derecha y entra a <strong
+              >Settings</strong
+            >.
           </p>
         </li>
 
@@ -71,7 +75,9 @@ import Footer from '../../components/Footer.astro';
             <span class="step-badge">2</span> Entrar a Developer Settings
           </div>
           <p>
-            En el menú lateral izquierdo, desplázate hasta el final y haz clic en <strong>Developer Settings</strong>.
+            En el menú lateral izquierdo, desplázate hasta el final y haz clic en <strong
+              >Developer Settings</strong
+            >.
           </p>
         </li>
 
@@ -80,7 +86,15 @@ import Footer from '../../components/Footer.astro';
             <span class="step-badge">3</span> Seleccionar Fine-grained Tokens
           </div>
           <p>
-            Selecciona <strong>Personal Access Tokens</strong> y haz clic en <strong>Fine-grained tokens</strong> (o accede directamente a través de <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer" style="color: var(--accent-color); text-decoration: underline">este enlace directo de GitHub</a>).
+            Selecciona <strong>Personal Access Tokens</strong> y haz clic en <strong
+              >Fine-grained tokens</strong
+            > (o accede directamente a través de <a
+              href="https://github.com/settings/personal-access-tokens/new"
+              target="_blank"
+              rel="noopener noreferrer"
+              style="color: var(--accent-color); text-decoration: underline"
+              >este enlace directo de GitHub</a
+            >).
           </p>
         </li>
 
@@ -96,10 +110,25 @@ import Footer from '../../components/Footer.astro';
             <span class="step-badge">5</span> Configurar Nombre y Accesos
           </div>
           <p>Configura los siguientes campos obligatorios:</p>
-          <ul style="margin-top: 8px; margin-left: 20px; display: flex; flex-direction: column; gap: 8px;">
-            <li><strong>Token name:</strong> Escribe un nombre identificativo (ej: <code>gitcard-studio-stats</code>).</li>
-            <li><strong>Repository access:</strong> Elige <em>All repositories</em> para sumar todas tus estadísticas privadas o <em>Only select repositories</em> si solo deseas incluir ciertos repositorios.</li>
-            <li><strong>Permissions:</strong> En el menú desplegable de <em>Repository permissions</em>, busca <strong>Metadata</strong> y asegúrate de que quede como <strong>Access: Read-only</strong>. No otorgues ningún otro permiso.</li>
+          <ul
+            style="margin-top: 8px; margin-left: 20px; display: flex; flex-direction: column; gap: 8px;"
+          >
+            <li>
+              <strong>Token name:</strong> Escribe un nombre identificativo (ej: <code
+                >gitcard-studio-stats</code
+              >).
+            </li>
+            <li>
+              <strong>Repository access:</strong> Elige <em>All repositories</em> para sumar todas tus
+              estadísticas privadas o <em>Only select repositories</em> si solo deseas incluir ciertos
+              repositorios.
+            </li>
+            <li>
+              <strong>Permissions:</strong> En el menú desplegable de <em>Repository permissions</em
+              >, busca <strong>Metadata</strong> y asegúrate de que quede como <strong
+                >Access: Read-only</strong
+              >. No otorgues ningún otro permiso.
+            </li>
           </ul>
         </li>
 
@@ -108,20 +137,32 @@ import Footer from '../../components/Footer.astro';
             <span class="step-badge">6</span> Copiar y Registrar
           </div>
           <p>
-            Haz clic en <strong>Generate token</strong> al final de la página, copia la clave generada y regístrala en el panel de Estadísticas Privadas de GitCard Studio.
+            Haz clic en <strong>Generate token</strong> al final de la página, copia la clave generada
+            y regístrala en el panel de Estadísticas Privadas de GitCard Studio.
           </p>
         </li>
       </ol>
 
       <div class="highlight-box-warning">
-        ⚠️ <strong>Atención:</strong> Si intentas registrar un token con permisos de escritura (como el ámbito global <code>repo</code> de un Classic Token), nuestro backend rechazará la solicitud de inmediato por motivos de seguridad.
+        ⚠️ <strong>Atención:</strong> Si intentas registrar un token con permisos de escritura (como el
+        ámbito global <code>repo</code> de un Classic Token), nuestro backend rechazará la solicitud de
+        inmediato por motivos de seguridad.
       </div>
     </section>
 
     <!-- Navigation Buttons -->
     <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px;">
       <a href="/help" class="btn-back">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
@@ -179,7 +220,8 @@ import Footer from '../../components/Footer.astro';
     flex-direction: column;
     gap: 16px;
   }
-  .help-section p, .help-section li {
+  .help-section p,
+  .help-section li {
     color: var(--text-secondary);
     line-height: 1.6;
     font-size: 1rem;

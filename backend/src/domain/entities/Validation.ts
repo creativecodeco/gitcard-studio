@@ -24,4 +24,3 @@ export function sanitizeBadgeLabel(label: unknown, fallbackLabel: string): strin
   }
   return trimmed;
 }
-

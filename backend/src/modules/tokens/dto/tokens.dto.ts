@@ -1,11 +1,4 @@
-import {
-  IsBoolean,
-  IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  Matches,
-} from 'class-validator';
+import { IsBoolean, IsIn, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
 
 const GITHUB_USERNAME_PATTERN = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
@@ -13,7 +6,7 @@ export class RegisterTokenDto {
   @IsNotEmpty()
   @IsString()
   @Matches(GITHUB_USERNAME_PATTERN, {
-    message: 'username must be a valid GitHub username.',
+    message: 'username must be a valid GitHub username.'
   })
   username!: string;
 
@@ -33,7 +26,7 @@ export class RevokeTokenDto {
   @IsNotEmpty()
   @IsString()
   @Matches(GITHUB_USERNAME_PATTERN, {
-    message: 'username must be a valid GitHub username.',
+    message: 'username must be a valid GitHub username.'
   })
   username!: string;
 
@@ -54,7 +47,7 @@ export class PurgeUserDto {
   @IsNotEmpty()
   @IsString()
   @Matches(GITHUB_USERNAME_PATTERN, {
-    message: 'username must be a valid GitHub username.',
+    message: 'username must be a valid GitHub username.'
   })
   username!: string;
 

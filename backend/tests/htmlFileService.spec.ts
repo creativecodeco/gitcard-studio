@@ -26,7 +26,9 @@ describe('HtmlFileService', () => {
   describe('getPublicFileOrThrow', () => {
     it('should throw NotFoundException for invalid or missing files', () => {
       expect(() => service.getPublicFileOrThrow('../package.json')).toThrow(NotFoundException);
-      expect(() => service.getPublicFileOrThrow('missing.html', 'Custom error')).toThrow('Custom error');
+      expect(() => service.getPublicFileOrThrow('missing.html', 'Custom error')).toThrow(
+        'Custom error'
+      );
     });
   });
 });

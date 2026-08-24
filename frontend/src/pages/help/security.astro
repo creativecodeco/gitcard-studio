@@ -46,13 +46,16 @@ import Footer from '../../components/Footer.astro';
     <div class="help-header">
       <h2>¿Cómo se Almacenan y Protegen mis Datos?</h2>
       <p style="color: var(--text-secondary); margin-top: 10px">
-        Tu privacidad y la seguridad de tu cuenta son nuestra máxima prioridad. Conoce la arquitectura de seguridad aplicada en GitCard Studio.
+        Tu privacidad y la seguridad de tu cuenta son nuestra máxima prioridad. Conoce la
+        arquitectura de seguridad aplicada en GitCard Studio.
       </p>
     </div>
 
     <section class="help-section">
       <p>
-        Cuando decides registrar un Personal Access Token (PAT) para sumar tus estadísticas privadas, nuestro servidor aplica automáticamente estrictas capas de protección bajo los estándares de OWASP:
+        Cuando decides registrar un Personal Access Token (PAT) para sumar tus estadísticas
+        privadas, nuestro servidor aplica automáticamente estrictas capas de protección bajo los
+        estándares de OWASP:
       </p>
 
       <div class="security-cards-grid">
@@ -60,7 +63,9 @@ import Footer from '../../components/Footer.astro';
           <div class="card-badge">Cifrado de Alto Nivel</div>
           <h3>Cifrado Simétrico Fuerte (AES-256-GCM)</h3>
           <p>
-            Tu token nunca se almacena en texto plano. Se cifra inmediatamente en memoria en el servidor utilizando el algoritmo de cifrado estándar militar <strong>AES-256-GCM</strong> con vector de inicialización único (IV) e identificador de autenticación (Auth Tag).
+            Tu token nunca se almacena en texto plano. Se cifra inmediatamente en memoria en el
+            servidor utilizando el algoritmo de cifrado estándar militar <strong>AES-256-GCM</strong
+            > con vector de inicialización único (IV) e identificador de autenticación (Auth Tag).
           </p>
         </div>
 
@@ -68,7 +73,9 @@ import Footer from '../../components/Footer.astro';
           <div class="card-badge">Aislamiento de Claves</div>
           <h3>Clave Secreta Exclusiva del Servidor</h3>
           <p>
-            La llave de descifrado habita únicamente en las variables de entorno aisladas del servidor de producción. Nadie (ni siquiera los administradores de la base de datos) puede leer o descifrar tu token sin esa clave maestra.
+            La llave de descifrado habita únicamente en las variables de entorno aisladas del
+            servidor de producción. Nadie (ni siquiera los administradores de la base de datos)
+            puede leer o descifrar tu token sin esa clave maestra.
           </p>
         </div>
 
@@ -76,7 +83,9 @@ import Footer from '../../components/Footer.astro';
           <div class="card-badge">Auditoría GDPR</div>
           <h3>Registro de Consentimiento Explícito</h3>
           <p>
-            Registramos que has aceptado explícitamente el almacenamiento junto con una marca de tiempo (timestamp) y una firma hash de auditoría para garantizar el cumplimiento normativo.
+            Registramos que has aceptado explícitamente el almacenamiento junto con una marca de
+            tiempo (timestamp) y una firma hash de auditoría para garantizar el cumplimiento
+            normativo.
           </p>
         </div>
 
@@ -84,20 +93,33 @@ import Footer from '../../components/Footer.astro';
           <div class="card-badge">Validación de Permisos</div>
           <h3>Rechazo de Permisos Elevados</h3>
           <p>
-            Al recibir un token, el servidor consulta directamente a la API de GitHub para verificar sus scopes. Si detecta permisos de escritura o administración, lo rechaza al instante y no guarda ningún registro.
+            Al recibir un token, el servidor consulta directamente a la API de GitHub para verificar
+            sus scopes. Si detecta permisos de escritura o administración, lo rechaza al instante y
+            no guarda ningún registro.
           </p>
         </div>
       </div>
 
       <div class="highlight-box">
-        🔒 <strong>Garantía de Control Total:</strong> Puedes revocar o eliminar de forma permanente tu token cifrado de nuestros servidores en cualquier momento a través del panel o desde la propia interfaz de GitHub.
+        🔒 <strong>Garantía de Control Total:</strong> Puedes revocar o eliminar de forma permanente tu
+        token cifrado de nuestros servidores en cualquier momento a través del panel o desde la propia
+        interfaz de GitHub.
       </div>
     </section>
 
     <!-- Navigation Buttons -->
     <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px;">
       <a href="/help" class="btn-back">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>

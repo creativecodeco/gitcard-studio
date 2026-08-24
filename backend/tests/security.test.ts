@@ -133,7 +133,7 @@ describe('security.ts tests', () => {
     it('should validate badge labels and reject XSS or invalid label payloads', () => {
       expect(sanitizeBadgeLabel('profile views', 'gitcard studio')).toBe('profile views');
       expect(sanitizeBadgeLabel('my-custom_badge.v1', 'default')).toBe('my-custom_badge.v1');
-      
+
       // Invalid / XSS payloads fall back to default label
       expect(sanitizeBadgeLabel('<script>alert(1)</script>', 'default')).toBe('default');
       expect(sanitizeBadgeLabel('label" onload="alert(1)', 'default')).toBe('default');
@@ -142,4 +142,3 @@ describe('security.ts tests', () => {
     });
   });
 });
-

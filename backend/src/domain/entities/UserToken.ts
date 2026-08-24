@@ -12,4 +12,3 @@ export interface UserToken {
   consent_fingerprint: string;
   updated_at?: string;
 }
-

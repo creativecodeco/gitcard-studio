@@ -32,7 +32,9 @@ export async function initDatabase(): Promise<void> {
       logger.info('📦 PostgreSQL Data Source has been initialized!');
     } catch (err) {
       if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
-        logger.warn('⚠️ PostgreSQL unreachable during tests. DB initialization skipped.', { error: err });
+        logger.warn('⚠️ PostgreSQL unreachable during tests. DB initialization skipped.', {
+          error: err
+        });
         return;
       }
       throw err;

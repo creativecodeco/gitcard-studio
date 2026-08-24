@@ -13,7 +13,7 @@ describe('RegisterOAuthTokenUseCase', () => {
     mockTokenRepo = {
       saveToken: vi.fn().mockResolvedValue(undefined),
       getToken: vi.fn().mockResolvedValue(null),
-      deleteToken: vi.fn().mockResolvedValue(undefined),
+      deleteToken: vi.fn().mockResolvedValue(undefined)
     };
 
     mockGitHubRepo = {
@@ -23,7 +23,7 @@ describe('RegisterOAuthTokenUseCase', () => {
       getFeaturedRepo: vi.fn(),
       getStreakStats: vi.fn(),
       getSponsorStats: vi.fn(),
-      clearCache: vi.fn(),
+      clearCache: vi.fn()
     } as unknown as IGitHubRepository;
   });
 
@@ -38,7 +38,7 @@ describe('RegisterOAuthTokenUseCase', () => {
       scope: 'read:user',
       tokenType: 'app_user',
       ip: '127.0.0.1',
-      userAgent: 'VitestTest',
+      userAgent: 'VitestTest'
     });
 
     expect(result.username).toBe('octocat');

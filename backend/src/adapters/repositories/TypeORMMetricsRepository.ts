@@ -8,7 +8,16 @@ import { logger } from '@/infrastructure/logging/logger';
 
 export class TypeORMMetricsRepository implements IMetricsRepository {
   recordHit(
-    type: 'stats' | 'languages' | 'repo' | 'rank' | 'streak' | 'trophies' | 'views' | 'sponsors' | 'commit-activity',
+    type:
+      | 'stats'
+      | 'languages'
+      | 'repo'
+      | 'rank'
+      | 'streak'
+      | 'trophies'
+      | 'views'
+      | 'sponsors'
+      | 'commit-activity',
     context?: HitContext
   ): void {
     const username = context?.username || 'unknown';
@@ -182,7 +191,10 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
 
       return currentViews;
     } catch (err) {
-      logger.error(`Error in getOrIncrementProfileViews for user ${username}`, { username, error: err });
+      logger.error(`Error in getOrIncrementProfileViews for user ${username}`, {
+        username,
+        error: err
+      });
       return 0;
     }
   }
@@ -196,14 +208,14 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       // Group by DATE(created_at) and select counts
       const rawResults = await requestLogRepo
         .createQueryBuilder('log')
-        .select("DATE(log.created_at)", "date")
-        .addSelect("COUNT(*)", "count")
-        .where("log.created_at >= :cutoffDate", { cutoffDate })
-        .groupBy("date")
-        .orderBy("date", "ASC")
+        .select('DATE(log.created_at)', 'date')
+        .addSelect('COUNT(*)', 'count')
+        .where('log.created_at >= :cutoffDate', { cutoffDate })
+        .groupBy('date')
+        .orderBy('date', 'ASC')
         .getRawMany();
 
-      return rawResults.map(r => ({
+      return rawResults.map((r) => ({
         date: r.date,
         count: Number.parseInt(r.count, 10) || 0
       }));
@@ -231,7 +243,8 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
         host.endsWith('.githubusercontent.com');
       return isGitHub ? 'github' : 'web';
     } catch {
-      const isGitHub = /^(https?:\/\/)?([a-z0-9-]+\.)*(github\.com|githubusercontent\.com)(\/|$)/i.test(referer);
+      const isGitHub =
+        /^(https?:\/\/)?([a-z0-9-]+\.)*(github\.com|githubusercontent\.com)(\/|$)/i.test(referer);
       return isGitHub ? 'github' : 'web';
     }
   }

@@ -6,7 +6,7 @@ export class GetUserMetricsQueryDto {
   @IsNotEmpty()
   @IsString()
   @Matches(GITHUB_USERNAME_PATTERN, {
-    message: 'username must be a valid GitHub username.',
+    message: 'username must be a valid GitHub username.'
   })
   username!: string;
 
@@ -19,7 +19,7 @@ export class DisconnectAccountDto {
   @IsNotEmpty()
   @IsString()
   @Matches(GITHUB_USERNAME_PATTERN, {
-    message: 'username must be a valid GitHub username.',
+    message: 'username must be a valid GitHub username.'
   })
   username!: string;
 
@@ -36,7 +36,7 @@ export class PurgeSelfAccountDto {
   @IsNotEmpty()
   @IsString()
   @Matches(GITHUB_USERNAME_PATTERN, {
-    message: 'username must be a valid GitHub username.',
+    message: 'username must be a valid GitHub username.'
   })
   username!: string;
 

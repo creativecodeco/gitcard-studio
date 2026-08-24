@@ -142,4 +142,3 @@ export function renderLiveReadmeHtml(
     <p style="font-size: 0.8rem; color: #8b949e; font-style: italic; margin: 0;">${footerText} &bull; <a href="${safePageUrl}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none;">${safePageUrl}</a></p>
   `;
 }
-

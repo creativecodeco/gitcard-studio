@@ -80,7 +80,10 @@ export function generateConsentFingerprint(
   ip: string = 'unknown-ip',
   userAgent: string = 'unknown-ua'
 ): string {
-  return crypto.createHash('sha256').update(`${ip || 'unknown-ip'}-${userAgent || 'unknown-ua'}`).digest('hex');
+  return crypto
+    .createHash('sha256')
+    .update(`${ip || 'unknown-ip'}-${userAgent || 'unknown-ua'}`)
+    .digest('hex');
 }
 
 /**
@@ -176,9 +179,10 @@ export async function validateTokenScopes(
   }
 }
 
-export async function getDecryptedRefreshToken(
-  tokenInfo: { encrypted_refresh_token?: string; refresh_token_iv?: string }
-): Promise<string | undefined> {
+export async function getDecryptedRefreshToken(tokenInfo: {
+  encrypted_refresh_token?: string;
+  refresh_token_iv?: string;
+}): Promise<string | undefined> {
   if (!tokenInfo.encrypted_refresh_token || !tokenInfo.refresh_token_iv) {
     return undefined;
   }
@@ -297,4 +301,3 @@ export async function getDecryptedToken(
   }
   return undefined;
 }
-

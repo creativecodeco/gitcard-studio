@@ -1,10 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { logger } from '@/infrastructure/logging/logger';
 
@@ -30,7 +24,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         url: req.url,
         status,
         error: exception instanceof Error ? exception.message : String(exception),
-        stack: exception instanceof Error ? exception.stack : undefined,
+        stack: exception instanceof Error ? exception.stack : undefined
       });
     }
 

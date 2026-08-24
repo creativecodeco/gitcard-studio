@@ -2,10 +2,19 @@
 
 This file documents workspace-specific rules, patterns, and guidelines that all AI coding assistants must adhere to when working on this repository.
 
-## MCP Tools & Discovery
+## Specialized Agents & Automated Scanners
 
-- **Codebase Memory**: This project uses `codebase-memory-mcp`. Always prefer using MCP graph tools (`search_graph`, `trace_path`, `get_code_snippet`, etc.) over raw grep/find commands for exploring the codebase.
-- **Mandatory Re-indexation**: After completing any task that creates, modifies, or deletes source files, you MUST re-index the repository by calling `index_repository` via `codebase-memory-mcp`. This keeps the knowledge graph in sync with the current codebase and ensures future graph queries remain accurate. Do this as the last step of every task before reporting completion.
+This project uses a dedicated ecosystem of specialized agents located in `.agents/skills/` and `.agents/rules/`:
+
+1. **Cybersecurity Agent (`cybersecurity-agent`)**: OWASP Top 10 auditing, secret leak prevention, SVG/XSS sanitization, SSRF protection, database query safety, and dependency vulnerability checks (`pnpm security:scan`).
+2. **Code Integrity Agent (`code-integrity-agent`)**: ESLint compliance, Prettier code formatting, dead code sweeping, DRY principles, and strict TypeScript checks (`pnpm integrity:scan`).
+3. **Architecture Agent (`architecture-agent`)**: Clean Architecture layer boundaries (Domain -> Use Cases -> Adapters -> Modules), monorepo package version synchronization, and documentation integrity (`pnpm architecture:scan`).
+4. **Best Practices Agent (`best-practices-agent`)**: Guard clauses (negation first), `readonly` class properties, runtime parameter type validation, exact package versions, and non-root Docker execution (`pnpm best-practices:scan`).
+
+To run the complete suite of agent checks before completing any task, run:
+```bash
+pnpm scan:all
+```
 
 ## Security Rules & Mandatory OWASP Review Workflow
 

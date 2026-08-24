@@ -21,7 +21,9 @@ export class GetUserTopReposCardUseCase {
     if (this.metricsRepo) {
       this.metricsRepo.recordHit('repo', hitContext);
     }
-    const userToken = this.tokenRepo ? await getDecryptedToken(username, this.tokenRepo) : undefined;
+    const userToken = this.tokenRepo
+      ? await getDecryptedToken(username, this.tokenRepo)
+      : undefined;
     const repos = await this.githubRepo.getUserTopRepos(username, 4, userToken);
     return renderTopReposCard(repos, theme, overrides, username);
   }

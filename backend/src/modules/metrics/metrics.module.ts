@@ -7,9 +7,9 @@ import { TypeORMMetricsRepository } from '@/adapters/repositories/TypeORMMetrics
   providers: [
     {
       provide: 'IMetricsRepository',
-      useClass: TypeORMMetricsRepository,
-    },
+      useClass: TypeORMMetricsRepository
+    }
   ],
-  exports: ['IMetricsRepository'],
+  exports: ['IMetricsRepository']
 })
 export class MetricsModule {}

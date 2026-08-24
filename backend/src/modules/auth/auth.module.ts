@@ -10,21 +10,21 @@ import { PurgeUserDataUseCase } from '@/use-cases/users/PurgeUserDataUseCase';
   providers: [
     {
       provide: 'ITokenRepository',
-      useClass: TypeORMTokenRepository,
+      useClass: TypeORMTokenRepository
     },
     {
       provide: 'IGitHubRepository',
-      useClass: ApiGitHubRepository,
+      useClass: ApiGitHubRepository
     },
     {
       provide: RegisterOAuthTokenUseCase,
       useFactory: (tokenRepo, ghRepo) => new RegisterOAuthTokenUseCase(tokenRepo, ghRepo),
-      inject: ['ITokenRepository', 'IGitHubRepository'],
+      inject: ['ITokenRepository', 'IGitHubRepository']
     },
     {
       provide: PurgeUserDataUseCase,
-      useFactory: () => new PurgeUserDataUseCase(),
-    },
-  ],
+      useFactory: () => new PurgeUserDataUseCase()
+    }
+  ]
 })
 export class AuthModule {}
