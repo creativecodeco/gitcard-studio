@@ -2,6 +2,13 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.9.0] - 2026-08-25
+
+### ⚡ Integración de Redis & Arquitectura de Caché Distribuido
+- **Conectividad Real a Redis (`RedisCacheAdapter.ts`)**: Integrado `ioredis@6.0.0` para habilitar caché distribuido persistente cuando las variables `REDIS_HOST` o `REDIS_URL` están presentes, con reconexión automática y fallback defensivo a memoria.
+- **Integración con GitHub Repository (`CachedGitHubRepository.ts`)**: Migrada la capa de almacenamiento en caché de tarjetas (estadísticas, lenguajes, repositorio destacado, top repositorios, racha, sponsors y matriz de commits) a `CacheStore` / `RedisCacheAdapter`.
+- **Invalidación por Webhooks & Patrones (`flushPattern`)**: Optimizado el filtrado por comodines en Redis para la limpieza instantánea de caché al recibir webhooks de push en `webhooks.controller.ts`.
+
 ## [1.8.3] - 2026-08-24
 
 ### 🤖 Ecosistema de Agentes Especializados & Auditoría Automatizada (`pnpm scan:all`)
@@ -422,4 +429,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.8.3
+**Versión actualmente expuesta / en producción:** v1.9.0

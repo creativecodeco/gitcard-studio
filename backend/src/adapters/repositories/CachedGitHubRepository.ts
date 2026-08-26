@@ -4,47 +4,39 @@ import { LanguageStat } from '@/domain/entities/LanguageStat';
 import { RepoStats } from '@/domain/entities/RepoStats';
 import { StreakStats } from '@/domain/entities/StreakStats';
 import { SponsorStats } from '@/domain/entities/SponsorStats';
-
-interface CacheEntry<T> {
-  data: T;
-  timestamp: number;
-}
+import { CacheStore, RedisCacheAdapter } from '@/infrastructure/cache/RedisCacheAdapter';
 
 export class CachedGitHubRepository implements IGitHubRepository {
-  private readonly statsCache = new Map<string, CacheEntry<UserStats>>();
-  private readonly languagesCache = new Map<string, CacheEntry<LanguageStat[]>>();
-  private readonly repoCache = new Map<string, CacheEntry<RepoStats>>();
-  private readonly streakCache = new Map<string, CacheEntry<StreakStats>>();
-  private readonly topReposCache = new Map<string, CacheEntry<RepoStats[]>>();
-  private readonly sponsorsCache = new Map<string, CacheEntry<SponsorStats>>();
+  private readonly CACHE_TTL_SECONDS = 2 * 60 * 60; // 2 hours in seconds
 
-  private readonly CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
-
-  constructor(private readonly delegate: IGitHubRepository) {}
+  constructor(
+    private readonly delegate: IGitHubRepository,
+    private readonly cacheStore: CacheStore = new RedisCacheAdapter()
+  ) {}
 
   async getUserStats(username: string, userToken?: string): Promise<UserStats> {
-    const cacheKey = `${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    const cached = this.statsCache.get(cacheKey);
+    const cacheKey = `stats:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
+    const cached = await this.cacheStore.get<UserStats>(cacheKey);
 
-    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-      return cached.data;
+    if (cached) {
+      return cached;
     }
 
     const data = await this.delegate.getUserStats(username, userToken);
-    this.statsCache.set(cacheKey, { data, timestamp: Date.now() });
+    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
     return data;
   }
 
   async getUserLanguages(username: string, userToken?: string): Promise<LanguageStat[]> {
-    const cacheKey = `${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    const cached = this.languagesCache.get(cacheKey);
+    const cacheKey = `langs:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
+    const cached = await this.cacheStore.get<LanguageStat[]>(cacheKey);
 
-    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-      return cached.data;
+    if (cached) {
+      return cached;
     }
 
     const data = await this.delegate.getUserLanguages(username, userToken);
-    this.languagesCache.set(cacheKey, { data, timestamp: Date.now() });
+    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
     return data;
   }
 
@@ -53,15 +45,15 @@ export class CachedGitHubRepository implements IGitHubRepository {
     repoName?: string,
     userToken?: string
   ): Promise<RepoStats> {
-    const cacheKey = `${username.toLowerCase()}:${(repoName || '').toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    const cached = this.repoCache.get(cacheKey);
+    const cacheKey = `repo:${username.toLowerCase()}:${(repoName || '').toLowerCase()}:${userToken ? 'private' : 'public'}`;
+    const cached = await this.cacheStore.get<RepoStats>(cacheKey);
 
-    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-      return cached.data;
+    if (cached) {
+      return cached;
     }
 
     const data = await this.delegate.getFeaturedRepo(username, repoName, userToken);
-    this.repoCache.set(cacheKey, { data, timestamp: Date.now() });
+    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
     return data;
   }
 
@@ -70,49 +62,41 @@ export class CachedGitHubRepository implements IGitHubRepository {
     limit: number = 4,
     userToken?: string
   ): Promise<RepoStats[]> {
-    const cacheKey = `${username.toLowerCase()}:top:${limit}:${userToken ? 'private' : 'public'}`;
-    const cached = this.topReposCache.get(cacheKey);
+    const cacheKey = `toprepos:${username.toLowerCase()}:${limit}:${userToken ? 'private' : 'public'}`;
+    const cached = await this.cacheStore.get<RepoStats[]>(cacheKey);
 
-    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-      return cached.data;
+    if (cached) {
+      return cached;
     }
 
     const data = await this.delegate.getUserTopRepos(username, limit, userToken);
-    this.topReposCache.set(cacheKey, { data, timestamp: Date.now() });
+    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
     return data;
   }
 
   async getUserStreak(username: string, userToken?: string): Promise<StreakStats> {
-    const cacheKey = `${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    const cached = this.streakCache.get(cacheKey);
+    const cacheKey = `streak:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
+    const cached = await this.cacheStore.get<StreakStats>(cacheKey);
 
-    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-      return cached.data;
+    if (cached) {
+      return cached;
     }
 
     const data = await this.delegate.getUserStreak(username, userToken);
-    this.streakCache.set(cacheKey, { data, timestamp: Date.now() });
+    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
     return data;
   }
 
-  private readonly commitActivityCache = new Map<
-    string,
-    {
-      data: { username: string; totalCommitsThisYear: number; hourlyMatrix: number[][] };
-      timestamp: number;
-    }
-  >();
-
   async getUserSponsors(username: string, userToken?: string): Promise<SponsorStats> {
-    const cacheKey = `${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    const cached = this.sponsorsCache.get(cacheKey);
+    const cacheKey = `sponsors:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
+    const cached = await this.cacheStore.get<SponsorStats>(cacheKey);
 
-    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-      return cached.data;
+    if (cached) {
+      return cached;
     }
 
     const data = await this.delegate.getUserSponsors(username, userToken);
-    this.sponsorsCache.set(cacheKey, { data, timestamp: Date.now() });
+    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
     return data;
   }
 
@@ -120,41 +104,26 @@ export class CachedGitHubRepository implements IGitHubRepository {
     username: string,
     userToken?: string
   ): Promise<{ username: string; totalCommitsThisYear: number; hourlyMatrix: number[][] }> {
-    const cacheKey = `${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    const cached = this.commitActivityCache.get(cacheKey);
+    const cacheKey = `activity:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
+    type ActivityData = {
+      username: string;
+      totalCommitsThisYear: number;
+      hourlyMatrix: number[][];
+    };
+    const cached = await this.cacheStore.get<ActivityData>(cacheKey);
 
-    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-      return cached.data;
+    if (cached) {
+      return cached;
     }
 
     const data = await this.delegate.getUserCommitActivity(username, userToken);
-    this.commitActivityCache.set(cacheKey, { data, timestamp: Date.now() });
+    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
     return data;
   }
 
   clearCache(username: string): void {
     const keyBase = username.toLowerCase();
-    this.statsCache.delete(`${keyBase}:public`);
-    this.statsCache.delete(`${keyBase}:private`);
-    this.languagesCache.delete(`${keyBase}:public`);
-    this.languagesCache.delete(`${keyBase}:private`);
-    this.streakCache.delete(keyBase);
-    this.sponsorsCache.delete(`${keyBase}:public`);
-    this.sponsorsCache.delete(`${keyBase}:private`);
-
-    for (const key of this.repoCache.keys()) {
-      if (key.startsWith(`${keyBase}:`)) {
-        this.repoCache.delete(key);
-      }
-    }
-
-    for (const key of this.topReposCache.keys()) {
-      if (key.startsWith(`${keyBase}:`)) {
-        this.topReposCache.delete(key);
-      }
-    }
-
-    // Propagate to delegate
+    this.cacheStore.flushPattern(keyBase);
     this.delegate.clearCache(username);
   }
 }
