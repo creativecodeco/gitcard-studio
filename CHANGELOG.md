@@ -2,6 +2,11 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.9.1] - 2026-08-25
+
+### 🛡️ Resiliencia y Fallback de Autenticación en API de GitHub
+- **Manejo Defensivo de Errores `401 Bad Credentials` (`ApiGitHubRepository.ts`)**: Implementado mecanismo automático de fallback a los endpoints públicos de la API de GitHub (`/users/{username}/repos`) en caso de recibir respuestas `401 Unauthorized` por tokens privados o globales caducados/inválidos, garantizando la renderización continua de las tarjetas de repositorio.
+
 ## [1.9.0] - 2026-08-25
 
 ### ⚡ Integración de Redis & Arquitectura de Caché Distribuido
@@ -429,4 +434,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.9.0
+**Versión actualmente expuesta / en producción:** v1.9.1

@@ -61,7 +61,21 @@ export class ApiGitHubRepository implements IGitHubRepository {
       throw new Error('Forbidden URL target: Only GitHub API requests are allowed.');
     }
     const mergedHeaders = { ...this.getHeaders(userToken), ...extraHeaders };
-    const response = await fetch(url, { headers: mergedHeaders });
+    let response = await fetch(url, { headers: mergedHeaders });
+
+    if (response.status === 401 && (userToken || process.env.GITHUB_TOKEN)) {
+      if (!url.includes('https://api.github.com/user/repos')) {
+        const publicHeaders: HeadersInit = {
+          'User-Agent': 'gitcard-studio-stats',
+          Accept: 'application/vnd.github.v3+json',
+          ...extraHeaders
+        };
+        const retryResponse = await fetch(url, { headers: publicHeaders });
+        if (retryResponse.ok) {
+          return retryResponse.json();
+        }
+      }
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -81,12 +95,28 @@ export class ApiGitHubRepository implements IGitHubRepository {
     let hasMoreRepos = true;
 
     while (hasMoreRepos && page <= 3) {
-      const reposUrl = userToken
-        ? `https://api.github.com/user/repos?per_page=100&page=${page}&visibility=all&affiliation=owner,collaborator,organization_member`
-        : `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`;
+      let repos: any[];
+      try {
+        const reposUrl = userToken
+          ? `https://api.github.com/user/repos?per_page=100&page=${page}&visibility=all&affiliation=owner,collaborator,organization_member`
+          : `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`;
+        repos = await this.fetchGitHub(reposUrl, userToken);
+      } catch (err: any) {
+        if (
+          userToken &&
+          (err.message?.includes('401') || err.message?.includes('Bad credentials'))
+        ) {
+          logger.warn(
+            `User token for ${username} returned 401 in fetchRepoStats. Falling back to public repos endpoint.`
+          );
+          const publicUrl = `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`;
+          repos = await this.fetchGitHub(publicUrl);
+        } else {
+          throw err;
+        }
+      }
 
-      const repos = await this.fetchGitHub(reposUrl, userToken);
-      if (repos.length === 0) {
+      if (!Array.isArray(repos) || repos.length === 0) {
         hasMoreRepos = false;
       } else {
         for (const repo of repos) {
@@ -384,12 +414,28 @@ export class ApiGitHubRepository implements IGitHubRepository {
     let hasMoreRepos = true;
 
     while (hasMoreRepos && page <= 5) {
-      const reposUrl = userToken
-        ? `https://api.github.com/user/repos?per_page=100&page=${page}&visibility=all&affiliation=owner,collaborator,organization_member`
-        : `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`;
+      let repos: any[];
+      try {
+        const reposUrl = userToken
+          ? `https://api.github.com/user/repos?per_page=100&page=${page}&visibility=all&affiliation=owner,collaborator,organization_member`
+          : `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`;
+        repos = await this.fetchGitHub(reposUrl, userToken);
+      } catch (err: any) {
+        if (
+          userToken &&
+          (err.message?.includes('401') || err.message?.includes('Bad credentials'))
+        ) {
+          logger.warn(
+            `User token for ${username} returned 401 in fetchNonForkRepos. Falling back to public repos endpoint.`
+          );
+          const publicUrl = `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`;
+          repos = await this.fetchGitHub(publicUrl);
+        } else {
+          throw err;
+        }
+      }
 
-      const repos = await this.fetchGitHub(reposUrl, userToken);
-      if (repos.length === 0) {
+      if (!Array.isArray(repos) || repos.length === 0) {
         hasMoreRepos = false;
       } else {
         for (const repo of repos) {
@@ -604,12 +650,28 @@ export class ApiGitHubRepository implements IGitHubRepository {
     let hasMoreRepos = true;
 
     while (hasMoreRepos && page <= 3) {
-      const reposUrl = userToken
-        ? `https://api.github.com/user/repos?per_page=100&page=${page}&visibility=all&affiliation=owner,collaborator,organization_member`
-        : `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`;
+      let repos: any[];
+      try {
+        const reposUrl = userToken
+          ? `https://api.github.com/user/repos?per_page=100&page=${page}&visibility=all&affiliation=owner,collaborator,organization_member`
+          : `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`;
+        repos = await this.fetchGitHub(reposUrl, userToken);
+      } catch (err: any) {
+        if (
+          userToken &&
+          (err.message?.includes('401') || err.message?.includes('Bad credentials'))
+        ) {
+          logger.warn(
+            `User token for ${username} returned 401 in findBestRepo. Falling back to public repos endpoint.`
+          );
+          const publicUrl = `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`;
+          repos = await this.fetchGitHub(publicUrl);
+        } else {
+          throw err;
+        }
+      }
 
-      const repos = await this.fetchGitHub(reposUrl, userToken);
-      if (repos.length === 0) {
+      if (!Array.isArray(repos) || repos.length === 0) {
         hasMoreRepos = false;
       } else {
         bestRepo = this.updateBestRepo(repos, bestRepo);
@@ -628,9 +690,23 @@ export class ApiGitHubRepository implements IGitHubRepository {
     repoName?: string,
     userToken?: string
   ): Promise<RepoStats> {
-    const repoData = repoName
-      ? await this.fetchGitHub(`https://api.github.com/repos/${username}/${repoName}`, userToken)
-      : await this.findBestRepo(username, userToken);
+    let repoData: any;
+    try {
+      repoData = repoName
+        ? await this.fetchGitHub(`https://api.github.com/repos/${username}/${repoName}`, userToken)
+        : await this.findBestRepo(username, userToken);
+    } catch (err: any) {
+      if (userToken && (err.message?.includes('401') || err.message?.includes('Bad credentials'))) {
+        logger.warn(
+          `User token for ${username} returned 401 in getFeaturedRepo. Retrying without userToken.`
+        );
+        repoData = repoName
+          ? await this.fetchGitHub(`https://api.github.com/repos/${username}/${repoName}`)
+          : await this.findBestRepo(username);
+      } else {
+        throw err;
+      }
+    }
 
     const name = repoData.name;
     const owner = repoData.owner.login;
@@ -962,11 +1038,23 @@ export class ApiGitHubRepository implements IGitHubRepository {
     const gqlTopRepos = await this.getUserTopReposViaGraphQL(username, limit, userToken);
     if (gqlTopRepos && gqlTopRepos.length > 0) return gqlTopRepos;
 
-    const reposUrl = userToken
-      ? `https://api.github.com/user/repos?per_page=100&sort=stars&direction=desc`
-      : `https://api.github.com/users/${username}/repos?per_page=100&sort=stars&direction=desc`;
-
-    const repos = await this.fetchGitHub(reposUrl, userToken);
+    let repos: any[];
+    try {
+      const reposUrl = userToken
+        ? `https://api.github.com/user/repos?per_page=100&sort=stars&direction=desc`
+        : `https://api.github.com/users/${username}/repos?per_page=100&sort=stars&direction=desc`;
+      repos = await this.fetchGitHub(reposUrl, userToken);
+    } catch (err: any) {
+      if (userToken && (err.message?.includes('401') || err.message?.includes('Bad credentials'))) {
+        logger.warn(
+          `User token for ${username} returned 401 in getUserTopRepos. Falling back to public repos endpoint.`
+        );
+        const publicUrl = `https://api.github.com/users/${username}/repos?per_page=100&sort=stars&direction=desc`;
+        repos = await this.fetchGitHub(publicUrl);
+      } else {
+        throw err;
+      }
+    }
 
     const sorted = (repos as any[])
       .filter((r: any) => !r.fork)
