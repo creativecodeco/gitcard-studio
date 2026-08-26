@@ -5,6 +5,7 @@ import { TypeORMTokenRepository } from '@/adapters/repositories/TypeORMTokenRepo
 import { RegisterUserTokenUseCase } from '@/use-cases/tokens/RegisterUserTokenUseCase';
 import { RevokeUserTokenUseCase } from '@/use-cases/tokens/RevokeUserTokenUseCase';
 import { PurgeUserDataUseCase } from '@/use-cases/users/PurgeUserDataUseCase';
+import { ExportUserDataUseCase } from '@/use-cases/users/ExportUserDataUseCase';
 
 @Module({
   controllers: [TokensController],
@@ -30,6 +31,10 @@ import { PurgeUserDataUseCase } from '@/use-cases/users/PurgeUserDataUseCase';
     {
       provide: PurgeUserDataUseCase,
       useFactory: () => new PurgeUserDataUseCase()
+    },
+    {
+      provide: ExportUserDataUseCase,
+      useFactory: () => new ExportUserDataUseCase()
     }
   ]
 })

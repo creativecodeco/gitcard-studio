@@ -103,11 +103,17 @@ export class CachedGitHubRepository implements IGitHubRepository {
   async getUserCommitActivity(
     username: string,
     userToken?: string
-  ): Promise<{ username: string; totalCommitsThisYear: number; hourlyMatrix: number[][] }> {
+  ): Promise<{
+    username: string;
+    totalCommitsThisYear: number;
+    commitsToday: number;
+    hourlyMatrix: number[][];
+  }> {
     const cacheKey = `activity:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
     type ActivityData = {
       username: string;
       totalCommitsThisYear: number;
+      commitsToday: number;
       hourlyMatrix: number[][];
     };
     const cached = await this.cacheStore.get<ActivityData>(cacheKey);

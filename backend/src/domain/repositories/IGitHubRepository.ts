@@ -14,6 +14,11 @@ export interface IGitHubRepository {
   getUserCommitActivity(
     username: string,
     userToken?: string
-  ): Promise<{ username: string; totalCommitsThisYear: number; hourlyMatrix: number[][] }>;
+  ): Promise<{
+    username: string;
+    totalCommitsThisYear: number;
+    commitsToday: number;
+    hourlyMatrix: number[][];
+  }>;
   clearCache(username: string): void;
 }

@@ -8,7 +8,9 @@ export interface BackendMessages {
   readonly tokenRevokeError: string;
   readonly tokenIdentityRequired: string;
   readonly purgeTokenRequired: string;
+  readonly exportTokenRequired: string;
   readonly purgeDataError: string;
+  readonly exportDataError: string;
   readonly tokenExpiredOrInvalid: string;
   readonly accessDenied: (tokenOwner: string, target: string) => string;
   readonly purgeSuccess: string;
@@ -35,10 +37,13 @@ const messages: Record<SupportedLocale, BackendMessages> = {
       'Se requiere proveer un token de GitHub válido para confirmar tu identidad.',
     purgeTokenRequired:
       'Se requiere proveer tu token de GitHub válido para confirmar y autorizar la purga de datos.',
+    exportTokenRequired:
+      'Se requiere proveer tu token de GitHub válido para autenticar la exportación de datos.',
     purgeDataError: 'Error interno del servidor al procesar la purga de datos.',
+    exportDataError: 'Error interno del servidor al exportar tus datos.',
     tokenExpiredOrInvalid: 'El token de GitHub provisto no es válido o ha expirado.',
     accessDenied: (tokenOwner: string, target: string) =>
-      `Acceso denegado. El token proporcionado pertenece al usuario '${tokenOwner}', pero estás intentando purgar los datos de '${target}'.`,
+      `Acceso denegado. El token proporcionado pertenece al usuario '${tokenOwner}', pero estás intentando procesar los datos de '${target}'.`,
     purgeSuccess:
       'Todos tus datos (token, historial, métricas de uso y logs) han sido eliminados de forma definitiva.',
     metricsDisabled: 'Las métricas no están configuradas o el acceso está deshabilitado.',
@@ -61,10 +66,12 @@ const messages: Record<SupportedLocale, BackendMessages> = {
     tokenRevokeError: 'Internal server error while revoking the token.',
     tokenIdentityRequired: 'A valid GitHub token is required to confirm your identity.',
     purgeTokenRequired: 'A valid GitHub token is required to confirm and authorize the data purge.',
+    exportTokenRequired: 'A valid GitHub token is required to authenticate data export.',
     purgeDataError: 'Internal server error while processing the data purge.',
+    exportDataError: 'Internal server error while exporting your data.',
     tokenExpiredOrInvalid: 'The provided GitHub token is invalid or has expired.',
     accessDenied: (tokenOwner: string, target: string) =>
-      `Access denied. The provided token belongs to user '${tokenOwner}', but you are trying to purge data for '${target}'.`,
+      `Access denied. The provided token belongs to user '${tokenOwner}', but you are trying to process data for '${target}'.`,
     purgeSuccess:
       'All your data (token, history, usage metrics, and logs) have been permanently deleted.',
     metricsDisabled: 'Metrics are not configured or access is disabled.',

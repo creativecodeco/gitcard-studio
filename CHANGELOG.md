@@ -2,6 +2,21 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.9.2] - 2026-08-26
+
+### 🎨 Rediseño de Tarjetas de Error y Validación 404 Consistente
+- **Presentador Rediseñado `renderErrorCard` (`errorCard.ts`)**: Reestructurada la generación SVG de errores con envoltura de texto en `<tspan>` (máximo 46 caracteres por línea) para evitar el desbordamiento de la tarjeta, soporte dinámico de temas, cabecera de marca `renderBrandHeader` y sanitización estricta XML.
+- **Manejo Consistente de Usuarios Inexistentes (404)**: Integrada la validación previa de existencia de usuario en `getUserCommitActivity` (`ApiGitHubRepository.ts`). Ahora los endpoints `/api/commit-activity`, `/api/today-status` y `/api/timeline-matrix` capturan el error 404 y devuelven la tarjeta estandarizada de error *"Usuario no encontrado"*.
+- **Agregación Dinámica Real de Commits**: Reemplazados los datos estáticos (*mock*) en `today-status` y `timeline-matrix` por la extracción real de `commitsToday` y la matriz de periodos desde la API GraphQL de GitHub.
+- **Resolución de Referencia `triggerToast` (`PrivateTokenModal.astro`)**: Definida la función helper `triggerToast` para notificaciones flotantes en acciones de exportación y purga de datos GDPR.
+
+### 🛡️ Cumplimiento de Habeas Data, Transparencia y Exportación de Datos
+- **Exportación de Datos (Portabilidad / Derecho de Consulta - Ley 1581 / GDPR)**: Creado el caso de uso `ExportUserDataUseCase` y el endpoint `@Post('users/export')` en `tokens.controller.ts` para permitir a los usuarios consultar y descargar un informe estructurado en formato JSON con la totalidad de sus datos almacenados.
+- **Acción de Descarga en UI (`PrivateTokenModal.astro`)**: Integrado el botón *"📥 Descargar mis Datos (JSON)"* en el panel activo de cuenta con disparador de descarga directa.
+- **Términos y Condiciones de Servicio (`terms.astro`)**: Creada la página formal de Términos de Servicio (`/terms.html`) que regula el uso aceptable, límites de la API y condiciones del servicio.
+- **Transparencia en Política de Privacidad (`privacy.astro`)**: Enriquecida la política con la identificación formal del Responsable del Tratamiento de Datos (CreativeCode Studio), canales oficiales para ejercicio de Derechos ARCO (`privacidad@creativecode.com.co`), tiempos de respuesta legal (PQR) y declaración explícita del uso funcional de `localStorage`.
+- **Aviso de Privacidad y Consentimiento de Almacenamiento Local (`PrivacyConsentBanner.astro`)**: Creado el banner flotante sutil para informar al usuario al ingresar por primera vez sobre la utilización de memoria local sin cookies de terceros.
+
 ## [1.9.1] - 2026-08-25
 
 ### 🛡️ Resiliencia y Fallback de Autenticación en API de GitHub
@@ -434,4 +449,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.9.1
+**Versión actualmente expuesta / en producción:** v1.9.2

@@ -1250,9 +1250,19 @@ export class ApiGitHubRepository implements IGitHubRepository {
   async getUserCommitActivity(
     username: string,
     userToken?: string
-  ): Promise<{ username: string; totalCommitsThisYear: number; hourlyMatrix: number[][] }> {
+  ): Promise<{
+    username: string;
+    totalCommitsThisYear: number;
+    commitsToday: number;
+    hourlyMatrix: number[][];
+  }> {
     const hourlyMatrix: number[][] = Array.from({ length: 7 }, () => new Array(24).fill(0));
     let totalCommitsThisYear = 0;
+    let commitsToday = 0;
+
+    if (!userToken) {
+      await this.fetchGitHub(`https://api.github.com/users/${username}`);
+    }
 
     const isViewer = Boolean(userToken);
     const query = isViewer
@@ -1302,6 +1312,9 @@ export class ApiGitHubRepository implements IGitHubRepository {
         userToken
       );
       const targetUser = isViewer ? data?.viewer : data?.user;
+      if (!targetUser && !isViewer) {
+        throw new Error(`GitHub API error (404) for URL https://api.github.com/users/${username}`);
+      }
       if (targetUser?.contributionsCollection) {
         const cc = targetUser.contributionsCollection;
         totalCommitsThisYear = cc.totalCommitContributions ?? 0;
@@ -1309,9 +1322,29 @@ export class ApiGitHubRepository implements IGitHubRepository {
 
         if (cal?.weeks) {
           this.populateCommitCalendarMatrix(cal.weeks, hourlyMatrix);
+
+          const todayStr = new Date().toISOString().split('T')[0];
+          for (const week of cal.weeks) {
+            for (const day of week.contributionDays ?? []) {
+              if (day.date === todayStr) {
+                commitsToday = day.contributionCount ?? 0;
+              }
+            }
+          }
+          if (commitsToday === 0 && cal.weeks.length > 0) {
+            const lastWeek = cal.weeks[cal.weeks.length - 1];
+            const days = lastWeek.contributionDays ?? [];
+            if (days.length > 0) {
+              const lastDay = days[days.length - 1];
+              commitsToday = lastDay.contributionCount ?? 0;
+            }
+          }
         }
       }
     } catch (err) {
+      if (err instanceof Error && err.message.includes('404')) {
+        throw err;
+      }
       logger.warn(`Could not fetch commit activity for user ${username}:`, {
         username,
         error: err
@@ -1321,6 +1354,7 @@ export class ApiGitHubRepository implements IGitHubRepository {
     return {
       username,
       totalCommitsThisYear,
+      commitsToday,
       hourlyMatrix
     };
   }

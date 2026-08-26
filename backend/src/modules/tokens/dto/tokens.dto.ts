@@ -63,3 +63,20 @@ export class PurgeUserDto {
   @IsIn(['es', 'en'])
   locale?: 'es' | 'en';
 }
+
+export class ExportUserDto {
+  @IsNotEmpty()
+  @IsString()
+  @Matches(GITHUB_USERNAME_PATTERN, {
+    message: 'username must be a valid GitHub username.'
+  })
+  username!: string;
+
+  @IsOptional()
+  @IsString()
+  token?: string;
+
+  @IsOptional()
+  @IsIn(['es', 'en'])
+  locale?: 'es' | 'en';
+}

@@ -13,6 +13,14 @@ export class GetUserCommitActivityCardUseCase {
     private readonly tokenRepo?: ITokenRepository
   ) {}
 
+  async getActivityData(username: string) {
+    validateUsername(username);
+    const userToken = this.tokenRepo
+      ? await getDecryptedToken(username, this.tokenRepo)
+      : undefined;
+    return this.githubRepo.getUserCommitActivity(username, userToken);
+  }
+
   async execute(
     username: string,
     theme: string,

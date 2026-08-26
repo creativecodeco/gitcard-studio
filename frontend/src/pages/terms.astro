@@ -1,0 +1,203 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout
+  title="Términos de Servicio | GitCard Studio"
+  description="Términos y condiciones de uso de GitCard Studio. Conoce las reglas de uso aceptable, límites de la API y condiciones del servicio."
+>
+  <header class="app-header">
+    <div class="header-top-row">
+      <a href="/" class="logo" style="text-decoration: none">
+        <svg
+          class="logo-icon"
+          viewBox="0 0 24 24"
+          width="36"
+          height="36"
+          fill="none"
+          stroke="url(#logo-grad)"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8"></stop>
+              <stop offset="100%" stop-color="#a855f7"></stop>
+            </linearGradient>
+          </defs>
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <h1 style="font-size: 1.8rem; margin: 0">
+          GitHub <span class="accent-text">Helpers</span>
+        </h1>
+      </a>
+    </div>
+  </header>
+
+  <main class="terms-content">
+    <div class="terms-header">
+      <h2>Términos y Condiciones de Servicio</h2>
+      <p style="color: var(--text-secondary); margin-top: 10px">
+        Última actualización: 20 de Julio, 2026. Condiciones generales de uso de la plataforma.
+      </p>
+    </div>
+
+    <!-- Section 1: Aceptación de los Términos -->
+    <section class="terms-section">
+      <h3>1. Aceptación de los Términos</h3>
+      <p>
+        Al acceder o utilizar GitCard Studio, aceptas quedar vinculado por los presentes Términos y
+        Condiciones de Servicio. Si no estás de acuerdo con alguno de los términos, te pedimos
+        abstenerte de utilizar el servicio.
+      </p>
+    </section>
+
+    <!-- Section 2: Descripción del Servicio -->
+    <section class="terms-section">
+      <h3>2. Descripción del Servicio</h3>
+      <p>
+        GitCard Studio proporciona una herramienta de generación dinámica de tarjetas y widgets
+        vectoriales SVG para perfiles y repositorios de GitHub. Las tarjetas son renderizadas
+        directamente en formato SVG para su inclusión en documentos Markdown (`README.md`), páginas
+        web o paneles informativos.
+      </p>
+    </section>
+
+    <!-- Section 3: Uso Aceptable y Restricciones -->
+    <section class="terms-section">
+      <h3>3. Uso Aceptable y Restricciones</h3>
+      <p>Al utilizar este servicio, te comprometes a:</p>
+      <ul>
+        <li>
+          No intentar saturar, realizar ataques de denegación de servicio (DDoS) ni sobrepasar los
+          límites de tasa (rate limits) establecidos.
+        </li>
+        <li>
+          No utilizar automatizaciones maliciosas o scripts abusivos para sobrecargar el servidor o
+          la API oficial de GitHub.
+        </li>
+        <li>
+          Proporcionar tokens de GitHub con los permisos mínimos necesarios (`read:user`,
+          `repo:status`).
+        </li>
+      </ul>
+    </section>
+
+    <!-- Section 4: Disponibilidad y Limitación de Responsabilidad -->
+    <section class="terms-section">
+      <h3>4. Disponibilidad y Limitación de Responsabilidad</h3>
+      <p>
+        El servicio se proporciona "tal cual" (*as is*) y según disponibilidad. Dado que depende de
+        las APIs públicas y autenticadas de GitHub Inc., GitCard Studio no garantiza una
+        disponibilidad ininterrumpida del 100% ni se hace responsable por caídas temporales
+        originadas por límites de tasa o mantenimiento de GitHub.
+      </p>
+    </section>
+
+    <!-- Section 5: Propiedad Intelectual -->
+    <section class="terms-section">
+      <h3>5. Propiedad Intelectual</h3>
+      <p>
+        Las plantillas de diseño y el código fuente de GitCard Studio están protegidos por licencias
+        de código abierto. Las marcas registradas, logotipos y nombres comerciales de GitHub
+        pertenecen a GitHub Inc. y se utilizan exclusivamente con fines explicativos e
+        identificativos.
+      </p>
+    </section>
+
+    <!-- Back Button -->
+    <a href="/" class="btn-back">
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Volver al Generador
+    </a>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .terms-content {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 16px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    max-width: 800px;
+    width: 100%;
+    margin-bottom: 40px;
+  }
+  .terms-header {
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 20px;
+  }
+  .terms-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .terms-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .terms-section h3 {
+    font-size: 1.25rem;
+    color: var(--accent-color);
+    margin: 0;
+  }
+  .terms-section p,
+  .terms-section li {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 0.98rem;
+    margin: 0;
+  }
+  .terms-section ul {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .btn-back {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition-smooth);
+  }
+  .btn-back:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-color);
+  }
+</style>

@@ -62,7 +62,12 @@ export class CardsController {
 
     if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
       res.status(400);
-      return renderErrorCard('Usuario de GitHub inválido');
+      const safeUser = typeof username === 'string' ? username : undefined;
+      return renderErrorCard(
+        'Usuario de GitHub inválido',
+        typeof theme === 'string' ? theme : undefined,
+        { username: safeUser }
+      );
     }
 
     try {
@@ -97,7 +102,7 @@ export class CardsController {
         .header('Content-Type', 'image/svg+xml; charset=utf-8')
         .header('X-Content-Type-Options', 'nosniff')
         .status(500);
-      return renderErrorCard(message);
+      return renderErrorCard(message, typeof theme === 'string' ? theme : undefined, { username });
     }
   }
 
@@ -306,7 +311,9 @@ export class CardsController {
       res,
       'TodayStatus',
       async (u, t, o) => {
-        return renderTodayStatusBadge({ username: u, commitsToday: 3 }, { theme: t, overrides: o });
+        const activity = await this.commitActivityCardUseCase.getActivityData(u);
+        const commitsToday = activity.commitsToday ?? 0;
+        return renderTodayStatusBadge({ username: u, commitsToday }, { theme: t, overrides: o });
       }
     );
   }
@@ -328,7 +335,31 @@ export class CardsController {
       res,
       'TimelineMatrix',
       async (u, t, o) => {
-        return renderTimelineMatrixCard({ username: u }, { theme: t, overrides: o, cardWidth });
+        const activity = await this.commitActivityCardUseCase.getActivityData(u);
+        let night = 0;
+        let morning = 0;
+        let afternoon = 0;
+        let evening = 0;
+        for (let day = 0; day < 7; day++) {
+          const row = activity.hourlyMatrix[day] || [];
+          for (let h = 0; h < 24; h++) {
+            const count = row[h] || 0;
+            if (h >= 0 && h < 6) night += count;
+            else if (h >= 6 && h < 12) morning += count;
+            else if (h >= 12 && h < 18) afternoon += count;
+            else evening += count;
+          }
+        }
+        const periods = [
+          { key: 'morning' as const, commits: morning },
+          { key: 'afternoon' as const, commits: afternoon },
+          { key: 'evening' as const, commits: evening },
+          { key: 'night' as const, commits: night }
+        ];
+        return renderTimelineMatrixCard(
+          { username: u, periods },
+          { theme: t, overrides: o, cardWidth }
+        );
       }
     );
   }

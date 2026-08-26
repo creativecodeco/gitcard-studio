@@ -1842,11 +1842,14 @@ import Footer from '@/components/Footer.astro';
     }, 2700);
   }
 
-  document.addEventListener('app:toast', ((e: CustomEvent) => {
+  const handleToastEvent = ((e: CustomEvent) => {
     if (e.detail && e.detail.message) {
       showToast(e.detail.message, e.detail.type || 'success');
     }
-  }) as EventListener);
+  }) as EventListener;
+
+  document.addEventListener('app:toast', handleToastEvent);
+  window.addEventListener('app:toast', handleToastEvent);
 
   window.addEventListener('app:user-authenticated', ((e: CustomEvent) => {
     const user = e.detail?.username;

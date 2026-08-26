@@ -104,7 +104,7 @@
     </div>
 
     <!-- Refresh / Generate Cards Action Button for Authenticated Users -->
-    <div style="margin-bottom: 12px;">
+    <div style="margin-bottom: 8px;">
       <button
         id="btn-generate-auth"
         class="primary-btn full-width-btn"
@@ -115,8 +115,16 @@
       </button>
     </div>
 
-    <!-- Danger Zone / Account Deletion Trigger -->
-    <div>
+    <!-- Export & Danger Zone Actions -->
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <button
+        id="btn-export-user-data"
+        class="theme-option"
+        style="padding: 0 12px; font-size: 0.78rem; border-radius: 6px; height: 32px; width: 100%; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px;"
+        data-i18n="export_data_btn"
+      >
+        📥 Descargar mis Datos (JSON)
+      </button>
       <button
         id="btn-open-purge-modal"
         class="danger-btn"
@@ -717,8 +725,48 @@
     });
 
     function triggerToast(message: string, type: 'success' | 'error' = 'success') {
-      document.dispatchEvent(new CustomEvent('app:toast', { detail: { message, type } }));
+      const detail = { message, type };
+      window.dispatchEvent(new CustomEvent('app:toast', { detail, bubbles: true }));
+      document.dispatchEvent(new CustomEvent('app:toast', { detail, bubbles: true }));
     }
+
+    const btnExportUserData = document.getElementById('btn-export-user-data');
+    btnExportUserData?.addEventListener('click', async () => {
+      const activeUser =
+        localStorage.getItem('registered-github-username') ||
+        localStorage.getItem('gh_active_user');
+      if (!activeUser) {
+        triggerToast('No se encontró un usuario activo para exportar.', 'error');
+        return;
+      }
+      try {
+        const res = await fetch('/api/users/export', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username: activeUser })
+        });
+        if (res.ok) {
+          const exportData = await res.json();
+          const dataStr =
+            'data:text/json;charset=utf-8,' +
+            encodeURIComponent(JSON.stringify(exportData, null, 2));
+          const downloadAnchor = document.createElement('a');
+          downloadAnchor.setAttribute('href', dataStr);
+          downloadAnchor.setAttribute('download', `gitcard-datos-${activeUser}.json`);
+          document.body.appendChild(downloadAnchor);
+          downloadAnchor.click();
+          downloadAnchor.remove();
+          triggerToast('Datos exportados exitosamente.', 'success');
+        } else {
+          triggerToast('No se pudieron exportar los datos. Verifica tu sesión.', 'error');
+        }
+      } catch (err) {
+        console.error('Error exporting data:', err);
+        triggerToast('Error de red al intentar exportar tus datos.', 'error');
+      }
+    });
 
     btnConfirmPurge?.addEventListener('click', async () => {
       const usernameToPurge = purgeUsernameInput?.value.trim().replace(/^@/, '');

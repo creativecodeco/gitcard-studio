@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import PrivacyConsentBanner from '../components/PrivacyConsentBanner.astro';
 
 interface Props {
   title?: string;
@@ -143,5 +144,7 @@ const {
     <div class="app-container">
       <slot />
     </div>
+
+    <PrivacyConsentBanner />
   </body>
 </html>

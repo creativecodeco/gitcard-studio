@@ -1,0 +1,167 @@
+---
+// Privacy & LocalStorage Consent Banner
+---
+
+<div
+  id="privacy-consent-banner"
+  class="privacy-consent-banner hidden"
+  role="region"
+  aria-label="Aviso de privacidad y almacenamiento local"
+>
+  <div class="banner-content">
+    <div class="banner-icon">
+      <svg
+        viewBox="0 0 24 24"
+        width="20"
+        height="20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+    </div>
+    <div class="banner-text">
+      <p>
+        <strong>Transparencia y Privacidad:</strong> Utilizamos almacenamiento local (<code
+          >localStorage</code
+        >) únicamente para recordar tus preferencias de tema y configuración. No usamos cookies de
+        rastreo publicitario de terceros. Consulta nuestra <a
+          href="/privacy.html"
+          class="banner-link">Política de Privacidad</a
+        > y <a href="/terms.html" class="banner-link">Términos</a>.
+      </p>
+    </div>
+    <div class="banner-actions">
+      <button type="button" id="btn-accept-privacy" class="btn-banner-accept"> Entendido </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const banner = document.getElementById('privacy-consent-banner');
+    const btnAccept = document.getElementById('btn-accept-privacy');
+
+    if (!banner || !btnAccept) return;
+
+    const accepted = localStorage.getItem('gitcard_privacy_accepted');
+    if (!accepted) {
+      banner.classList.remove('hidden');
+    }
+
+    btnAccept.addEventListener('click', () => {
+      localStorage.setItem('gitcard_privacy_accepted', 'true');
+      banner.classList.add('hidden');
+    });
+  });
+</script>
+
+<style>
+  .privacy-consent-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 820px;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.15));
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 12px;
+    padding: 14px 20px;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .privacy-consent-banner.hidden {
+    display: none !important;
+  }
+
+  .banner-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .banner-icon {
+    color: var(--accent-color, #38bdf8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .banner-text {
+    flex: 1;
+  }
+
+  .banner-text p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--text-secondary, #94a3b8);
+    line-height: 1.5;
+  }
+
+  .banner-text strong {
+    color: var(--text-primary, #f8fafc);
+  }
+
+  .banner-text code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+  }
+
+  .banner-link {
+    color: var(--accent-color, #38bdf8);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .banner-link:hover {
+    color: #a855f7;
+  }
+
+  .banner-actions {
+    flex-shrink: 0;
+  }
+
+  .btn-banner-accept {
+    background: var(--accent-color, #38bdf8);
+    color: #0f172a;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 0.2s ease,
+      transform 0.1s ease;
+  }
+
+  .btn-banner-accept:hover {
+    background: #0284c7;
+    color: #ffffff;
+  }
+
+  @media (max-width: 640px) {
+    .banner-content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .banner-actions {
+      align-self: flex-end;
+    }
+  }
+</style>

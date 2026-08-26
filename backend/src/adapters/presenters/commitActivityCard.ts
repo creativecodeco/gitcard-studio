@@ -30,6 +30,10 @@ function calculatePersona(matrix: number[][], isEn: boolean): string {
     }
   }
 
+  if (nightCommits === 0 && dayCommits === 0) {
+    return isEn ? '🌱 Getting Started' : '🌱 En Inicio';
+  }
+
   const isNightOwl = nightCommits >= dayCommits;
   if (isNightOwl) {
     return isEn ? '🦉 Night Owl' : '🦉 Búho Nocturno';

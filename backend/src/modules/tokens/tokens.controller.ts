@@ -13,10 +13,14 @@ import {
 import { RegisterUserTokenUseCase } from '@/use-cases/tokens/RegisterUserTokenUseCase';
 import { RevokeUserTokenUseCase } from '@/use-cases/tokens/RevokeUserTokenUseCase';
 import { PurgeUserDataUseCase } from '@/use-cases/users/PurgeUserDataUseCase';
+import {
+  ExportUserDataUseCase,
+  UserDataExportResult
+} from '@/use-cases/users/ExportUserDataUseCase';
 import { logger } from '@/infrastructure/logging/logger';
 import { escapeXml } from '@/utils/escape';
 import { getMessages, resolveLocale } from '@/infrastructure/i18n/backendI18n';
-import { RegisterTokenDto, RevokeTokenDto, PurgeUserDto } from './dto/tokens.dto';
+import { RegisterTokenDto, RevokeTokenDto, PurgeUserDto, ExportUserDto } from './dto/tokens.dto';
 
 export function extractBearerToken(authHeader?: string, bodyToken?: string): string | undefined {
   const raw = authHeader ?? bodyToken;
@@ -31,7 +35,8 @@ export class TokensController {
   constructor(
     private readonly registerUseCase: RegisterUserTokenUseCase,
     private readonly revokeUseCase: RevokeUserTokenUseCase,
-    private readonly purgeUseCase: PurgeUserDataUseCase
+    private readonly purgeUseCase: PurgeUserDataUseCase,
+    private readonly exportUseCase: ExportUserDataUseCase
   ) {}
 
   @Post('tokens/register')
@@ -140,6 +145,50 @@ export class TokensController {
         error
       });
       throw new InternalServerErrorException(m.purgeDataError);
+    }
+  }
+
+  @Post('users/export')
+  async exportData(
+    @Body() dto: ExportUserDto,
+    @Headers('authorization') authHeader?: string
+  ): Promise<UserDataExportResult> {
+    const m = getMessages(resolveLocale(dto.locale));
+    const providedToken = extractBearerToken(authHeader, dto.token);
+
+    if (!providedToken || providedToken.trim() === '') {
+      throw new BadRequestException(m.exportTokenRequired);
+    }
+
+    const profileRes = await fetch('https://api.github.com/user', {
+      headers: {
+        'User-Agent': 'gitcard-studio-security',
+        Accept: 'application/vnd.github.v3+json',
+        Authorization: `token ${providedToken}`
+      }
+    });
+
+    if (!profileRes.ok) {
+      throw new UnauthorizedException(m.tokenExpiredOrInvalid);
+    }
+
+    const githubUser = (await profileRes.json()) as { login: string };
+    const tokenOwner = githubUser.login;
+
+    if (tokenOwner.toLowerCase() !== dto.username.toLowerCase()) {
+      throw new ForbiddenException(m.accessDenied(escapeXml(tokenOwner), escapeXml(dto.username)));
+    }
+
+    try {
+      const data = await this.exportUseCase.execute(dto.username);
+      logger.info(`Data export generated for user ${dto.username}`, { username: dto.username });
+      return data;
+    } catch (error: unknown) {
+      logger.error(`Error exporting data for user ${dto.username}`, {
+        username: dto.username,
+        error
+      });
+      throw new InternalServerErrorException(m.exportDataError);
     }
   }
 }

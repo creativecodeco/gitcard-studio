@@ -11,10 +11,12 @@ import { TokensController } from '../src/modules/tokens/tokens.controller';
 import { RegisterUserTokenUseCase } from '../src/use-cases/tokens/RegisterUserTokenUseCase';
 import { RevokeUserTokenUseCase } from '../src/use-cases/tokens/RevokeUserTokenUseCase';
 import { PurgeUserDataUseCase } from '../src/use-cases/users/PurgeUserDataUseCase';
+import { ExportUserDataUseCase } from '../src/use-cases/users/ExportUserDataUseCase';
 import {
   RegisterTokenDto,
   RevokeTokenDto,
-  PurgeUserDto
+  PurgeUserDto,
+  ExportUserDto
 } from '../src/modules/tokens/dto/tokens.dto';
 
 describe('TokensController', () => {
@@ -23,6 +25,7 @@ describe('TokensController', () => {
   const mockRegisterUseCase = { execute: vi.fn() };
   const mockRevokeUseCase = { execute: vi.fn() };
   const mockPurgeUseCase = { execute: vi.fn() };
+  const mockExportUseCase = { execute: vi.fn() };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,7 +33,8 @@ describe('TokensController', () => {
       providers: [
         { provide: RegisterUserTokenUseCase, useValue: mockRegisterUseCase },
         { provide: RevokeUserTokenUseCase, useValue: mockRevokeUseCase },
-        { provide: PurgeUserDataUseCase, useValue: mockPurgeUseCase }
+        { provide: PurgeUserDataUseCase, useValue: mockPurgeUseCase },
+        { provide: ExportUserDataUseCase, useValue: mockExportUseCase }
       ]
     }).compile();
 
@@ -170,6 +174,42 @@ describe('TokensController', () => {
 
       expect(result.message).toContain('eliminados');
       expect(mockPurgeUseCase.execute).toHaveBeenCalledWith('testuser');
+
+      vi.unstubAllGlobals();
+    });
+  });
+
+  describe('exportData()', () => {
+    it('should throw BadRequestException when no token is provided', async () => {
+      const dto: ExportUserDto = { username: 'testuser' };
+
+      await expect(controller.exportData(dto, undefined)).rejects.toThrow(BadRequestException);
+    });
+
+    it('should export user data when GitHub token is verified', async () => {
+      const dto: ExportUserDto = { username: 'testuser', token: 'ghp_valid' };
+      const mockExportData = {
+        exportedAt: '2026-08-20T10:00:00Z',
+        username: 'testuser',
+        consentRecord: { hasRegisteredToken: true },
+        metrics: [],
+        statsHistory: [],
+        recentActivityLogs: []
+      };
+      mockExportUseCase.execute.mockResolvedValue(mockExportData);
+
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          json: vi.fn().mockResolvedValue({ login: 'testuser' })
+        })
+      );
+
+      const result = await controller.exportData(dto);
+
+      expect(result).toEqual(mockExportData);
+      expect(mockExportUseCase.execute).toHaveBeenCalledWith('testuser');
 
       vi.unstubAllGlobals();
     });
