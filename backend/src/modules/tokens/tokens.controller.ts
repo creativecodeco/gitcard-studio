@@ -23,6 +23,10 @@ import { escapeXml } from '@/utils/escape';
 import { getMessages, resolveLocale } from '@/infrastructure/i18n/backendI18n';
 import { RegisterTokenDto, RevokeTokenDto, PurgeUserDto, ExportUserDto } from './dto/tokens.dto';
 
+import { getDecryptedToken } from '@/infrastructure/security/security';
+import { ITokenRepository } from '@/domain/repositories/ITokenRepository';
+import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
+
 export function extractBearerToken(authHeader?: string, bodyToken?: string): string | undefined {
   const raw = authHeader ?? bodyToken;
   if (typeof raw !== 'string') return undefined;
@@ -37,7 +41,9 @@ export class TokensController {
     @Inject(RegisterUserTokenUseCase) private readonly registerUseCase: RegisterUserTokenUseCase,
     @Inject(RevokeUserTokenUseCase) private readonly revokeUseCase: RevokeUserTokenUseCase,
     @Inject(PurgeUserDataUseCase) private readonly purgeUseCase: PurgeUserDataUseCase,
-    @Inject(ExportUserDataUseCase) private readonly exportUseCase: ExportUserDataUseCase
+    @Inject(ExportUserDataUseCase) private readonly exportUseCase: ExportUserDataUseCase,
+    @Inject('IGitHubRepository') private readonly githubRepo: IGitHubRepository,
+    @Inject('ITokenRepository') private readonly tokenRepo: ITokenRepository
   ) {}
 
   @Post('tokens/register')
@@ -65,6 +71,7 @@ export class TokensController {
         ip,
         agent
       );
+      this.githubRepo.clearCache(dto.username);
       logger.info(`Token registered successfully for user ${dto.username}`, {
         username: dto.username
       });
@@ -92,6 +99,7 @@ export class TokensController {
 
     try {
       const result = await this.revokeUseCase.execute(dto.username, providedToken);
+      this.githubRepo.clearCache(dto.username);
       logger.info(`Token revoked successfully for user ${dto.username}`, {
         username: dto.username
       });
@@ -138,6 +146,7 @@ export class TokensController {
 
     try {
       await this.purgeUseCase.execute(dto.username);
+      this.githubRepo.clearCache(dto.username);
       logger.info(`GDPR data purge completed for user ${dto.username}`, { username: dto.username });
       return { message: m.purgeSuccess };
     } catch (error: unknown) {
@@ -155,7 +164,11 @@ export class TokensController {
     @Headers('authorization') authHeader?: string
   ): Promise<UserDataExportResult> {
     const m = getMessages(resolveLocale(dto.locale));
-    const providedToken = extractBearerToken(authHeader, dto.token);
+    let providedToken = extractBearerToken(authHeader, dto.token);
+
+    if (!providedToken || providedToken.trim() === '') {
+      providedToken = await getDecryptedToken(dto.username, this.tokenRepo);
+    }
 
     if (!providedToken || providedToken.trim() === '') {
       throw new BadRequestException(m.exportTokenRequired);

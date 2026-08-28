@@ -26,6 +26,8 @@ import { sanitizeColor } from '@/adapters/presenters/theme';
 import { extractThemeOverrides, extractCardWidth } from './card-query.helpers';
 import { escapeXml } from '@/utils/escape';
 
+import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
+
 @Controller('api')
 export class CardsController {
   constructor(
@@ -45,7 +47,9 @@ export class CardsController {
     @Inject(GetUserSponsorsCardUseCase)
     private readonly sponsorsCardUseCase: GetUserSponsorsCardUseCase,
     @Inject(GetUserCommitActivityCardUseCase)
-    private readonly commitActivityCardUseCase: GetUserCommitActivityCardUseCase
+    private readonly commitActivityCardUseCase: GetUserCommitActivityCardUseCase,
+    @Inject('IGitHubRepository')
+    private readonly githubRepo: IGitHubRepository
   ) {}
 
   private async handleCardRequest(
@@ -77,6 +81,19 @@ export class CardsController {
       );
     }
 
+    // Check if cache bypass/refresh was explicitly requested
+    const isCacheBypass =
+      query.cache === 'false' ||
+      query.cache === '0' ||
+      query.refresh === 'true' ||
+      query.refresh === '1' ||
+      query.cache_seconds === '0' ||
+      query.cache_bust !== undefined;
+
+    if (isCacheBypass) {
+      this.githubRepo.clearCache(username);
+    }
+
     try {
       const cardWidth = extractCardWidth(query);
       const overrides = {
@@ -92,10 +109,14 @@ export class CardsController {
 
       const svg = await executeUseCase(username, theme as string, overrides, hitContext);
 
+      const cacheHeader = isCacheBypass
+        ? 'no-cache, no-store, must-revalidate'
+        : 'public, max-age=7200';
+
       res
         .header('Content-Type', 'image/svg+xml; charset=utf-8')
         .header('X-Content-Type-Options', 'nosniff')
-        .header('Cache-Control', 'public, max-age=7200')
+        .header('Cache-Control', cacheHeader)
         .status(200);
       return svg;
     } catch (error: unknown) {

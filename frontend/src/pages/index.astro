@@ -763,7 +763,7 @@ import Footer from '@/components/Footer.astro';
     const btn = target.closest('#btn-generate, #btn-generate-auth');
     if (btn) {
       e.preventDefault();
-      submitUsername();
+      submitUsername(true);
     }
   });
 
@@ -773,12 +773,12 @@ import Footer from '@/components/Footer.astro';
       const target = e.target as HTMLElement;
       if (target && (target.id === 'username-input' || target.id === 'repo-input')) {
         e.preventDefault();
-        submitUsername();
+        submitUsername(true);
       }
     }
   });
 
-  function submitUsername() {
+  function submitUsername(forceRefresh = false) {
     const uInput =
       (document.getElementById('username-input') as HTMLInputElement | null) || usernameInput;
     const rInput = (document.getElementById('repo-input') as HTMLInputElement | null) || repoInput;
@@ -803,7 +803,7 @@ import Footer from '@/components/Footer.astro';
     window.history.pushState({}, '', newUrl.toString());
 
     updateThemeSelectorsState();
-    updateCards();
+    updateCards(forceRefresh);
   }
 
   // --- Direct Download Handlers (SVG & PNG) ---
@@ -880,6 +880,46 @@ import Footer from '@/components/Footer.astro';
         };
       } catch (err) {
         console.error('Error downloading PNG:', err);
+      }
+    }
+
+    const refreshCardBtn = target.closest('.btn-refresh-card') as HTMLButtonElement | null;
+    if (refreshCardBtn) {
+      const parent = refreshCardBtn.closest('.card-preview-wrapper');
+      const img = parent?.querySelector('.preview-img') as HTMLImageElement | null;
+      const shimmer = parent?.querySelector('.skeleton-shimmer') as HTMLElement | null;
+      const cardId = refreshCardBtn.id.replace('btn-refresh-', '');
+      if (!img || !img.src) return;
+
+      try {
+        const currentSrc = new URL(img.src, window.location.href);
+        currentSrc.searchParams.set('refresh', 'true');
+        currentSrc.searchParams.set('cache_bust', String(Date.now()));
+
+        if (shimmer) shimmer.classList.remove('hidden');
+        img.classList.add('hidden');
+
+        img.onload = () => {
+          if (shimmer) shimmer.classList.add('hidden');
+          img.classList.remove('hidden');
+          window.dispatchEvent(
+            new CustomEvent('app:toast', {
+              detail: {
+                message: `¡Caché de la tarjeta ${cardId} purgada y actualizada!`,
+                type: 'success'
+              }
+            })
+          );
+        };
+
+        img.onerror = () => {
+          if (shimmer) shimmer.classList.add('hidden');
+          img.classList.remove('hidden');
+        };
+
+        img.src = currentSrc.toString();
+      } catch (err) {
+        console.error('Error refreshing card cache:', err);
       }
     }
   });
@@ -1061,7 +1101,7 @@ import Footer from '@/components/Footer.astro';
   }
 
   // Update image previews and Markdown blocks
-  function updateCards() {
+  function updateCards(forceRefresh = false) {
     if (!currentUsername) return;
 
     applyPreviewWidth();
@@ -1114,7 +1154,20 @@ import Footer from '@/components/Footer.astro';
     showImageLoading(viewsImg, viewsPlaceholder);
 
     // 2. Set image sources with cache buster
-    const cacheBuster = `&t=${Date.now()}`;
+    const cacheBuster = forceRefresh
+      ? `&refresh=true&cache_bust=${Date.now()}`
+      : `&t=${Date.now()}`;
+
+    if (forceRefresh) {
+      window.dispatchEvent(
+        new CustomEvent('app:toast', {
+          detail: {
+            message: '¡Caché purgada y tarjetas actualizadas con datos en vivo!',
+            type: 'success'
+          }
+        })
+      );
+    }
     if (statsImg) {
       statsImg.src = statsUrl + cacheBuster;
       statsImg.alt = `Tarjeta de estadísticas generales de GitHub para el usuario @${currentUsername}`;

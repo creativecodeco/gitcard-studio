@@ -2,6 +2,17 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.10.1] - 2026-08-27
+
+### ⚡ Refresco e Invalidación Dinámica de Caché
+- **Refresco Forzado por Parámetro (`CardsController.ts`)**: Implementados los parámetros `refresh=true`, `cache=false`, `cache_seconds=0` y `cache_bust` para invalidar y purgar instantáneamente las tarjetas cacheadas en Redis/memoria y consultar datos en vivo directamente a GitHub.
+- **Acción Unificada en Frontend (`index.astro`)**: Unificada la purga y recarga de caché en el botón principal *"Refrescar Tarjetas"* / *"Generar Tarjetas"* (`#btn-generate` y `#btn-generate-auth`), eliminando botones sobrantes por tarjeta y notificando al usuario mediante avisos flotantes (*toasts*).
+- **Auto-Purga en Gestión de Tokens (`TokensController.ts`)**: Añadida la llamada automática a `githubRepo.clearCache(username)` al registrar, revocar o purgar un token de usuario.
+
+### 🛡️ Exportación de Datos de Usuario Robusta (GDPR / Habeas Data)
+- **Resolución Automática de Tokens (`TokensController.ts`)**: Integrada la búsqueda y descifrado automático de tokens de usuario desde PostgreSQL (`getDecryptedToken`) en el endpoint `@Post('users/export')`, resolviendo errores `400 Bad Request` en usuarios autenticados con GitHub App.
+- **Transmisión de Credenciales (`PrivateTokenModal.astro`)**: Actualizado el botón de exportación para transmitir encabezados de autenticación `Authorization: Bearer <token>` cuando existen credenciales guardadas en la sesión.
+
 ## [1.10.0] - 2026-08-27
 
 ### 🚀 Actualización Major de Dependencias & Ecosistema (NestJS 12 & TypeScript 7)
@@ -522,4 +533,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.10.0
+**Versión actualmente expuesta / en producción:** v1.10.1

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TokensController } from './tokens.controller';
 import { ApiGitHubRepository } from '@/adapters/repositories/ApiGitHubRepository';
+import { CachedGitHubRepository } from '@/adapters/repositories/CachedGitHubRepository';
 import { TypeORMTokenRepository } from '@/adapters/repositories/TypeORMTokenRepository';
 import { RegisterUserTokenUseCase } from '@/use-cases/tokens/RegisterUserTokenUseCase';
 import { RevokeUserTokenUseCase } from '@/use-cases/tokens/RevokeUserTokenUseCase';
@@ -16,7 +17,7 @@ import { ExportUserDataUseCase } from '@/use-cases/users/ExportUserDataUseCase';
     },
     {
       provide: 'IGitHubRepository',
-      useClass: ApiGitHubRepository
+      useFactory: () => new CachedGitHubRepository(new ApiGitHubRepository())
     },
     {
       provide: RegisterUserTokenUseCase,

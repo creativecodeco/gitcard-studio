@@ -739,13 +739,21 @@
         triggerToast('No se encontró un usuario activo para exportar.', 'error');
         return;
       }
+      const storedToken =
+        localStorage.getItem('registered-github-token') || localStorage.getItem('gh_token');
+
       try {
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json'
+        };
+        if (storedToken) {
+          headers['Authorization'] = `Bearer ${storedToken}`;
+        }
+
         const res = await fetch('/api/users/export', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ username: activeUser })
+          headers,
+          body: JSON.stringify({ username: activeUser, token: storedToken || undefined })
         });
         if (res.ok) {
           const exportData = await res.json();
@@ -760,11 +768,16 @@
           downloadAnchor.remove();
           triggerToast('Datos exportados exitosamente.', 'success');
         } else {
-          triggerToast('No se pudieron exportar los datos. Verifica tu sesión.', 'error');
+          const errData = await res.json().catch(() => ({}));
+          const errMsg =
+            typeof errData.message === 'string'
+              ? errData.message
+              : 'No se pudieron exportar los datos. Verifica tu sesión.';
+          triggerToast(errMsg, 'error');
         }
       } catch (err) {
-        console.error('Error exporting data:', err);
-        triggerToast('Error de red al intentar exportar tus datos.', 'error');
+        console.error('Error exporting user data:', err);
+        triggerToast('Error inesperado al exportar tus datos.', 'error');
       }
     });
 

@@ -26,6 +26,8 @@ describe('TokensController', () => {
   const mockRevokeUseCase = { execute: vi.fn() };
   const mockPurgeUseCase = { execute: vi.fn() };
   const mockExportUseCase = { execute: vi.fn() };
+  const mockGitHubRepo = { clearCache: vi.fn() };
+  const mockTokenRepo = { getToken: vi.fn().mockResolvedValue(null) };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +36,9 @@ describe('TokensController', () => {
         { provide: RegisterUserTokenUseCase, useValue: mockRegisterUseCase },
         { provide: RevokeUserTokenUseCase, useValue: mockRevokeUseCase },
         { provide: PurgeUserDataUseCase, useValue: mockPurgeUseCase },
-        { provide: ExportUserDataUseCase, useValue: mockExportUseCase }
+        { provide: ExportUserDataUseCase, useValue: mockExportUseCase },
+        { provide: 'IGitHubRepository', useValue: mockGitHubRepo },
+        { provide: 'ITokenRepository', useValue: mockTokenRepo }
       ]
     }).compile();
 
