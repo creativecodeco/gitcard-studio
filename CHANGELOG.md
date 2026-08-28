@@ -2,6 +2,14 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.10.2] - 2026-08-27
+
+### 📊 Ordenación Interactiva en Panel de Métricas (`/admin/metrics`)
+- **Ordenación por Columnas en Tabla (`metrics.astro`)**: Implementada la ordenación dinámica bidireccional por cualquiera de las 4 columnas de la tabla de perfiles activos (`Usuario`, `Total Renders`, `Vistas de Perfil` y `Última Actividad`), incluyendo indicadores visuales de dirección (`▲` / `▼`) y resaltado del encabezado activo.
+
+### 👁️ Precisión del Conteo de Visitas de Perfil (`profile_views`)
+- **Previsualizaciones en Vivo (`cardUrls.ts` & `index.astro`)**: Configurado el parámetro `&preview=true` de forma transparente en las tarjetas de previsualización en vivo del constructor web UI para evitar incrementos accidentales en las estadísticas reales del perfil del usuario, garantizando que solo las solicitudes provenientes del `README.md` en GitHub incrementen el contador.
+
 ## [1.10.1] - 2026-08-27
 
 ### ⚡ Refresco e Invalidación Dinámica de Caché
@@ -533,4 +541,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.10.1
+**Versión actualmente expuesta / en producción:** v1.10.2

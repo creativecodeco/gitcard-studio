@@ -297,10 +297,40 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
               <tr
                 style="border-bottom: 1px solid var(--glass-border); color: var(--text-secondary); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;"
               >
-                <th style="padding: 12px 16px;">Usuario</th>
-                <th style="padding: 12px 16px; text-align: right;">Total Renders (Camo/Web)</th>
-                <th style="padding: 12px 16px; text-align: right;">Vistas de Perfil</th>
-                <th style="padding: 12px 16px; text-align: center;">Última Actividad</th>
+                <th
+                  class="sortable-th"
+                  data-col="username"
+                  style="padding: 12px 16px; cursor: pointer; user-select: none; transition: color 0.2s;"
+                  title="Ordenar por Usuario"
+                >
+                  Usuario <span id="sort-icon-username" class="sort-icon"></span>
+                </th>
+                <th
+                  class="sortable-th"
+                  data-col="totalRenders"
+                  style="padding: 12px 16px; text-align: right; cursor: pointer; user-select: none; transition: color 0.2s;"
+                  title="Ordenar por Total Renders"
+                >
+                  Total Renders (Camo/Web) <span id="sort-icon-totalRenders" class="sort-icon"
+                    >▼</span
+                  >
+                </th>
+                <th
+                  class="sortable-th"
+                  data-col="profile_views"
+                  style="padding: 12px 16px; text-align: right; cursor: pointer; user-select: none; transition: color 0.2s;"
+                  title="Ordenar por Vistas de Perfil"
+                >
+                  Vistas de Perfil <span id="sort-icon-profile_views" class="sort-icon"></span>
+                </th>
+                <th
+                  class="sortable-th"
+                  data-col="last_updated"
+                  style="padding: 12px 16px; text-align: center; cursor: pointer; user-select: none; transition: color 0.2s;"
+                  title="Ordenar por Última Actividad"
+                >
+                  Última Actividad <span id="sort-icon-last_updated" class="sort-icon"></span>
+                </th>
               </tr>
             </thead>
             <tbody id="users-table-body">
@@ -374,9 +404,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   let sourceChart: any = null;
   let historyChart: any = null;
 
-  // In-memory users and pagination state
+  // In-memory users, sorting and pagination state
   let usersList: any[] = [];
   let filteredUsers: any[] = [];
+  let sortColumn: 'username' | 'totalRenders' | 'profile_views' | 'last_updated' = 'totalRenders';
+  let sortDirection: 'asc' | 'desc' = 'desc';
   let currentPage = 1;
   const itemsPerPage = 10;
 
@@ -725,6 +757,46 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     });
   }
 
+  function sortFilteredUsers() {
+    filteredUsers.sort((a: any, b: any) => {
+      let valA = a[sortColumn];
+      let valB = b[sortColumn];
+
+      if (sortColumn === 'username') {
+        valA = (valA || '').toLowerCase();
+        valB = (valB || '').toLowerCase();
+        return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      }
+
+      if (sortColumn === 'last_updated') {
+        valA = valA ? new Date(valA).getTime() : 0;
+        valB = valB ? new Date(valB).getTime() : 0;
+      } else {
+        valA = Number(valA || 0);
+        valB = Number(valB || 0);
+      }
+
+      return sortDirection === 'asc' ? valA - valB : valB - valA;
+    });
+  }
+
+  function updateHeaderSortIndicators() {
+    const cols = ['username', 'totalRenders', 'profile_views', 'last_updated'];
+    cols.forEach((col) => {
+      const iconSpan = document.getElementById(`sort-icon-${col}`);
+      const thEl = document.querySelector(`.sortable-th[data-col="${col}"]`) as HTMLElement | null;
+      if (iconSpan) {
+        if (col === sortColumn) {
+          iconSpan.textContent = sortDirection === 'asc' ? ' ▲' : ' ▼';
+          if (thEl) thEl.style.color = 'var(--accent-color)';
+        } else {
+          iconSpan.textContent = '';
+          if (thEl) thEl.style.color = 'var(--text-secondary)';
+        }
+      }
+    });
+  }
+
   function applyFiltersAndResetPage() {
     const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
     if (query) {
@@ -732,6 +804,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     } else {
       filteredUsers = [...usersList];
     }
+    sortFilteredUsers();
+    updateHeaderSortIndicators();
     currentPage = 1;
     renderCurrentTablePage();
   }
@@ -875,5 +949,26 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       currentPage++;
       renderCurrentTablePage();
     }
+  });
+
+  document.querySelectorAll('.sortable-th').forEach((th) => {
+    th.addEventListener('click', (e) => {
+      const targetCol = (e.currentTarget as HTMLElement).getAttribute('data-col') as
+        'username' | 'totalRenders' | 'profile_views' | 'last_updated';
+
+      if (!targetCol) return;
+
+      if (sortColumn === targetCol) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortColumn = targetCol;
+        sortDirection = targetCol === 'username' ? 'asc' : 'desc';
+      }
+
+      sortFilteredUsers();
+      updateHeaderSortIndicators();
+      currentPage = 1;
+      renderCurrentTablePage();
+    });
   });
 </script>

@@ -9,6 +9,7 @@ export interface CardUrlOptions {
   viewsLabel?: string;
   viewsColor?: string;
   viewsStyle?: string;
+  isPreview?: boolean;
 }
 
 export interface CardUrls {
@@ -71,6 +72,7 @@ export function buildCardUrls(options: CardUrlOptions): CardUrls {
   if (labelVal) viewsUrl += `&label=${encodeURIComponent(labelVal)}`;
   if (colorVal) viewsUrl += `&color=${encodeURIComponent(colorVal)}`;
   if (styleVal) viewsUrl += `&style=${encodeURIComponent(styleVal)}`;
+  if (options.isPreview) viewsUrl += `&preview=true`;
 
   return {
     statsUrl,

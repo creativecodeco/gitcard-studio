@@ -1,6 +1,6 @@
 {
   "name": "gitcard-studio",
-  "version": "1.10.1",
+  "version": "1.10.2",
   "description": "High-performance NestJS & Fastify API server and interactive Astro web frontend for GitCard Studio real-time customizable profile README stats cards, commit habit heatmaps, streak counters, developer ranks, trophies, badges, and metrics tracking.",
   "keywords": [
     "astro",
