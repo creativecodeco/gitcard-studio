@@ -1,12 +1,15 @@
 {
   "cSpell.language": "en,es",
   "cSpell.words": [
+    "astrojs",
     "bezier",
     "camo",
     "creativecode",
     "creativecodeco",
     "dasharray",
     "dashoffset",
+    "esbuild",
+    "fastify",
     "gitcard",
     "github",
     "Github",
@@ -17,8 +20,10 @@
     "minmax",
     "nestjs",
     "nowrap",
+    "resvg",
     "rgba",
-    "Segoe"
+    "Segoe",
+    "sqlite"
   ],
   "sonarlint.connectedMode.project": {
     "connectionId": "creativecodeco",

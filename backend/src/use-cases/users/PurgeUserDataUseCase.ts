@@ -1,9 +1,11 @@
+import { Injectable } from '@nestjs/common';
 import { AppDataSource } from '@/infrastructure/database/database';
 import { UserTokenEntity } from '@/infrastructure/database/entities/UserTokenEntity';
 import { UserMetric } from '@/infrastructure/database/entities/UserMetric';
 import { UserStatsHistory } from '@/infrastructure/database/entities/UserStatsHistory';
 import { RequestLog } from '@/infrastructure/database/entities/RequestLog';
 
+@Injectable()
 export class PurgeUserDataUseCase {
   async execute(username: string): Promise<void> {
     await AppDataSource.transaction(async (transactionalEntityManager) => {

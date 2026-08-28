@@ -1,4 +1,4 @@
-import { Controller, Get, Headers, Ip, Query, Res } from '@nestjs/common';
+import { Controller, Get, Headers, Inject, Ip, Query, Res } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { GetUserStatsCardUseCase } from '@/use-cases/cards/GetUserStatsCardUseCase';
 import { GetUserLanguagesCardUseCase } from '@/use-cases/cards/GetUserLanguagesCardUseCase';
@@ -29,15 +29,22 @@ import { escapeXml } from '@/utils/escape';
 @Controller('api')
 export class CardsController {
   constructor(
-    private readonly statsCardUseCase: GetUserStatsCardUseCase,
+    @Inject(GetUserStatsCardUseCase) private readonly statsCardUseCase: GetUserStatsCardUseCase,
+    @Inject(GetUserLanguagesCardUseCase)
     private readonly languagesCardUseCase: GetUserLanguagesCardUseCase,
+    @Inject(GetFeaturedRepoCardUseCase)
     private readonly repoCardUseCase: GetFeaturedRepoCardUseCase,
-    private readonly rankCardUseCase: GetUserRankCardUseCase,
-    private readonly streakCardUseCase: GetUserStreakCardUseCase,
+    @Inject(GetUserRankCardUseCase) private readonly rankCardUseCase: GetUserRankCardUseCase,
+    @Inject(GetUserStreakCardUseCase) private readonly streakCardUseCase: GetUserStreakCardUseCase,
+    @Inject(GetUserTrophiesCardUseCase)
     private readonly trophiesCardUseCase: GetUserTrophiesCardUseCase,
+    @Inject(RecordProfileViewUseCase)
     private readonly recordProfileViewUseCase: RecordProfileViewUseCase,
+    @Inject(GetUserTopReposCardUseCase)
     private readonly topReposCardUseCase: GetUserTopReposCardUseCase,
+    @Inject(GetUserSponsorsCardUseCase)
     private readonly sponsorsCardUseCase: GetUserSponsorsCardUseCase,
+    @Inject(GetUserCommitActivityCardUseCase)
     private readonly commitActivityCardUseCase: GetUserCommitActivityCardUseCase
   ) {}
 

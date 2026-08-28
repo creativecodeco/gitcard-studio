@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { AppDataSource } from '@/infrastructure/database/database';
 import { UserTokenEntity } from '@/infrastructure/database/entities/UserTokenEntity';
 import { UserMetric } from '@/infrastructure/database/entities/UserMetric';
@@ -33,6 +34,7 @@ export interface UserDataExportResult {
   }>;
 }
 
+@Injectable()
 export class ExportUserDataUseCase {
   async execute(username: string): Promise<UserDataExportResult> {
     const tokenRepo = AppDataSource.getRepository(UserTokenEntity);

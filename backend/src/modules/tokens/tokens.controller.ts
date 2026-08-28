@@ -5,6 +5,7 @@ import {
   Delete,
   ForbiddenException,
   Headers,
+  Inject,
   InternalServerErrorException,
   Ip,
   Post,
@@ -33,16 +34,16 @@ export function extractBearerToken(authHeader?: string, bodyToken?: string): str
 @Controller('api')
 export class TokensController {
   constructor(
-    private readonly registerUseCase: RegisterUserTokenUseCase,
-    private readonly revokeUseCase: RevokeUserTokenUseCase,
-    private readonly purgeUseCase: PurgeUserDataUseCase,
-    private readonly exportUseCase: ExportUserDataUseCase
+    @Inject(RegisterUserTokenUseCase) private readonly registerUseCase: RegisterUserTokenUseCase,
+    @Inject(RevokeUserTokenUseCase) private readonly revokeUseCase: RevokeUserTokenUseCase,
+    @Inject(PurgeUserDataUseCase) private readonly purgeUseCase: PurgeUserDataUseCase,
+    @Inject(ExportUserDataUseCase) private readonly exportUseCase: ExportUserDataUseCase
   ) {}
 
   @Post('tokens/register')
   async register(
     @Body() dto: RegisterTokenDto,
-    @Headers('authorization') authHeader?: string,
+    @Headers('authorization') _authHeader?: string,
     @Headers('user-agent') userAgent?: string,
     @Ip() clientIp?: string
   ): Promise<Record<string, unknown>> {

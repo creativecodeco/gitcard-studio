@@ -11,7 +11,7 @@
 | Capa | Tecnología | Versión |
 |---|---|---|
 | Runtime | Node.js | 24 |
-| Backend | NestJS + Fastify + TypeScript | 11.1.28 / 5.10.0 / 6.0.3 |
+| Backend | NestJS + Fastify + TypeScript | 12.0.1 / 5.12.1 / 7.0.2 |
 | Frontend | Astro (SSG estático) | 5.18.2 |
 | Base de datos | PostgreSQL + TypeORM | 8.x / 1.x |
 | Package Manager | pnpm (monorepo) | 11 |
@@ -116,5 +116,5 @@ github-helpers/
   - Repo: `/^[a-z\d-_.]{1,100}$/i`
 - **Fastify Helmet**: `@fastify/helmet` con `contentSecurityPolicy: false` para renderizado de SVG inline en etiquetas `<img>`.
 - **METRICS_KEY**: obligatoria — retorna `403` si no está configurada.
-- **Tokens**: AES-256-CBC cifrados en reposo, fingerprint de consentimiento con SHA-256.
+- **Tokens**: AES-256-GCM cifrados en reposo con IVs únicos por token, fingerprint de consentimiento con SHA-256.
 - **Error responses en tarjetas**: siempre `Content-Type: image/svg+xml` (SVG `renderErrorCard`).

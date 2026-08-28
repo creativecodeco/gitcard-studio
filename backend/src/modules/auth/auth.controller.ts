@@ -30,8 +30,9 @@ import { DisconnectAccountDto, GetUserMetricsQueryDto, PurgeSelfAccountDto } fro
 @Controller('api')
 export class AuthController {
   constructor(
+    @Inject(RegisterOAuthTokenUseCase)
     private readonly registerOAuthUseCase: RegisterOAuthTokenUseCase,
-    private readonly purgeUseCase: PurgeUserDataUseCase,
+    @Inject(PurgeUserDataUseCase) private readonly purgeUseCase: PurgeUserDataUseCase,
     @Inject('ITokenRepository') private readonly tokenRepo: ITokenRepository,
     @Inject('IGitHubRepository') private readonly githubRepo: IGitHubRepository
   ) {}

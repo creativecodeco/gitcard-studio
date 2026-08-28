@@ -11,9 +11,18 @@ This project uses a dedicated ecosystem of specialized agents located in `.agent
 3. **Architecture Agent (`architecture-agent`)**: Clean Architecture layer boundaries (Domain -> Use Cases -> Adapters -> Modules), monorepo package version synchronization, and documentation integrity (`pnpm architecture:scan`).
 4. **Best Practices Agent (`best-practices-agent`)**: Guard clauses (negation first), `readonly` class properties, runtime parameter type validation, exact package versions, and non-root Docker execution (`pnpm best-practices:scan`).
 
-To run the complete suite of agent checks before completing any task, run:
+## Mandatory Pre-Completion Verification Checklist
+
+On EVERY task that creates, modifies, updates dependencies, or refactors source code, all AI coding agents MUST execute and verify the following commands BEFORE declaring the task completed:
+
+1. **Production Build Compilation**: Run `pnpm build` to verify TypeScript compilation and Astro frontend build cleanly.
+2. **Code Formatting & Linting**: Run `pnpm format:check && pnpm lint` (or `pnpm format`) to enforce Prettier formatting and ESLint standards.
+3. **Cybersecurity Audit**: Run `pnpm security:scan` to verify OWASP compliance, secret leaks, XSS sanitization, and SSRF prevention.
+4. **Test Suite Execution**: Run `pnpm test` to ensure all unit, integration, and controller test suites execute and pass 100%.
+5. **Full Agent Scan Suite**: Run `pnpm scan:all` to run all agent checks across security, code integrity, architecture, and best practices.
+
 ```bash
-pnpm scan:all
+pnpm build && pnpm format:check && pnpm scan:all && pnpm test
 ```
 
 ## Security Rules & Mandatory OWASP Review Workflow

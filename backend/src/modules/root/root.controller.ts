@@ -1,4 +1,13 @@
-import { Controller, Get, Header, Headers, NotFoundException, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Header,
+  Headers,
+  Inject,
+  NotFoundException,
+  Param,
+  Query
+} from '@nestjs/common';
 import { escapeXml } from '@/utils/escape';
 import { GITHUB_USERNAME_REGEX } from '@/domain/entities/Validation';
 import { HtmlFileService } from './html-file.service';
@@ -9,7 +18,7 @@ const SLUG_CLEAN_REGEX = /[^a-z0-9-]/gi;
 
 @Controller()
 export class RootController {
-  constructor(private readonly htmlFileService: HtmlFileService) {}
+  constructor(@Inject(HtmlFileService) private readonly htmlFileService: HtmlFileService) {}
 
   @Get()
   @Header('Content-Type', 'text/html; charset=utf-8')

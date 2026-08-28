@@ -1,11 +1,8 @@
 import { Controller, Get, Query, BadRequestException } from '@nestjs/common';
-import { GetUserStatsCardUseCase } from '@/use-cases/cards/GetUserStatsCardUseCase';
 import { GITHUB_USERNAME_REGEX } from '@/domain/entities/Validation';
 
 @Controller('api/v1')
 export class ApiV1Controller {
-  constructor(private readonly statsCardUseCase: GetUserStatsCardUseCase) {}
-
   @Get('user/stats')
   async getUserStatsJson(
     @Query('username') rawUsername: string

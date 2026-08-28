@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
 import { ITokenRepository } from '@/domain/repositories/ITokenRepository';
 import {
@@ -6,6 +7,7 @@ import {
   generateConsentFingerprint
 } from '@/infrastructure/security/security';
 
+@Injectable()
 export class RegisterUserTokenUseCase {
   constructor(
     private readonly tokenRepo: ITokenRepository,

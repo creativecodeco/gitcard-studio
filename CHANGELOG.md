@@ -2,29 +2,44 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.10.0] - 2026-08-27
+
+### 🚀 Actualización Major de Dependencias & Ecosistema (NestJS 12 & TypeScript 7)
+
+- **Ecosistema NestJS (v11 → v12)**: Actualizados los paquetes principales `@nestjs/common`, `@nestjs/core`, `@nestjs/platform-fastify` y `@nestjs/testing` a la versión `12.0.1`.
+- **Compilador TypeScript (v5/v6 → v7)**: Estandarizada la versión del compilador TypeScript a `7.0.2` en todo el monorepo (backend y frontend).
+- **Migración del Servidor de Desarrollo (`tsx`)**: Reemplazada la dependencia `ts-node-dev` por `tsx@4.23.12` para una ejecución rápida, nativa y compatible con TypeScript 7 en `pnpm dev`.
+- **Reglas de Calidad y Limpieza de Código Estricta**: Configurada la regla `@typescript-eslint/no-unused-vars` en nivel `error` estricto en ESLint (`eslint.config.mjs`) y eliminadas las dependencias e importaciones sin uso en controladores.
+- **Transformaciones de Entorno**: Integradas decoraciones `@Type` y `@Transform` en `env.config.ts` para la conversión automática de variables numéricas y booleanas desde `.env`.
+- **Inyección de Dependencias Robusta**: Añadidos decoradores `@Inject(...)` explícitos en los controladores del servidor NestJS 12.
+
 ## [1.9.2] - 2026-08-26
 
 ### 🎨 Rediseño de Tarjetas de Error y Validación 404 Consistente
+
 - **Presentador Rediseñado `renderErrorCard` (`errorCard.ts`)**: Reestructurada la generación SVG de errores con envoltura de texto en `<tspan>` (máximo 46 caracteres por línea) para evitar el desbordamiento de la tarjeta, soporte dinámico de temas, cabecera de marca `renderBrandHeader` y sanitización estricta XML.
-- **Manejo Consistente de Usuarios Inexistentes (404)**: Integrada la validación previa de existencia de usuario en `getUserCommitActivity` (`ApiGitHubRepository.ts`). Ahora los endpoints `/api/commit-activity`, `/api/today-status` y `/api/timeline-matrix` capturan el error 404 y devuelven la tarjeta estandarizada de error *"Usuario no encontrado"*.
-- **Agregación Dinámica Real de Commits**: Reemplazados los datos estáticos (*mock*) en `today-status` y `timeline-matrix` por la extracción real de `commitsToday` y la matriz de periodos desde la API GraphQL de GitHub.
+- **Manejo Consistente de Usuarios Inexistentes (404)**: Integrada la validación previa de existencia de usuario en `getUserCommitActivity` (`ApiGitHubRepository.ts`). Ahora los endpoints `/api/commit-activity`, `/api/today-status` y `/api/timeline-matrix` capturan el error 404 y devuelven la tarjeta estandarizada de error _"Usuario no encontrado"_.
+- **Agregación Dinámica Real de Commits**: Reemplazados los datos estáticos (_mock_) en `today-status` y `timeline-matrix` por la extracción real de `commitsToday` y la matriz de periodos desde la API GraphQL de GitHub.
 - **Resolución de Referencia `triggerToast` (`PrivateTokenModal.astro`)**: Definida la función helper `triggerToast` para notificaciones flotantes en acciones de exportación y purga de datos GDPR.
 
 ### 🛡️ Cumplimiento de Habeas Data, Transparencia y Exportación de Datos
+
 - **Exportación de Datos (Portabilidad / Derecho de Consulta - Ley 1581 / GDPR)**: Creado el caso de uso `ExportUserDataUseCase` y el endpoint `@Post('users/export')` en `tokens.controller.ts` para permitir a los usuarios consultar y descargar un informe estructurado en formato JSON con la totalidad de sus datos almacenados.
-- **Acción de Descarga en UI (`PrivateTokenModal.astro`)**: Integrado el botón *"📥 Descargar mis Datos (JSON)"* en el panel activo de cuenta con disparador de descarga directa.
+- **Acción de Descarga en UI (`PrivateTokenModal.astro`)**: Integrado el botón _"📥 Descargar mis Datos (JSON)"_ en el panel activo de cuenta con disparador de descarga directa.
 - **Términos y Condiciones de Servicio (`terms.astro`)**: Creada la página formal de Términos de Servicio (`/terms.html`) que regula el uso aceptable, límites de la API y condiciones del servicio.
-- **Transparencia en Política de Privacidad (`privacy.astro`)**: Enriquecida la política con la identificación formal del Responsable del Tratamiento de Datos (CreativeCode Studio), canales oficiales para ejercicio de Derechos ARCO (`privacidad@creativecode.com.co`), tiempos de respuesta legal (PQR) y declaración explícita del uso funcional de `localStorage`.
+- **Transparencia en Política de Privacidad (`privacy.astro`)**: Enriquecida la política con la identificación formal del Responsable del Tratamiento de Datos (CreativeCode.com.co), canales oficiales para ejercicio de Derechos ARCO (`privacidad@creativecode.com.co`), tiempos de respuesta legal (PQR) y declaración explícita del uso funcional de `localStorage`.
 - **Aviso de Privacidad y Consentimiento de Almacenamiento Local (`PrivacyConsentBanner.astro`)**: Creado el banner flotante sutil para informar al usuario al ingresar por primera vez sobre la utilización de memoria local sin cookies de terceros.
 
 ## [1.9.1] - 2026-08-25
 
 ### 🛡️ Resiliencia y Fallback de Autenticación en API de GitHub
+
 - **Manejo Defensivo de Errores `401 Bad Credentials` (`ApiGitHubRepository.ts`)**: Implementado mecanismo automático de fallback a los endpoints públicos de la API de GitHub (`/users/{username}/repos`) en caso de recibir respuestas `401 Unauthorized` por tokens privados o globales caducados/inválidos, garantizando la renderización continua de las tarjetas de repositorio.
 
 ## [1.9.0] - 2026-08-25
 
 ### ⚡ Integración de Redis & Arquitectura de Caché Distribuido
+
 - **Conectividad Real a Redis (`RedisCacheAdapter.ts`)**: Integrado `ioredis@6.0.0` para habilitar caché distribuido persistente cuando las variables `REDIS_HOST` o `REDIS_URL` están presentes, con reconexión automática y fallback defensivo a memoria.
 - **Integración con GitHub Repository (`CachedGitHubRepository.ts`)**: Migrada la capa de almacenamiento en caché de tarjetas (estadísticas, lenguajes, repositorio destacado, top repositorios, racha, sponsors y matriz de commits) a `CacheStore` / `RedisCacheAdapter`.
 - **Invalidación por Webhooks & Patrones (`flushPattern`)**: Optimizado el filtrado por comodines en Redis para la limpieza instantánea de caché al recibir webhooks de push en `webhooks.controller.ts`.
@@ -32,6 +47,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.8.3] - 2026-08-24
 
 ### 🤖 Ecosistema de Agentes Especializados & Auditoría Automatizada (`pnpm scan:all`)
+
 - **Sistema de Agentes Dedicados**: Creación e integración de 4 agentes especializados para garantizar la calidad del repositorio:
   - **`cybersecurity-agent`**: Auditorías OWASP Top 10, sanitización XSS/SVG, prevención de SSRF/Inyección SQL y control de credenciales (`pnpm security:scan`).
   - **`code-integrity-agent`**: Cumplimiento estricto de ESLint, Prettier, detección de código muerto y tipado inmutable (`pnpm integrity:scan`).
@@ -40,6 +56,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 - **Comando Unificado de Escaneo**: Añadido `pnpm scan:all` para ejecutar de forma consecutiva la suite completa de agentes antes de cada commit.
 
 ### 📦 Gestor de Paquetes & Actualizaciones de Dependencias
+
 - **Sincronización de pnpm**: Actualizado el gestor de paquetes a `pnpm@11.24.0` en el `Dockerfile` (etapas builder y runner) y alineado con `packageManager` en `package.json`.
 - **Remediación de Seguridad en Dependencias (`pnpm audit`)**: Actualizado la anulación de `brace-expansion` a `5.0.9` en `pnpm-workspace.yaml`, logrando 0 vulnerabilidades reportadas.
 - **Actualización de Dependencias Frontend**: Actualizado `astro` a `7.2.5` y `happy-dom` a `20.11.6` en `frontend/package.json`.
@@ -47,6 +64,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.8.2] - 2026-08-19
 
 ### 🛡️ Agente de Ciberseguridad & Auditorías de Seguridad Automatizadas
+
 - **Integración del Agente de Ciberseguridad (`.agents/skills/cybersecurity-agent/SKILL.md`)**: Creada habilidad especializada para auditorías pre-commit alineadas con las directrices OWASP Top 10.
 - **Herramienta de Análisis Estático Automatizado (`security-scan.js`)**: Creado el script de escaneo `.agents/skills/cybersecurity-agent/scripts/security-scan.js` e integrado en `package.json` mediante el comando `pnpm security:scan`.
 - **Regla Global de Workspace (`.agents/rules/security-agent.md`)**: Añadida directiva obligatoria de revisión de ciberseguridad para todo cambio de código.
@@ -55,39 +73,47 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.8.1] - 2026-08-08
 
 ### 🎯 Sistema de Filtrado de Tarjetas por Categoría & UI Reactiva
-- **Filtrado Dinámico por Categorías (`CardFilterBar.astro`)**: Añadida barra de navegación por pestañas (*Todas*, *Estadísticas Principales*, *Repositorios*, *Productividad & Racha*, *Premios & Insignias*) con conteo de tarjetas e insignias animadas.
+
+- **Filtrado Dinámico por Categorías (`CardFilterBar.astro`)**: Añadida barra de navegación por pestañas (_Todas_, _Estadísticas Principales_, _Repositorios_, _Productividad & Racha_, _Premios & Insignias_) con conteo de tarjetas e insignias animadas.
 - **Modularización del Panel de Control (`ControlPanel.astro`, `SampleReadmeSection.astro`, `cardUrls.ts`)**: Desacoplada la interfaz del frontend en componentes aislados con helper dedicado para la construcción de URLs de tarjetas.
 
 ### 🎨 Mejoras de Accesibilidad (WCAG 2.2 AA) & Estilos
+
 - **Optimización de Ratios de Contraste**: Corregidos colores de texto y fondos en insignias activas de filtro (`.filter-tab.active .filter-badge`), estado copiado en botones (`.copy-btn.copied`), y selectores en modo claro.
 - **Correcciones de Tipado y Limpieza**: Ajustados tipos implícitos de Astro/JSX (`Astro.props`) y eliminadas referencias y variables sin uso.
 
 ## [1.8.0] - 2026-08-08
 
 ### 🚀 Nuevas Tarjetas SVG de Gamificación & Productividad
+
 - **Mini-Badge Dinámico "Today's Commit Status" (`GET /api/today-status`)**: Módulo presentador `todayStatusBadge.presenter.ts` que consulta el estado de contribuciones en el día actual (`🔥 Activo hoy • X commits` o `💤 Descansando hoy`).
-- **Tarjeta "Coding Productivity Timeline" (`GET /api/timeline-matrix`)**: Presentador gráfico SVG `timelineMatrixCard.ts` con desglose visual de horas de programación en 4 franjas horarias (*Mañana*, *Tarde*, *Noche* y *Madrugada*).
+- **Tarjeta "Coding Productivity Timeline" (`GET /api/timeline-matrix`)**: Presentador gráfico SVG `timelineMatrixCard.ts` con desglose visual de horas de programación en 4 franjas horarias (_Mañana_, _Tarde_, _Noche_ y _Madrugada_).
 - **Builder de Temas Personalizados (Custom Theme Permalinks)**: Sobreescritura dinámica de colores mediante query params (`theme=custom&bg=HEX&accent=HEX...`) validado por la regex de seguridad OWASP `sanitizeColor`.
 
 ### 🖼️ Exportación Multiformato (PNG / SVG) & Encabezados CDN
+
 - **Convertidor Gráfico SVG -> PNG (`imageConverter.ts`)**: Módulo de renderizado mediante `@resvg/resvg-js` para entregar buffers PNG de alta resolución cuando se incluye `?format=png`.
 - **Encabezados HTTP CDN**: Directivas `Cache-Control: public, max-age=7200, s-maxage=7200` y etiquetas `ETag` para aceleración global en CDNs (Cloudflare / Fastly).
 
 ### ⚡ Caché Distribuido (Stale-While-Revalidate) & Webhooks de GitHub
+
 - **Capa de Caché Distribuido (`RedisCacheAdapter.ts`)**: Almacenamiento en caché de alta velocidad con fallback en memoria.
 - **Endpoint de Webhooks de GitHub (`POST /api/webhooks/github`)**: Verificación de firma HMAC `X-Hub-Signature-256` para invalidar inmediatamente la caché del usuario al recibir eventos de commit (`push`).
 
 ### 🔑 API Pública REST JSON para Desarrolladores & Claves API
+
 - **Endpoint JSON v1 (`GET /api/v1/user/stats`)**: Exposición de datos de usuario en formato JSON estructurado listo para consumir en sitios web personales o portafolios (React/Next.js/Vue).
 - **Entidad Base de Datos de API Keys (`ApiKeyEntity.ts`)**: Almacenamiento cifrado de API Keys con scopes y expiración.
 
 ### 📊 Integración en Frontend Astro & Dashboard de Métricas Avanzado
+
 - **Actualización de Vistas Previas**: Integración del catálogo completo de 12 tarjetas en el builder del README y la vista previa interactiva de `index.astro`.
 - **Gráficos Chart.js**: Actualización de la vista `/admin/metrics` con desglose en tiempo real de todas las tarjetas.
 
 ## [1.7.4] - 2026-08-07
 
 ### 🧹 Calidad de Código & Limpieza de Incidencias Sonar (0 Incidencias)
+
 - **Remediación Completa de Incidencias SonarCloud**: Corregidas las 23 incidencias detectadas por SonarScanner en la plataforma:
   - **Simplificación de Expresiones Regulares (`S5843`)**: Optimizadas las expresiones regulares de colores RGB y HSL en `theme.ts` reduciendo la complejidad cognitiva por debajo de los límites exigidos.
   - **Extracción de Operadores Ternarios Anidados (`S3358`)**: Refactorizada la lógica de asignación de etiquetas en `CardsController.ts` y las insignias de persona de productividad en `commitActivityCard.ts`.
@@ -96,18 +122,22 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
   - **Gestión Robusta de Pruebas Unitarias (`S8968`)**: Actualizados los callbacks de pruebas en `history.test.ts`, `metrics.test.ts`, `purge.test.ts` y `viewsBadge.test.ts` para invocar `ctx.skip()` cuando la base de datos PostgreSQL no se encuentra inicializada.
 
 ### 📦 Modularización de Utilidades Frontend
+
 - **Módulo Centralizado de Escapado HTML**: Creada la utilidad reutilizable `escapeHtml` en `frontend/src/utils/escape.ts` e importada dinámicamente en `index.astro` y `admin/metrics.astro` eliminando duplicación de código.
 
 ## [1.7.3] - 2026-07-31
 
 ### 🏷️ Estandarización de Marca & Placeholders de Usuario
+
 - **Limpieza de Referencias Legacy**: Reemplazadas de forma exhaustiva todas las cadenas y variables legacy (`github-helpers`) por `gitcard-studio` en los `User-Agent` del backend, almacenamiento de `sessionStorage`, scripts de pruebas unitarias y configuración de Playwright.
 - **Estandarización de Placeholders de Usuario**: Unificados todos los campos de entrada de usuario (`username-input`, `token-username`, `purge-username`) en `PrivateTokenModal.astro` para usar una única constante de ejemplo bilingüe (`ej. octocat` / `e.g. octocat`) mediante la clave de i18n `username_placeholder`.
 
 ### ⚙️ Actualización de Entorno y Herramientas
+
 - **Actualización de Runtime y Package Manager**: Actualizado Node.js a `v24.19.0` y pnpm a `11.20.0` en `package.json` (`packageManager`) y `Dockerfile` (etapas `builder` y `runner`).
 
 ### 🔒 Auditoría & Remediación de Seguridad OWASP
+
 - **Protección contra Broken Access Control (OWASP A01)**: Implementada verificación obligatoria de token y coincidencia de identidad con la API de GitHub en `deleteUserAccount` (`DELETE /api/users/me`) y `disconnectAccount` (`POST /api/auth/disconnect`) para prevenir la eliminación o desconexión no autorizada de cuentas por terceros.
 - **Prevención de Inyección de Atributos SVG / XSS (OWASP A03)**:
   - Incorporada función `sanitizeColor` en `theme.ts` y `badge.presenter.ts` con validación estricta por expresiones regulares para formatos hex, RGB/RGBA y HSL/HSLA, filtrando cualquier payload malicioso de atributos SVG.
@@ -116,6 +146,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.7.2] - 2026-07-31
 
 ### 🎨 Rebranding Oficial a GitCard Studio & Mejoras de Identidad
+
 - **Rebranding Completo**: Renombrado el proyecto de `github-helpers` a **GitCard Studio** (`gitcard-studio`) en los paquetes raíz (`root`), backend (`gitcard-studio-backend`) y frontend (`gitcard-studio-frontend`).
 - **Sincronización Visual y SEO**:
   - Actualizados los títulos, logos, encabezados y metadatos SEO / JSON-LD (`WebApplication.name`) en el generador web de Astro y las tarjetas SVG.
@@ -126,6 +157,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.7.1] - 2026-07-30
 
 ### 🐛 Correcciones en Autenticación, Repos Privados y Flujo de Desconexión
+
 - **Metadatos y Contribuciones Privadas en GraphQL (`viewer`)**: Actualizadas las consultas GraphQL (`getUserLanguagesViaGraphQL`, `getUserStreakViaGraphQL`, `getUserTopReposViaGraphQL`, `getUserCommitActivity`) para consultar el nodo `viewer` cuando se proporciona un token de usuario autenticado, permitiendo incluir contribuciones y repositorios privados.
 - **Alcance OAuth Ampliado (`read:user,repo`)**: Añadido el scope `read:user,repo` en la URL de inicio de sesión de GitHub OAuth para autorizar lectura de contribuciones y repositorios privados.
 - **Garantía y Flujo de Desconexión de Cuenta**:
@@ -138,6 +170,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.7.0] - 2026-07-30
 
 ### ✨ Matriz de Hábitos de Commit, Badges Personalizados y SEO de Alto Impacto
+
 - **Matriz de Hábitos de Commit (`/api/commit-activity`)**: Creado caso de uso `GetUserCommitActivityCardUseCase`, adaptador GraphQL para consultar `contributionCalendar` anual de GitHub API y presentador de mapa de calor semanal (grilla 7x24) de distribución horaria de commits con 7 temas de color.
 - **Insignias SVG Personalizadas & Contador de Vistas (`/api/badge`)**: Creado presentador `renderBadgeSVG` con diseño tipo Shields.io para representar el contador de visitas al perfil (`profile_views`) y grados/rangos del desarrollador en tarjetas livianas para incrustar en GitHub.
 - **Optimización SEO Avanzada & Rich Snippets**: Incorporado marcado estructurado JSON-LD `WebApplication` (Schema.org), etiquetas alternativas `hreflang` (`es`, `en`, `x-default`), meta etiquetas Open Graph/Twitter y 20 keywords/topics de alto impacto en búsqueda.
@@ -150,6 +183,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.6.0] - 2026-07-29
 
 ### ✨ Autenticación GitHub App & Dashboard de Métricas de Usuario
+
 - **Autorización Directa con GitHub App (OAuth Web Flow)**: Incorporado flujo completo de vinculación "Conectar con GitHub App" (`/api/auth/github` y `/api/auth/github/callback`) con soporte de **Refresh Tokens** automáticos (renovación transparente antes de la expiración de 8 horas) y alcance de solo lectura de metadata de repositorios públicos, privados y organizaciones.
 - **Opción de PAT Manual Secundaria**: Mantenida la alternativa de registrar un Personal Access Token (PAT) de forma secundaria para usuarios avanzados o despliegues self-hosted.
 - **Panel de Métricas Personales**: Añadido endpoint `/api/users/me/metrics` y componente frontend interactivo en `PrivateTokenModal.astro` para que los usuarios autenticados consulten sus propias métricas personales (visitas a perfil `profile_views` y conteo de renders de tarjetas de estadísticas, lenguajes, repositorios y racha).
@@ -158,6 +192,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.5.3] - 2026-07-28
 
 ### 🚀 Mejoras de Rendimiento, Accesibilidad y Resiliencia en Pruebas
+
 - **Gestión de Memoria y LRU en Caché de Avatares (`avatar.ts`)**: Creado módulo centralizado de caché en memoria con límite máximo de 500 elementos y rutina de evicción automática (`cleanCache`) para registros expirados (TTL de 1 hora) o antiguos.
 - **Accesibilidad Universal SVG (WCAG 2.2)**: Integradas etiquetas semánticas `<title>` y `<desc>` en todos los presentadores de tarjetas SVG (`statsCard`, `sponsorsCard`, `languagesCard`, `repoCard`, `rankCard`, `streakCard`, `topReposCard`, `trophiesCard`, `viewsBadge`, `errorCard`) para optimizar lectores de pantalla.
 - **Resiliencia y Aislamiento en Pruebas Unitarias**: Manejada la desconexión de PostgreSQL en `initDatabase()` durante la ejecución de tests en Vitest (`NODE_ENV === 'test'`), permitiendo que la suite completa pase al 100% (18/18 suites, 99/99 tests) de manera aislada sin depender de base de datos activa.
@@ -166,6 +201,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.5.2] - 2026-07-27
 
 ### 🧹 Calidad de Código y Limpieza de Incidencias Sonar
+
 - **Resolución de Code Smells y Reducción de Complejidad**:
   - Removido import sin uso `getTranslations` en `repoCard.ts`.
   - Refactorizado `TRANSLATIONS` en `backend/src/adapters/presenters/i18n.ts` y `frontend/src/utils/i18n.ts` a diccionarios estáticos, reduciendo la complejidad cognitiva de 27 y 82 a 0 y eliminando ramas ternarias duplicadas (`total: 'Total Sponsors:'` y `title_sponsors`).
@@ -176,6 +212,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.5.1] - 2026-07-27
 
 ### 🔒 Mitigación de Vulnerabilidades de Seguridad (CodeQL Alerts #73, #74, #75)
+
 - **Corrección de Sanitización de URL (`renderBrandHeader`)**: Sustituido el chequeo por subcadena `path.startsWith('github.com')` en `theme.ts` por una expresión regular estricta para desinfectar prefijos de dominio y aplicado escape XML (`escapeXml`) para evitar inyecciones en el marcado SVG.
 - **Protección contra Path Traversal (`HtmlFileService`)**: Implementada validación rigurosa de límites de directorio en `readPublicFile()` (`html-file.service.ts`), asegurando que las rutas solicitadas no puedan salir de la carpeta `PUBLIC_DIR` (rechazando caracteres nulos y secuencias `../`).
 - **Nuevas Suites de Pruebas**: Añadidos tests unitarios en `backend/tests/theme.spec.ts` y `backend/tests/htmlFileService.spec.ts` para verificar la prevención de inyecciones, sanitización de marca y bloqueo de traversals.
@@ -183,15 +220,18 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.5.0] - 2026-07-27
 
 ### ✨ Nueva Tarjeta de GitHub Sponsors (`/api/sponsors`)
+
 - **Métricas y Grid de Patrocinadores**: Implementada la nueva tarjeta `/api/sponsors` para renderizar información completa de patrocinios tanto de mantenimiento como de aportes a terceros (cuentas de usuario u organización). Incluye desglose de patrocinadores mensuales y de pago único, cálculo estimado de ingresos mensuales, avatar grid interactivo y tarjeta de invitación cuando no existen patrocinadores activos.
 - **Caso de Uso y Persistencia**: Creados `SponsorStats` domain entity, `GetUserSponsorsCardUseCase`, adaptador GraphQL en `ApiGitHubRepository`, caché de 2 horas en `CachedGitHubRepository` y contador global de renders `sponsorsRenders` en TypeORM metrics.
 - **Soporte Frontend & i18n**: Integrado componente de vista previa, internacionalización bilingüe (`es`/`en`) y soporte en el generador de README de la aplicación web.
 
 ### 🎨 Refactorización DRY y Estandarización de Layout en Presentadores SVG
+
 - **Función Reutilizable `renderBrandHeader`**: Centralizado el subtítulo/marca superior derecho `github.com/...` en `theme.ts` y consumido de forma DRY en todas las tarjetas SVG (`statsCard`, `languagesCard`, `rankCard`, `repoCard`, `streakCard`, `topReposCard`, `trophiesCard`, `sponsorsCard`).
 - **Encabezados e Iconografía**: Integrado el título traducido (`${t.trophies.title}`) e iconografía en `trophiesCard` y el título (`${t.streak.title}`) en `streakCard` con márgenes adaptativos (`paddingY = 42`) para evitar cualquier superposición visual.
 
 ### 🖥️ Optimización de Layout Responsivo Frontend (`.app-container`)
+
 - **Ampliación de Ancho Máximo**: Aumentado `.app-container` a `1440px` centrado con padding adaptativo `clamp(20px, 3vw, 40px)` para un óptimo aprovechamiento del espacio en monitores de escritorio (FHD, 2K, 4K).
 - **Sticky Configuration Sidebar**: Panel de controles `.config-panel` fijado (`position: sticky; top: 24px;`) en resoluciones de escritorio.
 - **Grid Responsivo de 2 Columnas**: La vista previa `.cards-preview-container` evoluciona a un grid adaptativo de 2 columnas en monitores `≥ 1150px`.
@@ -201,18 +241,21 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.4.7] - 2026-07-24
 
 ### 🛠️ Correcciones de Configuración y Resolución de Módulos TypeScript
+
 - **Resolución de alias de módulos en tests (`@/*`)**: Actualizado `backend/tsconfig.json` para incluir `"tests/**/*"` en la propiedad `"include"` y establecer `"rootDir": "./"`. Esto resuelve los errores de importación de módulos (como `Cannot find module '@/...'`) en el entorno de desarrollo y servidor de lenguaje TypeScript (IDE) al trabajar con archivos dentro de `backend/tests/`.
 - **Aislamiento de compilación para producción**: `pnpm build` continúa utilizando `tsconfig.build.json` para compilar exclusivamente `src/` hacia `dist/`, manteniendo el bundle libre de artefactos de prueba.
 
 ## [1.4.6] - 2026-07-24
 
 ### 🐛 Corrección de Contadores Globales del Dashboard
+
 - **Métricas globales leídas desde la base de datos** (`TypeORMMetricsRepository`): `getMetrics()` devolvía un caché en memoria por instancia (`globalMetricsCache`) que nunca se poblaba en la instancia del `MetricsModule`, por lo que los KPIs globales del panel admin (`Total Renders`, `Views` y el gráfico por tipo de tarjeta) mostraban siempre cero. Ahora `getMetrics()` es `async` y consulta directamente la tabla `global_metrics`, que es la fuente de verdad que `recordHit()` persiste.
 - **Eliminación del caché en memoria**: Removidos `globalMetricsCache`, `loadGlobalMetricsCache()` y las rutas que lo actualizaban (el `.then()` de `recordHit()` y los incrementos dentro de `incrementProfileViewCounters()`). Un caché por proceso resultaba incorrecto además con más de una réplica.
 - **Instancia huérfana de bootstrap**: Eliminada la instancia de `TypeORMMetricsRepository` creada y descartada en `main.ts` (nunca se inyectaba en el contenedor de NestJS).
 - **Contrato actualizado**: `IMetricsRepository.getMetrics` pasa a `Promise<Metrics>` y `MetricsController.getMetrics` a `async`.
 
 ### 🧪 Tests
+
 - Nuevo `backend/tests/metricsRepository.getMetrics.spec.ts`: verifica con `AppDataSource` mockeado que `getMetrics()` lee los contadores de `global_metrics` y que los valores ausentes caen a `0`.
 - Nuevo caso en `backend/tests/metrics.test.ts`: una instancia separada del repositorio (escenario del dashboard) refleja los hits registrados por otra instancia.
 - Specs de `MetricsController` adaptados al `getMetrics` asíncrono y removido el mock obsoleto `loadGlobalMetricsCache` en `recordProfileView.spec.ts`.
@@ -220,6 +263,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.4.5] - 2026-07-24
 
 ### 🛠️ Correcciones de Calidad SonarCloud & Refactorización Clean Code
+
 - **Correcciones SonarCloud**:
   - Removidas redundancias de caracteres en expresiones regulares (`[a-z0-9-]`) en `TypeORMMetricsRepository`.
   - Aplicado el operador de coalescencia nula (`??`) en `RecordProfileViewUseCase` y `SaveUserStatsHistoryUseCase`.
@@ -232,12 +276,14 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.4.4] - 2026-07-24
 
 ### 🛠️ Refactorización y Calidad de Código (Sonar & Clean Code)
+
 - **Reducción de Complejidad Cognitiva**: Refactorizado el método `getOrIncrementProfileViews` en `TypeORMMetricsRepository` para reducir su complejidad cognitiva por debajo del umbral de 15.
 - **Parámetros por Defecto de ES6 (`prefer-default-parameters`)**: Refactorizado el método `determineTrafficSource` en `TypeORMMetricsRepository` para usar valores por defecto en la firma del método (`userAgent: string = ''`, `referer: string = ''`), eliminando la reasignación/fallback manual de variables en el cuerpo del método.
 
 ## [1.4.3] - 2026-07-24
 
 ### 🐛 Correcciones en el Contador de Visitas de GitHub (`/api/views`)
+
 - **Persistencia e Incremento de Visitas**: Refactorizada la clase `RecordProfileViewUseCase` para garantizar que las solicitudes del badge de visitas desde GitHub (Camo proxy) y sitios externos incrementen correctamente el contador en la base de datos PostgreSQL/TypeORM.
 - **Cabeceras Anti-Caché para GitHub Camo**: Configurado el encabezado de respuesta HTTP `Cache-Control: max-age=0, s-maxage=0, no-cache, no-store, must-revalidate` en `getProfileViews` de `CardsController` para cumplir la especificación de GitHub Camo y evitar que la imagen SVG quede congelada en el proxy CDN de GitHub.
 - **Soporte de Previsualización Web (`preview=true`)**: Integrado el parámetro de consulta `preview=true` en la app web de Astro (`index.astro`) para omitir el autoincremento en el dashboard de vista previa sin interferir en la URL del badge copiado para GitHub.
@@ -246,6 +292,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.4.2] - 2026-07-24
 
 ### ♻️ Arquitectura NestJS — Controladores Estándar, DI e i18n Backend
+
 - **Controladores NestJS Estándar (sin `@Req/@Res`)**: Refactorizados `TokensController` y `MetricsController` para eliminar el uso innecesario de objetos de bajo nivel de Fastify (`FastifyRequest`, `FastifyReply`). Los métodos retornan objetos/promesas directamente y lanzan excepciones idiomáticas de NestJS (`BadRequestException`, `UnauthorizedException`, `ForbiddenException`, `InternalServerErrorException`).
 - **DTOs con `class-validator` y `class-transformer`**: Creados `RegisterTokenDto`, `RevokeTokenDto`, `PurgeUserDto`, `MetricsHistoryQueryDto` y `MetricsKeyQueryDto` con validación declarativa y coerción automática de tipos. El `ValidationPipe` global ahora usa `forbidNonWhitelisted: true` para rechazar campos desconocidos.
 - **Validación de Entorno en Bootstrap** (`env.config.ts`): Al iniciar el servidor, se validan todas las variables de entorno requeridas (`GITHUB_TOKEN`, `DATABASE_URL`, `ENCRYPTION_KEY`, `METRICS_KEY`) con `class-validator`. El proceso falla inmediatamente si falta alguna variable crítica.
@@ -258,6 +305,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 - **IP Segura en Registro de Tokens**: Reemplazado el uso de `x-forwarded-for` (falsificable por el cliente) por el decorador `@Ip()` de NestJS, que obtiene la IP real desde el socket de Fastify.
 
 ### 🧪 Tests Unitarios de Controladores (25 nuevos tests)
+
 - **`tokens.controller.spec.ts`** (11 tests): Guard clauses, error paths, i18n en respuestas (`locale=en`), flujos exitosos de registro, revocación y purga.
 - **`metrics.controller.spec.ts`** (14 tests): Validación de clave de métricas, cobertura completa de endpoints, mock de `IMetricsRepository` via DI.
 - Total de tests: **76 tests** pasando (51 anteriores + 25 nuevos).
@@ -265,6 +313,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.4.1] - 2026-07-24
 
 ### 🛠️ Refactorización y Buenas Prácticas (Clean Code)
+
 - **Eliminación de Operadores Ternarios Anidados**: Extraída la ternaria anidada en `RootController` ([root.controller.ts](file:///Users/joaltoroc/Code/creativecodeco/github-helpers/backend/src/modules/root/root.controller.ts)) a sentencias `if / else if` independientes para evitar problemas de mantenibilidad (`no-nested-ternary`).
 - **Remoción de Usuario por Defecto**: Removido el valor fallback por defecto `'creativecode'` en `targetUsername`. Ahora la vista previa solo reemplaza metadatos sociales si la petición incluye un parámetro `user`/`username` válido.
 - **Uso de Guard Clauses (Negación Primero)**: Refactorizado el flujo de control en `RootController` para utilizar guard clauses con negación primero (`if (!targetUsername) { return; }`), evitando anidar la lógica principal dentro de bloques condicionales `if` positivos.
@@ -273,6 +322,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.4.0] - 2026-07-24
 
 ### ⚡ Migración de Framework Backend a NestJS + Fastify
+
 - **Adopción de NestJS Framework & Adaptador HTTP Fastify**:
   - Sustitución de Express.js por **NestJS (`@nestjs/core`, `@nestjs/common`)** utilizando **Fastify (`@nestjs/platform-fastify`, `fastify`)** para multiplicar el rendimiento de peticiones HTTP (2x–4x más rápido en entrega de tarjetas SVG y endpoints JSON).
   - Reestructuración de controladores en módulos fuertemente tipados con Inyección de Dependencias (DI): `AppModule`, `CardsModule`, `TokensModule`, `MetricsModule` y `RootModule`.
@@ -280,6 +330,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
   - Inclusión de cabeceras estáticas de control de caché (`Cache-Control: public, max-age=31536000, immutable` para assets `/_astro/`) y manejo de errores 404 estáticos para garantizar compatibilidad estricta con MIME checking en navegadores.
 
 ### 🚀 Nuevas Funcionalidades
+
 - **Integración con GitHub GraphQL API v4 (`https://api.github.com/graphql`)**:
   - Migración de consultas de datos de usuarios, lenguajes, repositorios top y rachas de contribución a la API v4 de GraphQL en una sola petición POST.
   - Uso automático del `GITHUB_TOKEN` del servidor para todas las peticiones globales y del PAT (`userToken`) del usuario registrado cuando está disponible.
@@ -296,6 +347,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
   - Hub principal `/help` con tarjetas de categoría navegables y redirección inteligente de hashes (`#github-profile` -> `/help/github-profile`).
 
 ### 📝 Sistema de Logging Estructurado & Observabilidad
+
 - **Módulo Centralizado de Logging (`backend/src/infrastructure/logging/logger.ts`)**:
   - Implementación de un logger estructurado en formato JSON para producción y formateado en desarrollo.
   - Enmascaramiento y redactado automático de tokens, secretos y credenciales en metadatos (`[REDACTED]`).
@@ -303,6 +355,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
   - Migración completa de todas las invocaciones `console.log`, `console.warn` y `console.error` del backend hacia el logger centralizado.
 
 ### 🌐 Arquitectura i18n & Refactorización del Frontend
+
 - **Módulo Centralizado de Internacionalización (`src/utils/i18n.ts`)**:
   - Implementación de un diccionario fuertemente tipado en TypeScript para `'es'` y `'en'` que abarca interfaz, mensajes de estado, toasts de notificación, errores de red, modales y encabezados del README live.
   - Función auxiliar `t(key, locale, params?)` que reemplaza todas las comparaciones ternarias estáticas dispersas (`currentLocale === 'en' ? ... : ...`) y soporta interpolación de parámetros dinámicos (ej. `{username}`).
@@ -312,15 +365,18 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
   - Corrección de la configuración de TypeScript en `frontend/tsconfig.json` removiendo la opción obsoleta `"baseUrl": "."`.
 
 ### 🧪 Pruebas Unitarias
+
 - **Suite para `i18n` Frontend**: Creado `frontend/tests/i18nFrontend.test.ts` para verificar la paridad de claves entre idiomas, interpolación de variables y comportamientos de fallback.
 - **Suite para `readmeGenerator`**: Creado `frontend/tests/sampleReadme.test.ts` para verificar la generación correcta de plantillas Markdown bilingües y la integración con las tarjetas activas.
 
 ### 🛠️ Entorno y Gestor de Paquetes
+
 - **Actualización de pnpm**: Actualizado el gestor de paquetes a `pnpm@11.17.0` en el `Dockerfile` (etapas builder y runner) y en la configuración de `packageManager` de `package.json`.
 
 ## [1.3.0] - 2026-07-22
 
 ### 🔒 Seguridad y Correcciones SonarCloud
+
 - **Resolución de Vulnerabilidades**:
   - Se añadieron cabeceras seguras `rel="noopener noreferrer"` en todos los enlaces del frontend con `target="_blank"`.
   - Se configuró la descarga segura de `pnpm@11.15.1` y se añadió el flag `--ignore-scripts` en las etapas del Dockerfile para mitigar riesgos en dependencias de ciclo de vida.
@@ -337,11 +393,13 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
   - Reemplazados los parseadores nativos globales (`parseInt` y `parseFloat`) por sus métodos estáticos de `Number` correspondientes para consistencia de tipos.
 
 ### 🎨 Accesibilidad (WCAG AA)
+
 - **Contraste de Color en global.css**:
   - Ajustados los botones y estados (`.primary-btn`, `.danger-btn`, `.copy-btn.copied`) con colores WCAG AA complacientes (> 4.5:1 de ratio).
   - Eliminado el uso de fondos semitransparentes `rgba` en el botón de light-mode, reemplazándolo por color sólido para garantizar relaciones de contraste superiores a 9.4:1 de forma estática.
 
 ### 🧪 Pruebas Unitarias
+
 - **Migración a Aserciones Semánticas**:
   - Se reemplazaron todas las aserciones de longitud basadas en `.length` con `.toBe()` por la aserción semántica dedicada `.toHaveLength()` en las suites de pruebas unitarias (`history`, `purge`, `security`, `github`).
   - Reemplazada la aserción estática obvia `expect(1+1).toBe(2)` en `sample.test.ts` por una validación dinámica.
@@ -349,9 +407,10 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.2.2] - 2026-07-21
 
 ### 🚀 Nuevas Funcionalidades
+
 - **Sincronización de Parámetros en URL**: Se añadió lógica para leer y escribir los parámetros `user` y `theme` directamente desde la barra de direcciones del navegador en caliente (utilizando `window.history.pushState`). Esto mantiene una URL única, limpia y fácilmente compartible por usuario con su configuración seleccionada.
 - **Soporte de Búsqueda Dinámica por Parámetro de URL**: El backend de Express en `/` intercepta las solicitudes para parsear tanto `user` como `username` de la consulta y generar las meta-etiquetas de redes sociales en concordancia.
-- **Internacionalización Completa (UI i18n & SVG locale)**: 
+- **Internacionalización Completa (UI i18n & SVG locale)**:
   - Se añadieron diccionarios de traducción en español (`es`) e inglés (`en`) en backend para las 5 tarjetas SVG.
   - Se implementó un selector de idioma en el panel del frontend que sincroniza con la query de URL `?locale=en|es` y actualiza reactivamente el idioma de la página completa (`index.astro`, modal de tokens privados, modal de purga GDPR y mensajes Toast en caliente) sin recargas.
 - **Panel de Administración de Métricas (`/admin/metrics`)**:
@@ -361,43 +420,52 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
   - **Búsqueda y Paginación**: Tabla de perfiles con entrada de filtro en tiempo real y paginación de 10 elementos por página.
 
 ### 🎨 Frontend / UX
+
 - **Notificaciones Toasts Premium**: Implementado un sistema de toasts flotantes animados en la esquina inferior derecha con curvas de rebote sutiles (`cubic-bezier`), barra de progreso de autodescarte e íconos dinámicos en reemplazo de los textos en línea de copiado.
 
 ### 🔒 Seguridad
+
 - **Políticas CSP Flexibles**: Se añadió el dominio de entrega de contenido seguro `https://cdn.jsdelivr.net` a la directiva `scriptSrc` en la configuración de Helmet para permitir la carga segura de la librería Chart.js en el dashboard.
 
 ### 🧪 Pruebas
+
 - **Pruebas End-to-End (E2E) con Playwright**: Incorporados 12 casos de prueba integrales para verificar interacciones (incluyendo cambio de idioma en caliente, traducción de placeholders y textos de UI, búsqueda y paginación de perfiles en el dashboard, sincronización de la URL y el flujo de gráficos con mocks herméticos robustos).- **Pruebas Unitarias de Traducción**: Creado `backend/tests/i18n.test.ts` con 6 tests unitarios en Vitest para validar la correcta sustitución de cadenas de idioma en todas las tarjetas de acuerdo con el parámetro `locale`.
 - **Aislamiento en Vitest**: Excluidas las especificaciones de Playwright en la suite de pruebas unitarias en `vitest.config.ts`.
 
 ## [1.2.1] - 2026-07-21
 
 ### 🚀 Nuevas Funcionalidades
+
 - **Tarjeta de Top Repositorios** (`/api/top-repos`): Nuevo endpoint SVG que muestra los 4 repositorios más destacados del usuario (por estrellas), con nombre, descripción, lenguaje con color, conteo de estrellas y forks. Soporta todos los temas y ancho personalizado.
 - **5 Nuevos Temas Premium**: Se añadieron `catppuccin_mocha`, `nord`, `cyberpunk`, `gruvbox` y `synthwave` al sistema de temas en `theme.ts`.
 - **Aliases de Color Comunitarios**: El controlador de tarjetas acepta ahora los alias estándar de la comunidad `title_color`, `bg_color`, `icon_color`, `border_color`, `text_color`, `secondary_color` y `bg_gradient`.
 - **Personalización del Ancho de Tarjeta**: Todos los presentadores SVG soportan el parámetro `card_width` (e.g. `card_width=100%`, `card_width=600`, `full_width=true`). La coordenada `viewBox` se mantiene fija para preservar el layout interno.
 
 ### 🎨 Frontend
+
 - **Nuevos botones de tema** en el panel de configuración (Catppuccin, Nord, Cyberpunk, Gruvbox, Synthwave).
 - **Control de Ancho de Tarjeta**: Botones "Estándar (495px)" y "Ancho Completo (100%)" + campo de ancho personalizado con botón "Aplicar". El parámetro `card_width` se inyecta en todas las URLs generadas.
 - **Vista previa de Top Repositorios**: Nueva tarjeta de previsualización con generador de código Markdown.
 
 ### 🧪 Pruebas
+
 - **10 nuevas pruebas unitarias** en `topReposCard.test.ts`: validación de estructura SVG, aplicación de temas, formato K-suffix de conteos, soporte de ancho 100% y personalizado, truncado de descripciones, y los 5 nuevos temas.
 
 ## [1.2.0] - 2026-07-21
 
 ### 🏗️ Arquitectura y Estructura (Monorepo)
+
 - **Separación de Backend en Carpeta Dedicada**: Reestructuración completa del monorepo moviendo el código fuente del backend (`src/`) y las pruebas (`tests/`) al subdirectorio dedicado `backend/` para evitar la mezcla de configuraciones en la raíz del proyecto.
 - **Configuración de pnpm workspaces**: Ajustado el archivo [pnpm-workspace.yaml](file:///Users/joaltoroc/Code/creativecodeco/github-helpers/pnpm-workspace.yaml) para registrar de forma separada los paquetes `"backend"` y `"frontend"`.
 - **Simplificación del package.json Raíz**: Rediseñado el package.json de la raíz del monorepo para servir únicamente como orquestador de dependencias compartidas y comandos globales (`build`, `dev`, `test`, `lint`, `format`).
 
 ### 📦 Gestión de Dependencias
+
 - **Eliminación de release-it**: Se removió por completo la suite de automatización `release-it` y `@release-it/conventional-changelog` del proyecto, delegando la gestión de versiones directamente a los agentes de IA mediante directrices explícitas en `AGENTS.md`.
 - **Fijación de Versiones de Dependencias**: Se eliminaron los caracteres de rango `^` y `~` de todas las dependencias en los tres archivos `package.json` del monorepo para asegurar la consistencia absoluta de versiones probadas localmente. Se documentó esta regla en `AGENTS.md`.
 
 ### ⚙️ Herramientas de Desarrollo y Calidad (TypeScript / Linters / Pruebas)
+
 - **Soporte Nativo de TypeScript en Frontend**: Creado el archivo de compilación [frontend/tsconfig.json](file:///Users/joaltoroc/Code/creativecodeco/github-helpers/frontend/tsconfig.json) heredando de `astro/tsconfigs/strict`.
 - **Migración a ESLint Flat Config (ESM)**: Creado [eslint.config.mjs](file:///Users/joaltoroc/Code/creativecodeco/github-helpers/eslint.config.mjs) con soporte ESM completo para integrar de manera nativa TypeScript y componentes Astro (`eslint-plugin-astro` v3 y `astro-eslint-parser` v3) con cero errores y cero advertencias.
 - **Entorno de Pruebas Unitarias**: Configurada la suite de pruebas unitarias con Vitest y `happy-dom` en el frontend ([frontend/vitest.config.ts](file:///Users/joaltoroc/Code/creativecodeco/github-helpers/frontend/vitest.config.ts)) junto a un script unificado de ejecución paralela (`pnpm -r test`).
@@ -405,19 +473,24 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.1.1] - 2026-07-21
 
 ### 🏗️ Base de Datos
+
 - **Migración a PostgreSQL con TypeORM**: Reemplazo completo de la base de datos SQLite y su controlador de bajo nivel `sqlite3` por una arquitectura basada en TypeORM con PostgreSQL para mejorar la seguridad (prevención de inyección SQL), concurrencia y flexibilidad de despliegue.
 - **Entidades de Dominio e Infraestructura**: Mapeo completo de las tablas `global_metrics`, `user_metrics`, `request_log` y `user_tokens` mediante decoradores TypeORM.
 
 ### 🐳 Docker & Despliegue
+
 - **Simplificación del Contenedor**: Eliminación del entrypoint script `docker-entrypoint.sh` y la dependencia de volumen persistente local. El contenedor ahora se inicia directamente con el usuario no privilegiado `node`.
 
 ### 🔒 Seguridad
+
 - **Políticas de Secretos**: Modificación de las directrices en `AGENTS.md` prohibiendo la lectura/escritura del archivo `.env` por parte de agentes de IA para salvaguardar secretos locales de producción.
 
 ### 📡 Rutas de la API (Corrección)
+
 - **Corrección de Error 404**: Solucionado el error 404 en las tarjetas de racha (`/api/streak`) y trofeos (`/api/trophies`) corrigiendo su registro en el servidor de Express.
 
 ### 🎨 Frontend / UX
+
 - **Configuración del Contador de Visitas**: Reubicación de las opciones de configuración del contador de visitas del perfil dentro de su propia tarjeta de vista previa.
 - **Optimización de Foco**: Implementación de actualización en tiempo real que mantiene el foco del teclado al escribir, previniendo reinicios molestos del DOM.
 
@@ -449,4 +522,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.9.2
+**Versión actualmente expuesta / en producción:** v1.10.0

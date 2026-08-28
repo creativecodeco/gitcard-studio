@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import {
   IsBoolean,
   IsInt,
@@ -9,7 +10,7 @@ import {
   Min,
   validateSync
 } from 'class-validator';
-import { plainToInstance, Type } from 'class-transformer';
+import { plainToInstance, Transform, Type } from 'class-transformer';
 
 class EnvConfigDto {
   @IsOptional()
@@ -32,6 +33,7 @@ class EnvConfigDto {
   DB_HOST!: string;
 
   @IsNotEmpty()
+  @Type(() => Number)
   @IsNumber()
   DB_PORT!: number;
 
@@ -48,10 +50,12 @@ class EnvConfigDto {
   DB_DATABASE!: string;
 
   @IsNotEmpty()
+  @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
   DB_SYNCHRONIZE!: boolean;
 
   @IsNotEmpty()
+  @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
   DB_SSL!: boolean;
 

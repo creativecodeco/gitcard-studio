@@ -1,6 +1,8 @@
+import { Injectable } from '@nestjs/common';
 import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
 import { ITokenRepository } from '@/domain/repositories/ITokenRepository';
 
+@Injectable()
 export class RevokeUserTokenUseCase {
   constructor(
     private readonly tokenRepo: ITokenRepository,

@@ -1,6 +1,6 @@
 {
   "name": "gitcard-studio-frontend",
-  "version": "1.9.2",
+  "version": "1.10.0",
   "description": "Interactive Astro web client for GitCard Studio real-time SVG card customization, live README preview, and markdown builder.",
   "private": true,
   "type": "module",
@@ -15,12 +15,12 @@
   },
   "dependencies": {
     "@astrojs/check": "0.9.10",
-    "astro": "7.2.7",
-    "typescript": "6.0.3"
+    "astro": "7.2.9",
+    "typescript": "7.0.2"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
-    "happy-dom": "20.11.6",
+    "happy-dom": "20.11.12",
     "vitest": "4.1.11"
   }
 }
