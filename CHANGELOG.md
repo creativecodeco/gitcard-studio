@@ -2,6 +2,14 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.10.4] - 2026-08-29
+
+### 🧪 Expansión de Cobertura de Pruebas Unitarias
+- **Pruebas Unitarias de Controladores (`cards.controller.spec.ts`)**: Integradas 7 pruebas unitarias para el `CardsController` verificando la renderización de tarjetas, cabeceras HTTP `Content-Type: image/svg+xml`, purga explícita de caché (`cache=false`, `refresh=true`) y gestión de contadores de visitas de perfil.
+- **Validación y Parseo de Parámetros (`cardQueryHelpers.spec.ts`)**: Agregadas pruebas para `extractThemeOverrides` y `extractCardWidth` validando alias de color (`bg_color`, `icon_color`, `lang`), sanitización estricta y rechazo de payloads XSS.
+- **Utilidades de Escape e Infraestructura (`escape.spec.ts` & `allExceptionsFilter.spec.ts`)**: Creadas suites de prueba para sanitización de caracteres especiales XML en `escapeXml` y captura de excepciones globales con `AllExceptionsFilter` (400 Bad Request y 500 Internal Server Error).
+- **Actualización de Documentación de Arquitectura (`.agents/ARCHITECTURE.md`)**: Sincronizado el recuento de pruebas unitarias backend a 32 archivos y 132 pruebas aprobadas.
+
 ## [1.10.3] - 2026-08-29
 
 ### 🛡️ Depuración Automática de Tokens Inválidos & Fallback de Endpoints GitHub API
@@ -548,4 +556,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.10.3
+**Versión actualmente expuesta / en producción:** v1.10.4

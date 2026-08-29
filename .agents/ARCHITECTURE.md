@@ -53,7 +53,7 @@ github-helpers/
 │       ├── components/               # CardPreview, ThemeToggle, PrivateTokenModal, Footer
 │       ├── pages/                    # index.astro, help.astro, privacy.astro, sitemap.xml.ts
 │       └── styles/global.css
-├── tests/                        # Vitest unit tests (11 archivos, 51 tests pasados)
+├── backend/tests/                # Vitest unit tests (32 archivos, 132 tests pasados)
 ├── Dockerfile                    # Multi-stage: builder + runner (non-root node user)
 ├── pnpm-workspace.yaml           # Config monorepo + allowBuilds + minimumReleaseAgeExclude
 └── .agents/
@@ -104,7 +104,6 @@ github-helpers/
 | `GITHUB_CLIENT_SECRET` | No | Client Secret para autenticación de GitHub App |
 | `GITHUB_CALLBACK_URL` | No | URL de callback OAuth de GitHub App |
 | `GITHUB_TOKEN` | No | PAT de GitHub para mayor rate limit en la API |
-| `PRIVATE_STATS_COMING_SOON` | No | `'false'` para habilitar estadísticas privadas |
 | `PORT` | No | Puerto del servidor (default: `3000`) |
 
 ---
