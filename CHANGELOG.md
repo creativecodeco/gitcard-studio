@@ -2,6 +2,13 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.10.3] - 2026-08-29
+
+### 🛡️ Depuración Automática de Tokens Inválidos & Fallback de Endpoints GitHub API
+- **Manejo de Errores de Refresco (`bad_refresh_token`)**: Actualizado `security.ts` para eliminar automáticamente registros de tokens obsoletos o revocados (`tokenRepo.deleteToken(username)`) cuando la llamada a la API de GitHub OAuth retorna `bad_refresh_token` o la fecha `expires_at` haya vencido y el refresco falle.
+- **Prevención de Errores 401 en Tarjetas**: Actualizado `getDecryptedToken` para retornar `undefined` si un token expirado no se puede refrescar, permitiendo que las tarjetas (*Stats*, *Rank*, *Trophies*, *Sponsors*) realicen el fallback automático al endpoint público `/users/${username}` sin generar errores 401 en los registros del servidor.
+- **Reintento de Consulta GraphQL (`fetchGraphQL`)**: Implementada la reintención automática con `process.env.GITHUB_TOKEN` si el token provisto por el usuario responde con `401 Unauthorized` en las consultas GraphQL.
+
 ## [1.10.2] - 2026-08-27
 
 ### 📊 Ordenación Interactiva en Panel de Métricas (`/admin/metrics`)
@@ -541,4 +548,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.10.2
+**Versión actualmente expuesta / en producción:** v1.10.3

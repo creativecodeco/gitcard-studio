@@ -232,10 +232,22 @@ export async function refreshGitHubAppToken(
       expires_in?: number;
       refresh_token?: string;
       scope?: string;
+      error?: string;
+      error_description?: string;
     };
 
-    if (!data.access_token) {
+    if (data.error || !data.access_token) {
       logger.warn('GitHub App token refresh response did not contain access_token', { data });
+      if (
+        data.error === 'bad_refresh_token' ||
+        data.error === 'bad_verification_code' ||
+        data.error === 'incorrect_client_credentials'
+      ) {
+        logger.warn(`Purging unrefreshable token for user ${username} due to ${data.error}`);
+        await tokenRepo.deleteToken(username).catch((err) => {
+          logger.error(`Error deleting unrefreshable token for ${username}`, { error: err });
+        });
+      }
       return undefined;
     }
 
@@ -291,6 +303,16 @@ export async function getDecryptedToken(
           if (freshAccessToken) {
             return freshAccessToken;
           }
+        }
+
+        if (Date.now() >= expiresTime) {
+          logger.warn(
+            `Token for user ${username} is expired and token refresh failed. Purging invalid token.`
+          );
+          await tokenRepo.deleteToken(username).catch((err) => {
+            logger.error(`Error deleting expired token for ${username}`, { error: err });
+          });
+          return undefined;
         }
       }
     }

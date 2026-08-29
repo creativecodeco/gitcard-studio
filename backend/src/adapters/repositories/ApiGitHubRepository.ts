@@ -165,7 +165,7 @@ export class ApiGitHubRepository implements IGitHubRepository {
     if (!token) return null;
 
     try {
-      const response = await fetch('https://api.github.com/graphql', {
+      let response = await fetch('https://api.github.com/graphql', {
         method: 'POST',
         headers: {
           'User-Agent': 'gitcard-studio-stats',
@@ -174,6 +174,23 @@ export class ApiGitHubRepository implements IGitHubRepository {
         },
         body: JSON.stringify({ query, variables })
       });
+
+      if (
+        response.status === 401 &&
+        userToken &&
+        process.env.GITHUB_TOKEN &&
+        userToken !== process.env.GITHUB_TOKEN
+      ) {
+        response = await fetch('https://api.github.com/graphql', {
+          method: 'POST',
+          headers: {
+            'User-Agent': 'gitcard-studio-stats',
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
+          },
+          body: JSON.stringify({ query, variables })
+        });
+      }
 
       if (!response.ok) return null;
 
@@ -356,9 +373,21 @@ export class ApiGitHubRepository implements IGitHubRepository {
     const gqlStats = await this.getUserStatsViaGraphQL(username, userToken);
     if (gqlStats) return gqlStats;
 
-    const userProfile = userToken
-      ? await this.fetchGitHub('https://api.github.com/user', userToken)
-      : await this.fetchGitHub(`https://api.github.com/users/${username}`);
+    let userProfile: any;
+    try {
+      userProfile = userToken
+        ? await this.fetchGitHub('https://api.github.com/user', userToken)
+        : await this.fetchGitHub(`https://api.github.com/users/${username}`);
+    } catch (err: any) {
+      if (userToken && (err.message?.includes('401') || err.message?.includes('Bad credentials'))) {
+        logger.warn(
+          `User token for ${username} returned 401 in getUserStats. Falling back to public user endpoint.`
+        );
+        userProfile = await this.fetchGitHub(`https://api.github.com/users/${username}`);
+      } else {
+        throw err;
+      }
+    }
 
     const { totalStars, forksReceived } = await this.fetchRepoStats(username, userToken);
 
@@ -1211,9 +1240,21 @@ export class ApiGitHubRepository implements IGitHubRepository {
     const gqlSponsors = await this.getUserSponsorsViaGraphQL(username, userToken);
     if (gqlSponsors) return gqlSponsors;
 
-    const userProfile = userToken
-      ? await this.fetchGitHub('https://api.github.com/user', userToken)
-      : await this.fetchGitHub(`https://api.github.com/users/${username}`);
+    let userProfile: any;
+    try {
+      userProfile = userToken
+        ? await this.fetchGitHub('https://api.github.com/user', userToken)
+        : await this.fetchGitHub(`https://api.github.com/users/${username}`);
+    } catch (err: any) {
+      if (userToken && (err.message?.includes('401') || err.message?.includes('Bad credentials'))) {
+        logger.warn(
+          `User token for ${username} returned 401 in getUserSponsors. Falling back to public user endpoint.`
+        );
+        userProfile = await this.fetchGitHub(`https://api.github.com/users/${username}`);
+      } else {
+        throw err;
+      }
+    }
 
     return {
       username: userProfile.login || username,
