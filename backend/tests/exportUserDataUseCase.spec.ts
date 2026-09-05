@@ -80,4 +80,41 @@ describe('ExportUserDataUseCase', () => {
     expect(result.statsHistory).toHaveLength(1);
     expect(result.recentActivityLogs).toHaveLength(1);
   });
+
+  it('should utilize constructor-injected repositories directly when provided', async () => {
+    const customTokenRepo = {
+      findOne: vi.fn().mockResolvedValue({
+        username: 'injected_user',
+        token_type: 'oauth',
+        scopes: 'read:org',
+        consent_accepted: true,
+        consent_date: '2026-09-01T12:00:00Z',
+        consent_fingerprint: 'fp-injected',
+        updated_at: '2026-09-01T12:00:00Z'
+      })
+    };
+    const customMetricRepo = {
+      findOne: vi.fn().mockResolvedValue({
+        username: 'injected_user',
+        profile_views: 99
+      })
+    };
+    const customHistoryRepo = { find: vi.fn().mockResolvedValue([]) };
+    const customLogRepo = { find: vi.fn().mockResolvedValue([]) };
+
+    const injectedUseCase = new ExportUserDataUseCase(
+      customTokenRepo as never,
+      customMetricRepo as never,
+      customHistoryRepo as never,
+      customLogRepo as never
+    );
+
+    const result = await injectedUseCase.execute('injected_user');
+
+    expect(result.username).toBe('injected_user');
+    expect(result.consentRecord.tokenType).toBe('oauth');
+    expect(result.metrics?.profile_views).toBe(99);
+    expect(customTokenRepo.findOne).toHaveBeenCalledWith({ where: { username: 'injected_user' } });
+    expect(customMetricRepo.findOne).toHaveBeenCalledWith({ where: { username: 'injected_user' } });
+  });
 });

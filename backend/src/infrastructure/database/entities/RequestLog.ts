@@ -1,10 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
 
 @Entity('request_log')
 export class RequestLog {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Index()
   @Column({ type: 'varchar', length: 100, nullable: true })
   username!: string;
 
@@ -23,6 +24,7 @@ export class RequestLog {
   @Column({ type: 'varchar', length: 45, nullable: true })
   ip_address!: string;
 
+  @Index()
   @CreateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   created_at!: Date;
 }

@@ -69,6 +69,7 @@ export const TRANSLATIONS = {
     title_repo: 'Repositorio Destacado',
     placeholder_msg: 'Ingresa tu usuario de GitHub para cargar la vista previa',
     copy_btn: 'Copiar',
+    theme_toggle_btn: 'Cambiar tema claro/oscuro',
 
     // Footer elements
     footer_rights: 'Todos los derechos reservados.',
@@ -209,6 +210,7 @@ export const TRANSLATIONS = {
     title_repo: 'Featured Repository',
     placeholder_msg: 'Enter your GitHub username to load the preview',
     copy_btn: 'Copy',
+    theme_toggle_btn: 'Toggle light/dark theme',
 
     // Footer elements
     footer_rights: 'All rights reserved.',
@@ -314,6 +316,10 @@ export function updateDomTranslations(locale: string = 'es'): void {
   const lang = (locale in TRANSLATIONS ? locale : 'es') as SupportedLocale;
   const dict = TRANSLATIONS[lang];
 
+  if (typeof document !== 'undefined' && document.documentElement) {
+    document.documentElement.lang = lang;
+  }
+
   // 1. Text elements
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     const htmlEl = el as HTMLElement;
@@ -329,6 +335,15 @@ export function updateDomTranslations(locale: string = 'es'): void {
     const key = htmlEl.dataset.i18nPlaceholder;
     if (key && key in dict) {
       (htmlEl as HTMLInputElement).placeholder = dict[key as TranslationKey];
+    }
+  });
+
+  // 3. Accessible Labels (aria-label)
+  document.querySelectorAll('[data-i18n-aria-label]').forEach((el) => {
+    const htmlEl = el as HTMLElement;
+    const key = htmlEl.dataset.i18nAriaLabel;
+    if (key && key in dict) {
+      htmlEl.setAttribute('aria-label', dict[key as TranslationKey]);
     }
   });
 }

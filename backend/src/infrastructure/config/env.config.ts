@@ -28,6 +28,10 @@ class EnvConfigDto {
   @IsString()
   GITHUB_TOKEN!: string;
 
+  @IsOptional()
+  @IsString()
+  DATABASE_URL?: string;
+
   @IsNotEmpty()
   @IsString()
   DB_HOST!: string;

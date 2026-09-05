@@ -7,6 +7,11 @@ import { RegisterUserTokenUseCase } from '@/use-cases/tokens/RegisterUserTokenUs
 import { RevokeUserTokenUseCase } from '@/use-cases/tokens/RevokeUserTokenUseCase';
 import { PurgeUserDataUseCase } from '@/use-cases/users/PurgeUserDataUseCase';
 import { ExportUserDataUseCase } from '@/use-cases/users/ExportUserDataUseCase';
+import { AppDataSource } from '@/infrastructure/database/database';
+import { UserTokenEntity } from '@/infrastructure/database/entities/UserTokenEntity';
+import { UserMetric } from '@/infrastructure/database/entities/UserMetric';
+import { UserStatsHistory } from '@/infrastructure/database/entities/UserStatsHistory';
+import { RequestLog } from '@/infrastructure/database/entities/RequestLog';
 
 @Module({
   controllers: [TokensController],
@@ -35,7 +40,13 @@ import { ExportUserDataUseCase } from '@/use-cases/users/ExportUserDataUseCase';
     },
     {
       provide: ExportUserDataUseCase,
-      useFactory: () => new ExportUserDataUseCase()
+      useFactory: () =>
+        new ExportUserDataUseCase(
+          AppDataSource.getRepository(UserTokenEntity),
+          AppDataSource.getRepository(UserMetric),
+          AppDataSource.getRepository(UserStatsHistory),
+          AppDataSource.getRepository(RequestLog)
+        )
     }
   ]
 })

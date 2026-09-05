@@ -72,7 +72,7 @@ export class CardsController {
     const theme = query.theme;
 
     if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
-      res.status(400);
+      res.header('Cache-Control', 'no-cache, no-store, must-revalidate').status(400);
       const safeUser = typeof username === 'string' ? username : undefined;
       return renderErrorCard(
         'Usuario de GitHub inválido',
@@ -129,6 +129,7 @@ export class CardsController {
       res
         .header('Content-Type', 'image/svg+xml; charset=utf-8')
         .header('X-Content-Type-Options', 'nosniff')
+        .header('Cache-Control', 'no-cache, no-store, must-revalidate')
         .status(500);
       return renderErrorCard(message, typeof theme === 'string' ? theme : undefined, { username });
     }
@@ -234,7 +235,9 @@ export class CardsController {
     const { username, theme, color, label, style, preview } = query;
 
     if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
-      res.status(400);
+      res
+        .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
+        .status(400);
       return renderErrorCard('Usuario de GitHub inválido');
     }
 
@@ -272,6 +275,7 @@ export class CardsController {
       res
         .header('Content-Type', 'image/svg+xml; charset=utf-8')
         .header('X-Content-Type-Options', 'nosniff')
+        .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
         .status(500);
       return renderErrorCard(message);
     }
@@ -406,7 +410,7 @@ export class CardsController {
       typeof rawUsername !== 'string' ||
       !GITHUB_USERNAME_REGEX.test(rawUsername)
     ) {
-      res.status(400);
+      res.header('Cache-Control', 'no-cache, no-store, must-revalidate').status(400);
       return renderBadgeSVG({
         label: 'gitcard studio',
         value: 'invalid user',
@@ -458,6 +462,7 @@ export class CardsController {
       res
         .header('Content-Type', 'image/svg+xml; charset=utf-8')
         .header('X-Content-Type-Options', 'nosniff')
+        .header('Cache-Control', 'no-cache, no-store, must-revalidate')
         .status(500);
       return renderBadgeSVG({ label: 'gitcard studio', value: 'error', valueColor: '#ef4444' });
     }

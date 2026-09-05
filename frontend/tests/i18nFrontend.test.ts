@@ -22,4 +22,33 @@ describe('Frontend i18n Utility', () => {
     const res = t('header_metrics_label', 'en');
     expect(res).toBe('Users active with cards: ');
   });
+
+  it('should update DOM text, placeholders, aria-labels and html lang attribute', async () => {
+    const { updateDomTranslations } = await import('../src/utils/i18n');
+
+    document.body.innerHTML = `
+      <span data-i18n="settings_title"></span>
+      <input data-i18n-placeholder="username_placeholder" />
+      <button data-i18n-aria-label="theme_toggle_btn"></button>
+    `;
+
+    updateDomTranslations('en');
+
+    expect(document.documentElement.lang).toBe('en');
+    expect(document.querySelector('[data-i18n="settings_title"]')?.textContent).toBe('Configuration');
+    expect(
+      (document.querySelector('input') as HTMLInputElement).placeholder
+    ).toBe('e.g. octocat');
+    expect(
+      document.querySelector('button')?.getAttribute('aria-label')
+    ).toBe('Toggle light/dark theme');
+
+    // Switch back to ES
+    updateDomTranslations('es');
+    expect(document.documentElement.lang).toBe('es');
+    expect(document.querySelector('[data-i18n="settings_title"]')?.textContent).toBe('Configuración');
+    expect(
+      document.querySelector('button')?.getAttribute('aria-label')
+    ).toBe('Cambiar tema claro/oscuro');
+  });
 });

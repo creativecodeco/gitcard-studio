@@ -5,16 +5,18 @@ import PrivacyConsentBanner from '../components/PrivacyConsentBanner.astro';
 interface Props {
   title?: string;
   description?: string;
+  lang?: string;
 }
 
 const {
   title = 'GitCard Studio - Stats Generator | CreativeCode',
-  description = 'Generador en tiempo real de tarjetas de estadísticas y lenguajes para tu perfil de GitHub y archivos README.'
+  description = 'Generador en tiempo real de tarjetas de estadísticas y lenguajes para tu perfil de GitHub y archivos README.',
+  lang = 'es'
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang={lang}>
   <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-9SV7XMX2Q1"></script>
@@ -56,7 +58,7 @@ const {
         "applicationCategory": "DeveloperApplication",
         "operatingSystem": "Any",
         "browserRequirements": "Requires JavaScript",
-        "softwareVersion": "1.7.1",
+        "softwareVersion": "1.10.5",
         "offers": {
           "@type": "Offer",
           "price": "0",

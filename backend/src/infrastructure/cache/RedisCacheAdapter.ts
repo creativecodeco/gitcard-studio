@@ -64,13 +64,13 @@ export class RedisCacheAdapter implements CacheStore {
         };
 
         if (process.env.REDIS_PORT) {
-          options.port = parseInt(process.env.REDIS_PORT, 10);
+          options.port = Number.parseInt(process.env.REDIS_PORT, 10);
         }
         if (process.env.REDIS_PASSWORD) {
           options.password = process.env.REDIS_PASSWORD;
         }
         if (process.env.REDIS_DB) {
-          options.db = parseInt(process.env.REDIS_DB, 10);
+          options.db = Number.parseInt(process.env.REDIS_DB, 10);
         }
 
         this.client = redisUrl

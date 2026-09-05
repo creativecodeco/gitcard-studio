@@ -1,6 +1,6 @@
 {
   "name": "gitcard-studio-backend",
-  "version": "1.10.4",
+  "version": "1.10.5",
   "description": "High-performance NestJS & Fastify API backend server for GitCard Studio SVG stats card generation, OAuth integration, and metrics tracking.",
   "main": "dist/server.js",
   "scripts": {
@@ -26,21 +26,16 @@
     "ioredis": "6.0.0",
     "pg": "8.23.0",
     "reflect-metadata": "0.2.2",
-    "typeorm": "1.1.0"
+    "typeorm": "1.1.1"
   },
   "devDependencies": {
     "@nestjs/testing": "12.0.1",
-    "@types/node": "26.4.0",
+    "@types/node": "26.4.1",
     "@types/pg": "8.23.1",
-    "tsc-alias": "1.9.2",
+    "tsc-alias": "1.9.4",
     "tsconfig-paths": "4.2.0",
-    "tsx": "4.23.12",
+    "tsx": "4.23.13",
     "typescript": "7.0.2",
-    "vitest": "4.1.11"
-  },
-  "overrides": {
-    "brace-expansion": "5.0.8",
-    "fastify": "5.12.1",
-    "find-my-way": "9.7.0"
+    "vitest": "5.0.0"
   }
 }

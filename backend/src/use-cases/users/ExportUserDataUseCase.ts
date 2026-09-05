@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { AppDataSource } from '@/infrastructure/database/database';
 import { UserTokenEntity } from '@/infrastructure/database/entities/UserTokenEntity';
 import { UserMetric } from '@/infrastructure/database/entities/UserMetric';
@@ -36,11 +37,18 @@ export interface UserDataExportResult {
 
 @Injectable()
 export class ExportUserDataUseCase {
+  constructor(
+    @Optional() private readonly tokenRepo?: Repository<UserTokenEntity>,
+    @Optional() private readonly metricRepo?: Repository<UserMetric>,
+    @Optional() private readonly historyRepo?: Repository<UserStatsHistory>,
+    @Optional() private readonly logRepo?: Repository<RequestLog>
+  ) {}
+
   async execute(username: string): Promise<UserDataExportResult> {
-    const tokenRepo = AppDataSource.getRepository(UserTokenEntity);
-    const metricRepo = AppDataSource.getRepository(UserMetric);
-    const historyRepo = AppDataSource.getRepository(UserStatsHistory);
-    const logRepo = AppDataSource.getRepository(RequestLog);
+    const tokenRepo = this.tokenRepo ?? AppDataSource.getRepository(UserTokenEntity);
+    const metricRepo = this.metricRepo ?? AppDataSource.getRepository(UserMetric);
+    const historyRepo = this.historyRepo ?? AppDataSource.getRepository(UserStatsHistory);
+    const logRepo = this.logRepo ?? AppDataSource.getRepository(RequestLog);
 
     const tokenRecord = await tokenRepo.findOne({ where: { username } });
     const metrics = await metricRepo.findOne({ where: { username } });

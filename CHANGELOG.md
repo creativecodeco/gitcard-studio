@@ -2,6 +2,20 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.10.5] - 2026-09-04
+
+### 📦 Optimización y Saneamiento del Árbol de Dependencias
+- **Eliminación Total de `overrides` Obsoletos**: Removidos los bloques de anulación de versiones en `package.json`, `backend/package.json` y `pnpm-workspace.yaml`.
+- **Desbloqueo de `find-my-way` (9.7.0 → 9.9.0)**: Eliminada la anulación que forzaba el downgrade a 9.7.0, resolviendo naturalmente a la versión `9.9.0` requerida por NestJS 12 y compartida sin conflictos con Fastify.
+- **Limpieza de `brace-expansion`**: Eliminada la anulación a 5.0.9 al ser resuelta de manera nativa y segura por `minimatch@10.2.6 (^5.0.8)` sin vulnerabilidades detectadas.
+- **Alineación de `fastify` (5.12.1)**: Estandarizada la versión exacta en `backend/package.json` a `5.12.1`, coincidiendo con `@nestjs/platform-fastify@12.0.1` y eliminando conflictos de tipos TypeScript en `FastifyInstance`.
+- **Actualización de Dependencias**: Actualizados `vitest@5.0.0`, `astro@7.3.1`, `@playwright/test@1.63.0`, `happy-dom@20.14.0`, `typeorm@1.1.1`, `@types/node@26.4.1`, `tsc-alias@1.9.4` y `tsx@4.23.13`.
+- **Soporte `DATABASE_URL` y Resiliencia**: Añadido soporte de conexión completa mediante `DATABASE_URL` en `database.ts` con fallback a credenciales individuales.
+- **Indexación de Base de Datos**: Creados índices en `RequestLog` (`username` y `created_at`) para acelerar consultas analíticas y reportes.
+- **Prevención de Caché en Respuestas de Error**: Añadida cabecera `Cache-Control: no-cache, no-store, must-revalidate` en tarjetas SVG de error (400 y 500) en `CardsController.ts`.
+- **Inyección Limpia en Casos de Uso**: Refactorizado `ExportUserDataUseCase` y `tokens.module.ts` para inyectar `Repository<UserToken>` a través del constructor.
+- **Accesibilidad Web (a11y)**: Sincronizado dinámicamente el atributo `lang` en `<html>` de `BaseLayout.astro` y añadido `aria-label` descriptivo en `ThemeToggle.astro`.
+
 ## [1.10.4] - 2026-08-29
 
 ### 🧪 Expansión de Cobertura de Pruebas Unitarias
@@ -556,4 +570,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.10.4
+**Versión actualmente expuesta / en producción:** v1.10.5

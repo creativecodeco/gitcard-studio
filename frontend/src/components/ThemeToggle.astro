@@ -1,4 +1,10 @@
-<button id="btn-theme-toggle" class="theme-toggle-btn" aria-label="Cambiar tema claro/oscuro">
+<button
+  id="btn-theme-toggle"
+  class="theme-toggle-btn"
+  aria-label="Cambiar tema claro/oscuro"
+  aria-pressed="false"
+  data-i18n-aria-label="theme_toggle_btn"
+>
   <!-- Sun Icon -->
   <svg
     class="sun-icon"
@@ -46,7 +52,9 @@
 
   function initTheme() {
     const savedTheme = localStorage.getItem('theme') || 'dark';
-    if (savedTheme === 'light') {
+    const isLight = savedTheme === 'light';
+    btnThemeToggle?.setAttribute('aria-pressed', isLight ? 'true' : 'false');
+    if (isLight) {
       document.body.classList.add('light-mode');
       sunIcon?.classList.add('hidden');
       moonIcon?.classList.remove('hidden');
@@ -59,6 +67,7 @@
 
   btnThemeToggle?.addEventListener('click', () => {
     const isLight = document.body.classList.toggle('light-mode');
+    btnThemeToggle.setAttribute('aria-pressed', isLight ? 'true' : 'false');
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
 
     if (isLight) {
