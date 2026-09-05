@@ -1,8 +1,6 @@
 export function escapeXml(unsafe: unknown): string {
-  if (typeof unsafe !== 'string') {
-    return String(unsafe ?? '');
-  }
-  return unsafe.replace(/[<>&'"]/g, (c) => {
+  const str = typeof unsafe === 'string' ? unsafe : String(unsafe ?? '');
+  return str.replace(/[<>&'"]/g, (c) => {
     switch (c) {
       case '<':
         return '&lt;';

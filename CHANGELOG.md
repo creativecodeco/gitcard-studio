@@ -2,6 +2,16 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.10.6] - 2026-09-04
+
+### 🛡️ Mitigación de Alertas de Seguridad CodeQL (OWASP & CWE)
+- **Validación Estricta de URLs de la API de GitHub (Alerta #83, CWE-20)**: Reemplazada la comprobación de subcadenas `url.includes('https://api.github.com/user/repos')` por parseo seguro mediante `new URL(url)` en `ApiGitHubRepository.ts`, validando estrictamente que el origen coincida con `https://api.github.com` y comprobando directamente la propiedad `pathname !== '/user/repos'` para prevenir falsificaciones o bypasses de subcadenas.
+- **Prevención Integral de Reflected XSS en Insignias SVG (Alerta #82, CWE-79)**:
+  - **Barrera de Reemplazo en `sanitizeBadgeLabel`**: Actualizada la función para aplicar una expresión regular global con clase de caracteres invertida (`trimmed.replace(/[^a-z\d\s\-_.:/]/gi, '')`), garantizando una barrera formal de sanitización reconocida por CodeQL.
+  - **Reconstrucción Numérica Segura en `sanitizeColor`**: Implementada la reconstrucción limpia de colores mediante `parseInt` y `parseFloat` para componentes RGB/RGBA y HSL/HSLA, y extracción limpia de caracteres hexadecimales (`[0-9a-fA-F]`), impidiendo que valores contaminados de entrada alcancen el atributo SVG `fill`.
+  - **Escape de Atributos SVG en Presentadores**: Asegurado el escape estricto con `escapeXml` de los colores de fondo e insignias (`labelBg`, `valueBg` y `rightColor`) en `badge.presenter.ts` y `viewsBadge.ts`.
+  - **Blindaje Universal en `escapeXml`**: Asegurado que todas las rutas de ejecución en `escape.ts` ejecuten el reemplazo global de entidades XML (`&lt;`, `&gt;`, `&amp;`, `&apos;`, `&quot;`) para cualquier tipo de dato de entrada.
+
 ## [1.10.5] - 2026-09-04
 
 ### 📦 Optimización y Saneamiento del Árbol de Dependencias
@@ -570,4 +580,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.10.5
+**Versión actualmente expuesta / en producción:** v1.10.6

@@ -22,5 +22,5 @@ export function sanitizeBadgeLabel(label: unknown, fallbackLabel: string): strin
   if (!trimmed || !BADGE_LABEL_REGEX.test(trimmed)) {
     return fallbackLabel;
   }
-  return trimmed;
+  return trimmed.replace(/[^a-z\d\s\-_.:/]/gi, '');
 }

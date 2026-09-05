@@ -22,11 +22,9 @@ function resolveColor(colorParam?: string, themeParam?: string): string {
       return COLOR_MAP[cleanColor];
     }
     // Support custom hex codes like #007ec6 or 007ec6
-    if (/^#[0-9a-f]{3,6}$/i.test(cleanColor)) {
-      return cleanColor;
-    }
-    if (/^[0-9a-f]{3,6}$/i.test(cleanColor)) {
-      return `#${cleanColor}`;
+    const hexMatch = cleanColor.match(/^#?([0-9a-f]{3,6})$/i);
+    if (hexMatch) {
+      return '#' + hexMatch[1].replace(/[^0-9a-f]/gi, '');
     }
   }
 
@@ -49,7 +47,7 @@ export function renderViewsBadge(
   const countText = escapeXml(rawCount);
 
   const isFlat = styleParam?.toLowerCase() !== 'flat-square';
-  const rightColor = resolveColor(colorParam, themeParam);
+  const rightColor = escapeXml(resolveColor(colorParam, themeParam));
 
   // Dynamic L/R width calculation (approximate characters width of raw text)
   const LWidth = Math.max(77, Math.round(rawLabel.length * 6.2 + 10));

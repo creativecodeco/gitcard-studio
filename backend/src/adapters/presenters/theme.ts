@@ -118,19 +118,41 @@ export const THEMES: Record<string, Theme> = {
 };
 
 const HEX_REGEX = /^#?([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
-const RGB_REGEX = /^rgba?\(\s*\d{1,3}(?:\s*,\s*\d{1,3}){2}(?:\s*,\s*[\d.]+)?\s*\)$/i;
-const HSL_REGEX = /^hsla?\(\s*\d{1,3}(?:\s*,\s*\d{1,3}%){2}(?:\s*,\s*[\d.]+)?\s*\)$/i;
+const RGB_REGEX = /^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*([\d.]+))?\s*\)$/i;
+const HSL_REGEX =
+  /^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%(?:\s*,\s*([\d.]+))?\s*\)$/i;
 
 const GRADIENT_REGEX = /^(?:linear|radial)-gradient\([^<>"'\r\n;]+\)$/i;
 
 export function sanitizeColor(val?: string): string | undefined {
   if (!val || typeof val !== 'string') return undefined;
   const trimmed = val.trim();
-  if (HEX_REGEX.test(trimmed)) {
-    return trimmed.startsWith('#') ? trimmed : `#${trimmed}`;
+  const hexMatch = trimmed.match(HEX_REGEX);
+  if (hexMatch) {
+    const raw = hexMatch[1].replace(/[^0-9a-fA-F]/g, '');
+    return `#${raw}`;
   }
-  if (RGB_REGEX.test(trimmed) || HSL_REGEX.test(trimmed)) {
-    return trimmed;
+  const rgbMatch = trimmed.match(RGB_REGEX);
+  if (rgbMatch) {
+    const r = Math.min(255, parseInt(rgbMatch[1], 10));
+    const g = Math.min(255, parseInt(rgbMatch[2], 10));
+    const b = Math.min(255, parseInt(rgbMatch[3], 10));
+    if (rgbMatch[4] !== undefined) {
+      const a = Math.min(1, Math.max(0, parseFloat(rgbMatch[4])));
+      return `rgba(${r}, ${g}, ${b}, ${a})`;
+    }
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+  const hslMatch = trimmed.match(HSL_REGEX);
+  if (hslMatch) {
+    const h = Math.min(360, parseInt(hslMatch[1], 10));
+    const s = Math.min(100, parseInt(hslMatch[2], 10));
+    const l = Math.min(100, parseInt(hslMatch[3], 10));
+    if (hslMatch[4] !== undefined) {
+      const a = Math.min(1, Math.max(0, parseFloat(hslMatch[4])));
+      return `hsla(${h}, ${s}%, ${l}%, ${a})`;
+    }
+    return `hsl(${h}, ${s}%, ${l}%)`;
   }
   return undefined;
 }

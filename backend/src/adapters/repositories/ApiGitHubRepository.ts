@@ -57,14 +57,15 @@ export class ApiGitHubRepository implements IGitHubRepository {
     userToken?: string,
     extraHeaders: Record<string, string> = {}
   ): Promise<any> {
-    if (!url.startsWith('https://api.github.com/')) {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.origin !== 'https://api.github.com') {
       throw new Error('Forbidden URL target: Only GitHub API requests are allowed.');
     }
     const mergedHeaders = { ...this.getHeaders(userToken), ...extraHeaders };
     let response = await fetch(url, { headers: mergedHeaders });
 
     if (response.status === 401 && (userToken || process.env.GITHUB_TOKEN)) {
-      if (!url.includes('https://api.github.com/user/repos')) {
+      if (parsedUrl.pathname !== '/user/repos') {
         const publicHeaders: HeadersInit = {
           'User-Agent': 'gitcard-studio-stats',
           Accept: 'application/vnd.github.v3+json',
