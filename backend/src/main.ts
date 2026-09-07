@@ -5,6 +5,8 @@ import { ValidationPipe } from '@nestjs/common';
 import fastifyCors from '@fastify/cors';
 import fastifyHelmet from '@fastify/helmet';
 import fastifyStatic from '@fastify/static';
+import fastifyCompress from '@fastify/compress';
+import fastifyEtag from '@fastify/etag';
 import path from 'node:path';
 import dotenv from 'dotenv';
 import { AppModule } from './app.module';
@@ -23,7 +25,10 @@ export async function bootstrap(): Promise<NestFastifyApplication> {
 
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({ logger: false })
+    new FastifyAdapter({
+      logger: false,
+      keepAliveTimeout: 65000
+    })
   );
 
   // Register security headers via Fastify Helmet
@@ -36,6 +41,15 @@ export async function bootstrap(): Promise<NestFastifyApplication> {
     origin: '*',
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS']
   });
+
+  // Register Fastify compression (brotli & gzip) for high-performance payload delivery
+  await app.register(fastifyCompress, {
+    global: true,
+    encodings: ['br', 'gzip', 'deflate']
+  });
+
+  // Register Fastify ETag support for 304 Not Modified responses
+  await app.register(fastifyEtag);
 
   // Serve public static assets
   const publicDir = path.resolve(__dirname, '../../public');

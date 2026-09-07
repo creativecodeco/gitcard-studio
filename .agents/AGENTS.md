@@ -10,6 +10,7 @@ This project uses a dedicated ecosystem of specialized agents located in `.agent
 2. **Code Integrity Agent (`code-integrity-agent`)**: ESLint compliance, Prettier code formatting, dead code sweeping, DRY principles, and strict TypeScript checks (`pnpm integrity:scan`).
 3. **Architecture Agent (`architecture-agent`)**: Clean Architecture layer boundaries (Domain -> Use Cases -> Adapters -> Modules), monorepo package version synchronization, and documentation integrity (`pnpm architecture:scan`).
 4. **Best Practices Agent (`best-practices-agent`)**: Guard clauses (negation first), `readonly` class properties, runtime parameter type validation, exact package versions, and non-root Docker execution (`pnpm best-practices:scan`).
+5. **Dependency Agent (`dependency-agent`)**: Monorepo dependency synchronization (`package.json`, `backend/package.json`, `frontend/package.json`), exact version enforcement (no `^` or `~`), and lockfile auditing (`pnpm deps:scan`).
 
 ## Mandatory Pre-Completion Verification Checklist
 
@@ -19,7 +20,7 @@ On EVERY task that creates, modifies, updates dependencies, or refactors source 
 2. **Code Formatting & Linting**: Run `pnpm format:check && pnpm lint` (or `pnpm format`) to enforce Prettier formatting and ESLint standards.
 3. **Cybersecurity Audit**: Run `pnpm security:scan` to verify OWASP compliance, secret leaks, XSS sanitization, and SSRF prevention.
 4. **Test Suite Execution**: Run `pnpm test` to ensure all unit, integration, and controller test suites execute and pass 100%.
-5. **Full Agent Scan Suite**: Run `pnpm scan:all` to run all agent checks across security, code integrity, architecture, and best practices.
+5. **Full Agent Scan Suite**: Run `pnpm scan:all` to run all agent checks across security, code integrity, architecture, best practices, and dependencies.
 
 ```bash
 pnpm build && pnpm format:check && pnpm scan:all && pnpm test

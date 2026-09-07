@@ -17,3 +17,8 @@ export function escapeXml(unsafe: unknown): string {
     }
   });
 }
+
+export function minifySvg(svg: unknown): string {
+  const str = typeof svg === 'string' ? svg : String(svg ?? '');
+  return str.replace(/>\s+</g, '><').trim();
+}

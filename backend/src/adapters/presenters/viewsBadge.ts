@@ -1,5 +1,5 @@
 import { getTheme } from './theme';
-import { escapeXml } from '@/utils/escape';
+import { escapeXml, minifySvg } from '@/utils/escape';
 
 const COLOR_MAP: Record<string, string> = {
   brightgreen: '#4c1',
@@ -54,7 +54,7 @@ export function renderViewsBadge(
   const RWidth = Math.max(30, Math.round(rawCount.length * 7.5 + 10));
   const totalWidth = LWidth + RWidth;
 
-  return `
+  return minifySvg(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="20" role="img" aria-label="${labelText}: ${countText}">
       <title>${labelText}: ${countText}</title>
       <linearGradient id="s" x2="0" y2="100%">
@@ -82,5 +82,5 @@ export function renderViewsBadge(
         <text x="${LWidth + RWidth / 2}" y="14">${countText}</text>
       </g>
     </svg>
-  `.trim();
+  `);
 }

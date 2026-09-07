@@ -1,6 +1,6 @@
 {
   "name": "gitcard-studio",
-  "version": "1.10.6",
+  "version": "1.11.0",
   "description": "High-performance NestJS & Fastify API server and interactive Astro web frontend for GitCard Studio real-time customizable profile README stats cards, commit habit heatmaps, streak counters, developer ranks, trophies, badges, and metrics tracking.",
   "keywords": [
     "astro",
@@ -35,7 +35,7 @@
     "typeorm",
     "typescript"
   ],
-  "packageManager": "pnpm@11.25.0",
+  "packageManager": "pnpm@12.3.4",
   "scripts": {
     "build": "pnpm --filter gitcard-studio-frontend build && pnpm --filter gitcard-studio-backend build",
     "start": "pnpm --filter gitcard-studio-backend start",
@@ -52,14 +52,15 @@
     "integrity:scan": "node .agents/skills/code-integrity-agent/scripts/integrity-scan.js",
     "architecture:scan": "node .agents/skills/architecture-agent/scripts/architecture-scan.js",
     "best-practices:scan": "node .agents/skills/best-practices-agent/scripts/best-practices-scan.js",
-    "scan:all": "pnpm security:scan && pnpm integrity:scan && pnpm architecture:scan && pnpm best-practices:scan"
+    "deps:scan": "node .agents/skills/dependency-agent/scripts/dependency-scan.js",
+    "scan:all": "pnpm security:scan && pnpm integrity:scan && pnpm architecture:scan && pnpm best-practices:scan && pnpm deps:scan"
   },
   "author": "CreativeCode.com.co",
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@typescript-eslint/eslint-plugin": "8.69.0",
-    "@typescript-eslint/parser": "8.69.0",
+    "@typescript-eslint/eslint-plugin": "8.70.0",
+    "@typescript-eslint/parser": "8.70.0",
     "astro-eslint-parser": "3.1.0",
     "eslint": "10.10.0",
     "eslint-config-prettier": "10.1.8",

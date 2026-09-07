@@ -9,6 +9,7 @@ export interface CacheStore {
 }
 
 export class MemoryCacheAdapter implements CacheStore {
+  private readonly maxItems: number = 5000;
   private readonly store = new Map<string, { value: unknown; expiresAt: number }>();
 
   async get<T>(key: string): Promise<T | null> {
@@ -20,11 +21,24 @@ export class MemoryCacheAdapter implements CacheStore {
       return null;
     }
 
+    // Refresh access position for LRU
+    this.store.delete(key);
+    this.store.set(key, item);
+
     return item.value as T;
   }
 
   async set<T>(key: string, value: T, ttlSeconds: number = 7200): Promise<void> {
     const expiresAt = Date.now() + ttlSeconds * 1000;
+    if (this.store.has(key)) {
+      this.store.delete(key);
+    } else if (this.store.size >= this.maxItems) {
+      // Evict oldest (least recently used) entry
+      const oldestKey = this.store.keys().next().value;
+      if (oldestKey !== undefined) {
+        this.store.delete(oldestKey);
+      }
+    }
     this.store.set(key, { value, expiresAt });
   }
 

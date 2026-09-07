@@ -1,5 +1,5 @@
 import { RepoStats } from '@/domain/entities/RepoStats';
-import { escapeXml } from '@/utils/escape';
+import { escapeXml, minifySvg } from '@/utils/escape';
 import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 
 const ICONS = {
@@ -54,7 +54,7 @@ export function renderRepoCard(
     return `<text x="25" y="${80 + idx * 20}" class="desc">${line}</text>`;
   });
 
-  return `
+  return minifySvg(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
       <title>${repo.name} - GitHub Repository</title>
       <desc>Featured repository card for ${repo.name}</desc>
@@ -128,5 +128,5 @@ export function renderRepoCard(
       <!-- Brand Logo / Subtitle -->
       ${renderBrandHeader(`${repo.owner}/${repo.name}`, theme)}
     </svg>
-  `.trim();
+  `);
 }

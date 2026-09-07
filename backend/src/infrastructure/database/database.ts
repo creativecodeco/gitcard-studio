@@ -11,6 +11,11 @@ const commonDbOptions = {
   synchronize: process.env.DB_SYNCHRONIZE === 'true',
   logging: process.env.NODE_ENV === 'development',
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  extra: {
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 3000
+  },
   entities: [GlobalMetric, UserMetric, RequestLog, UserTokenEntity, UserStatsHistory],
   migrations: [],
   subscribers: []

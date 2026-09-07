@@ -1,5 +1,5 @@
 import { UserStats } from '@/domain/entities/UserStats';
-import { escapeXml } from '@/utils/escape';
+import { escapeXml, minifySvg } from '@/utils/escape';
 import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 import { getTranslations } from './i18n';
 import { fetchAvatarBase64 } from './avatar';
@@ -39,7 +39,7 @@ export async function renderStatsCard(
     : `<circle cx="60" cy="60" r="35" fill="${theme.secondary}" opacity="0.3"/>
        <path d="M60 45a10 10 0 100 20 10 10 0 000-20zm0 25c-11.5 0-21 5.2-21 12v3h42v-3c0-6.8-9.5-12-21-12z" fill="${theme.text}" />`;
 
-  return `
+  return minifySvg(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
       <title>${safeName} - GitHub Stats</title>
       <desc>GitHub Profile Statistics card for ${safeUsername}</desc>
@@ -135,5 +135,5 @@ export async function renderStatsCard(
       <!-- Brand Logo / Subtitle -->
       ${renderBrandHeader(stats.username, theme)}
     </svg>
-  `.trim();
+  `);
 }

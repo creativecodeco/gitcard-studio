@@ -1,4 +1,4 @@
-import { escapeXml } from '@/utils/escape';
+import { escapeXml, minifySvg } from '@/utils/escape';
 import { sanitizeColor } from './theme';
 
 export interface BadgeOptions {
@@ -25,7 +25,7 @@ export function renderBadgeSVG(options: BadgeOptions): string {
   const labelX = Math.round(labelWidth / 2);
   const valueX = Math.round(labelWidth + valueWidth / 2);
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="20" role="img" aria-label="${label}: ${value}">
+  return minifySvg(`<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="20" role="img" aria-label="${label}: ${value}">
   <title>${label}: ${value}</title>
   <linearGradient id="s" x2="0" y2="100%">
     <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
@@ -45,5 +45,5 @@ export function renderBadgeSVG(options: BadgeOptions): string {
     <text x="${valueX * 10}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${Math.max(10, (valueWidth - 12) * 10)}">${value}</text>
     <text x="${valueX * 10}" y="140" transform="scale(.1)" fill="#fff" textLength="${Math.max(10, (valueWidth - 12) * 10)}">${value}</text>
   </g>
-</svg>`;
+</svg>`);
 }

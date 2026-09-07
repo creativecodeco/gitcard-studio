@@ -2,7 +2,7 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
-## [1.10.6] - 2026-09-04
+## [1.11.0] - 2026-09-07
 
 ### 🛡️ Mitigación de Alertas de Seguridad CodeQL (OWASP & CWE)
 - **Validación Estricta de URLs de la API de GitHub (Alerta #83, CWE-20)**: Reemplazada la comprobación de subcadenas `url.includes('https://api.github.com/user/repos')` por parseo seguro mediante `new URL(url)` en `ApiGitHubRepository.ts`, validando estrictamente que el origen coincida con `https://api.github.com` y comprobando directamente la propiedad `pathname !== '/user/repos'` para prevenir falsificaciones o bypasses de subcadenas.
@@ -11,6 +11,22 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
   - **Reconstrucción Numérica Segura en `sanitizeColor`**: Implementada la reconstrucción limpia de colores mediante `parseInt` y `parseFloat` para componentes RGB/RGBA y HSL/HSLA, y extracción limpia de caracteres hexadecimales (`[0-9a-fA-F]`), impidiendo que valores contaminados de entrada alcancen el atributo SVG `fill`.
   - **Escape de Atributos SVG en Presentadores**: Asegurado el escape estricto con `escapeXml` de los colores de fondo e insignias (`labelBg`, `valueBg` y `rightColor`) en `badge.presenter.ts` y `viewsBadge.ts`.
   - **Blindaje Universal en `escapeXml`**: Asegurado que todas las rutas de ejecución en `escape.ts` ejecuten el reemplazo global de entidades XML (`&lt;`, `&gt;`, `&amp;`, `&apos;`, `&quot;`) para cualquier tipo de dato de entrada.
+
+### 🤖 Agente Especializado de Dependencias (`dependency-agent`)
+- **Nuevo Agente de Auditoría de Dependencias**: Creadas las directivas `.agents/rules/dependency-agent.md`, la habilidad `.agents/skills/dependency-agent/SKILL.md` y el script de escaneo `.agents/skills/dependency-agent/scripts/dependency-scan.js`.
+- **Integración en la Suite de Escaneo**: Añadido el comando `pnpm deps:scan` e integrado en `pnpm scan:all` para auditar automáticamente que todas las dependencias usen versiones exactas (sin `^` o `~`), estén sincronizadas entre `package.json`, `backend/package.json` y `frontend/package.json`, y mantengan alineado el lockfile.
+
+### 🚀 Rendimiento HTTP, Compresión y Optimización Global
+- **Compresión y ETags Nivel Servidor (`@fastify/compress` & `@fastify/etag`)**: Registrados los módulos `@fastify/compress@9.2.0` (Brotli/Gzip) y `@fastify/etag@6.2.0` en `main.ts`, reduciendo entre 60% y 80% el tamaño del payload y permitiendo respuestas `304 Not Modified`.
+- **Ajuste de Conexiones Fastify (Keep-Alive & Timeouts)**: Configurado `keepAliveTimeout: 65000` y `headersTimeout: 66000` en `FastifyAdapter` para optimizar la estabilidad en proxies inversos (Cloudflare/Nginx/Traefik).
+- **Pool de Conexiones TypeORM (PostgreSQL)**: Configurado el pool de conexiones con `max: 20`, `idleTimeoutMillis: 30000` y `connectionTimeoutMillis: 3000` en `database.ts`.
+- **Estrategia de Evicción LRU en Caché Memoria**: Implementado un límite de 5.000 entradas y evicción LRU en `MemoryCacheAdapter` (`RedisCacheAdapter.ts`) para evitar fugas de RAM.
+- **Minificación de HTML y CSS en Astro (`compressHTML` & `content-visibility`)**: Activado `compressHTML: true` en `astro.config.mjs`, añadido `<link rel="dns-prefetch" href="https://api.github.com" />` en `BaseLayout.astro` y configurado `content-visibility: auto` en `global.css`.
+- **Minificación de Marcado SVG (`minifySvg`)**: Creada la función `minifySvg` en `escape.ts` para eliminar indentaciones redundantes y espacios entre etiquetas XML en la generación de tarjetas SVG.
+
+### 📦 Actualización de Dependencias
+- **Actualización de Paquetes en Monorepo**: Actualizados `@typescript-eslint/eslint-plugin` y `@typescript-eslint/parser` a `8.70.0` en `package.json`, y `@types/node` a `26.5.0` en `backend/package.json` (manteniendo `fastify@5.12.1` alineado con `@nestjs/platform-fastify@12.0.1`).
+- **Sincronización de pnpm (12.3.4)**: Actualizado el gestor de paquetes a `pnpm@12.3.4` en el `Dockerfile` (etapas `builder` y `runner`), alineado con `packageManager` en `package.json` y la documentación del proyecto (`.agents/ARCHITECTURE.md`).
 
 ## [1.10.5] - 2026-09-04
 
@@ -580,4 +596,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.10.6
+**Versión actualmente expuesta / en producción:** v1.11.0

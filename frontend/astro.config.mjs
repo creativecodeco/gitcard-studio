@@ -4,6 +4,7 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   site: 'https://gitcard-studio.creativecode.com.co',
   outDir: '../public',
+  compressHTML: true,
   build: {
     format: 'file'
   },

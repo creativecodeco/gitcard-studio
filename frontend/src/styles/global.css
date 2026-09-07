@@ -1439,3 +1439,10 @@ body.light-mode #sample-readme-rendered p {
 body.light-mode #sample-readme-rendered hr {
   border-top-color: #e2e8f0;
 }
+
+/* Performance rendering optimization for heavy landing elements */
+.card-preview-wrapper,
+.sample-readme-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 400px;
+}
