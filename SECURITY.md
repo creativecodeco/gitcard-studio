@@ -45,7 +45,7 @@ Our codebase implements defense-in-depth security measures aligned with OWASP st
   - Username: `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`
   - Repo: `/^[a-z\d-_.]{1,100}$/i`
 - **XSS & Injection Prevention:** All dynamic values rendered inside SVG cards or HTML previews are strictly sanitized and XML/HTML-escaped.
-- **HTTP Rate Limiting:** Enforced via `express-rate-limit` (100 requests per 15 minutes per IP). Rate limit breaches return valid SVG error cards to prevent broken image tags in GitHub READMEs.
+- **HTTP Rate Limiting:** Enforced at the HTTP layer via Fastify rate limiting (100 requests per 15 minutes per IP). Rate limit breaches return valid SVG error cards to prevent broken image tags in GitHub READMEs.
 - **Metrics Key Protection:** Admin analytics endpoints under `/api/metrics` require a valid `METRICS_KEY`. Missing keys default to `403 Forbidden`.
 - **Encrypted Token Management:** User OAuth/PAT tokens are encrypted at rest using AES-256-GCM authenticated encryption.
 - **Non-Root Container Execution:** Docker builds run under the non-privileged `node` user.

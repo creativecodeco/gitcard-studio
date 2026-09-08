@@ -36,10 +36,10 @@ pnpm build && pnpm format:check && pnpm scan:all && pnpm test
      - Username Regex: `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`
      - Repo Regex: `/^[a-z\d-_.]{1,100}$/i`
      - Color Regex: Hex, RGB/RGBA, HSL/HSLA strictly validated via `sanitizeColor` in `theme.ts`.
-  5. **OWASP A05 - Security Misconfiguration**: Maintain secure Helmet headers and rate-limiting middleware (`express-rate-limit`).
+  5. **OWASP A05 - Security Misconfiguration**: Maintain secure Helmet headers and rate-limiting middleware (`@fastify/rate-limit`).
   6. **OWASP A10 - SSRF Prevention**: Validate all dynamic request target URLs and hostnames before making outbound HTTP calls.
 - **Metrics Security**: The metrics endpoints under `/api/metrics` must always require a valid `METRICS_KEY`. If `METRICS_KEY` is not set in the environment, the endpoints must respond with `403 Forbidden` rather than falling back to public access.
-- **Rate Limiting**: Rate limiting is configured at `/api/` using `express-rate-limit`. Do not bypass or remove this unless instructed. If adding new endpoints, ensure they are protected by the rate limiter.
+- **Rate Limiting**: Rate limiting is configured at `/api/` using `@fastify/rate-limit`. Do not bypass or remove this unless instructed. If adding new endpoints, ensure they are protected by the rate limiter.
 - **Security Headers**: `helmet` is used to enforce secure headers. Keep `contentSecurityPolicy: false` to allow inline CSS inside the generated SVG cards.
 - **Environment Secrets**: Do NOT attempt to read, write, or modify the `.env` file (or any other local environment files containing secrets/configurations) directly. Always output or present the required environment key templates to the user so they can configure them manually.
 
@@ -74,7 +74,7 @@ pnpm build && pnpm format:check && pnpm scan:all && pnpm test
     3. Obsolete environment variables, configuration flags, or feature flags (`PRIVATE_STATS_COMING_SOON`, etc.).
     4. Commented-out dead code blocks, unused mock data, or orphaned scratch files.
   - **Readonly Members**: Mark all class properties, private fields, and methods that are initialized and never reassigned as `readonly` (e.g. `private readonly handleCardRequest`).
-  - **Strict Parameter Types**: Ensure all inputs (especially query parameters from Express `req.query`) are strictly type-checked at runtime using `typeof` and validated before passing them to internal functions to avoid type confusion.
+  - **Strict Parameter Types**: Ensure all inputs (especially query parameters from Fastify / NestJS `@Query()`) are strictly type-checked at runtime using `typeof` and validated before passing them to internal functions to avoid type confusion.
 - **OWASP & Sonar Compliance**: Keep code clean and free of Sonar issues. Avoid raw `.includes()` checks for security-sensitive domains/referers. Sanitization of user inputs for XSS prevention and validation of dynamic request target hosts to prevent SSRF are required.
 - **Guard Clauses & Negation First**: Prefer guard clauses with negation first (e.g. `if (!targetUsername) { return ...; }` or `if (!targetUsername) { throw new BadRequestException(...); }`) to handle validation/missing conditions early and avoid nesting main logic in positive `if` blocks.
 - **Clean Code Principles**: Adhere strictly to Clean Code principles: write highly readable, single-responsibility functions, use meaningful self-documenting names, eliminate dead code/unused variables, avoid magic numbers/strings, keep methods short, and maintain minimal cyclomatic complexity across all modules.

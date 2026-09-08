@@ -100,33 +100,51 @@ Diseña y personaliza tus tarjetas interactivamente en:
 
 ## 🏗️ Arquitectura del Proyecto
 
-El código fuente está organizado siguiendo los principios de **Clean Architecture**:
+El código fuente está estructurado como un monorepo organizado bajo los principios de **Clean Architecture**:
 
 ```
-src/
-├── domain/                  # Lógica de negocio pura (Entidades y Contratos de Repositorios)
-│   ├── entities/            # UserStats, LanguageStat, Metrics, UserToken, Validation
-│   └── repositories/        # IGitHubRepository, ITokenRepository, IMetricsRepository
-├── use-cases/               # Casos de uso (Orquestadores de la lógica de negocio)
-│   ├── cards/               # GetUserStatsCardUseCase, GetUserLanguagesCardUseCase, etc.
-│   └── tokens/              # RegisterUserTokenUseCase, RevokeUserTokenUseCase
-├── adapters/                # Adaptadores de Interfaz (Controladores, Repositorios y Presentadores)
-│   ├── controllers/         # CardController, TokenController, MetricsController
-│   ├── presenters/          # statsCard, languagesCard, commitActivityCard, badge.presenter (Renderizadores SVGs)
-│   └── repositories/        # TypeORMTokenRepository, TypeORMMetricsRepository, ApiGitHubRepository, CachedGitHubRepository
-└── infrastructure/          # Detalles técnicos concretos (Base de datos, Servidor Express/Fastify, Criptografía)
-    ├── database/            # Configuración de TypeORM con PostgreSQL y Entidades
-    │   └── entities/        # Entidades de base de datos (GlobalMetric, UserMetric, etc.)
-    ├── express/             # Enrutamiento, middlewares y arranque de servidor
-    ├── security/            # Criptografía AES-256-GCM y validación de scopes
-    └── server.ts            # Entrypoint principal
+gitcard-studio/
+├── backend/src/
+│   ├── domain/              # Lógica de negocio pura (Entidades y Contratos de Repositorios)
+│   │   ├── entities/        # UserStats, LanguageStat, Metrics, UserToken, Validation
+│   │   └── repositories/    # IGitHubRepository, ITokenRepository, IMetricsRepository
+│   ├── use-cases/           # Casos de uso (Orquestadores de la lógica de negocio)
+│   │   ├── cards/           # GetUserStatsCardUseCase, GetUserLanguagesCardUseCase, etc.
+│   │   ├── tokens/          # RegisterUserTokenUseCase, RevokeUserTokenUseCase
+│   │   └── users/           # PurgeUserDataUseCase, ExportUserDataUseCase
+│   ├── adapters/            # Adaptadores de Interfaz (Controladores, Repositorios y Presentadores)
+│   │   ├── presenters/      # statsCard, languagesCard, commitActivityCard, badge.presenter, etc.
+│   │   └── repositories/    # TypeORMTokenRepository, TypeORMMetricsRepository, ApiGitHubRepository
+│   ├── infrastructure/      # Infraestructura técnica (Base de datos, Caché, Logging, Seguridad)
+│   │   ├── cache/           # RedisCacheAdapter y MemoryCacheAdapter (con LRU cache)
+│   │   ├── config/          # Validación estricta de entorno con class-validator (env.config.ts)
+│   │   ├── database/        # Configuración de TypeORM con PostgreSQL y Entidades
+│   │   ├── filters/         # AllExceptionsFilter (manejo global de excepciones)
+│   │   ├── i18n/            # Internacionalización backend (es / en)
+│   │   ├── logging/         # Logger estructurado Winston
+│   │   └── security/        # Criptografía AES-256-GCM y validación de tokens
+│   ├── modules/             # Módulos y Controladores NestJS + Fastify
+│   │   ├── api-v1/          # Endpoints JSON públicos (/api/v1/user/stats)
+│   │   ├── auth/            # Flujo OAuth de GitHub App y métricas personales
+│   │   ├── cards/           # Renderizado de tarjetas SVG (/api/stats, /api/languages, etc.)
+│   │   ├── metrics/         # Endpoints de KPIs y analíticas (/api/metrics)
+│   │   ├── root/            # Servido de páginas web y SEO (/ , /health, /help, /admin/metrics)
+│   │   ├── tokens/          # Registro PAT, purga GDPR y exportación de datos
+│   │   └── webhooks/        # Integración de webhooks de GitHub
+│   ├── utils/               # Sanitización XML, escape y minificación de SVG
+│   ├── app.module.ts        # Módulo raíz NestJS
+│   └── main.ts              # Arranque con Fastify, compresión Brotli/Gzip, ETags y Helmet
+└── frontend/src/            # Cliente web interactivo construido en Astro
+    ├── components/          # Previsualizador interactivo, selectores de tema, etc.
+    ├── layouts/             # Plantillas base accesibles (BaseLayout.astro)
+    └── pages/               # Páginas generadas estáticamente (index, help, privacy, admin)
 ```
 
 ### Path Aliases (Alias de Rutas)
 
-El proyecto utiliza alias `@/` apuntando al directorio `src/`. Esto previene la existencia de rutas relativas complejas como `../../`.
+El proyecto utiliza alias `@/` apuntando al directorio `backend/src/`. Esto previene la existencia de rutas relativas complejas como `../../`.
 
-- En desarrollo: Se resuelve en tiempo de ejecución utilizando `tsconfig-paths/register`.
+- En desarrollo: Se resuelve en tiempo de ejecución utilizando `tsconfig-paths/register` y `tsx`.
 - En producción: `tsc-alias` reescribe los imports a rutas relativas nativas durante la compilación en el directorio `dist/`.
 
 ---
@@ -135,7 +153,7 @@ El proyecto utiliza alias `@/` apuntando al directorio `src/`. Esto previene la 
 
 ### Requisitos previos
 
-- Node.js v18 o superior.
+- Node.js v24 o superior.
 - Gestor de paquetes **pnpm** (exclusivo del repositorio).
 - (Opcional) Un token de acceso personal (PAT) de GitHub para aumentar el límite de peticiones de la API.
 
@@ -151,32 +169,41 @@ El proyecto utiliza alias `@/` apuntando al directorio `src/`. Esto previene la 
    cp .env.example .env
    ```
 4. Abre el archivo `.env` y configura las siguientes variables clave:
-   - `GITHUB_TOKEN`: Tu token de acceso personal de GitHub para evitar límites de tasa.
-   - `METRICS_KEY`: Clave secreta obligatoria para poder acceder a los endpoints de analíticas (`/api/metrics`).
-   - `TRUST_PROXY`: Número de saltos del proxy (por defecto `1`), útil para que el rate limit identifique correctamente las IPs detrás de Cloudflare, Nginx, etc.
+   - `GITHUB_TOKEN`: Tu token de acceso personal de GitHub para evitar límites de tasa (5.000 req/h).
+   - `ENCRYPTION_KEY`: Clave hexadecimal de 64 caracteres para el cifrado AES-256-GCM.
+   - `METRICS_KEY`: Clave secreta obligatoria para acceder a los endpoints de analíticas (`/api/metrics`).
+   - `DATABASE_URL` o parámetros individuales `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`.
    - `STATS_HISTORY_FREQUENCY_HOURS`: Frecuencia mínima en horas entre tomas de instantáneas del historial de estadísticas del usuario (por defecto `12`).
 
 ### Scripts de Desarrollo
 
-- **Modo Desarrollo (auto-reload y resolución de paths):**
+- **Modo Desarrollo Backend (auto-reload NestJS + Fastify):**
   ```bash
   pnpm dev
   ```
-- **Ejecutar Pruebas Unitarias (Vitest):**
+- **Modo Desarrollo Frontend (Astro dev server):**
+  ```bash
+  pnpm dev:frontend
+  ```
+- **Ejecutar Pruebas Unitarias (Vitest en backend y frontend):**
   ```bash
   pnpm test
   ```
-- **Compilar para Producción (compila archivos TS y reescribe alias):**
+- **Compilar para Producción (Frontend Astro + Backend NestJS):**
   ```bash
   pnpm build
   ```
-- **Iniciar Servidor Compilado:**
+- **Iniciar Servidor Compilado en Producción:**
   ```bash
   pnpm start
   ```
-- **Gestionar Versiones y Releases (release-it):**
+- **Escaneo Completo de Calidad y Seguridad:**
   ```bash
-  pnpm release
+  pnpm scan:all
+  ```
+- **Verificación de Formato y Linter:**
+  ```bash
+  pnpm format:check && pnpm lint
   ```
 
 Una vez ejecutado, el panel de configuración estará disponible en:  
@@ -197,8 +224,12 @@ Las tarjetas se pueden incrustar en cualquier archivo Markdown usando la siguien
 | `/api/rank` | Tarjeta de grado / rango de desarrollador (S+, A+, B) | `![Rank](https://gitcard-studio.creativecode.com.co/api/rank?username=tu-usuario&theme=glassmorphism)` |
 | `/api/trophies` | Trofeos e hitos alcanzados en GitHub | `![Trophies](https://gitcard-studio.creativecode.com.co/api/trophies?username=tu-usuario&theme=dark)` |
 | `/api/top-repos` | Tarjeta con los repositorios más destacados | `![Top Repos](https://gitcard-studio.creativecode.com.co/api/top-repos?username=tu-usuario&theme=solarized)` |
+| `/api/repo` | Tarjeta de un repositorio destacado individual | `![Featured Repo](https://gitcard-studio.creativecode.com.co/api/repo?username=tu-usuario&repo=tu-repo&theme=dark)` |
 | `/api/sponsors` | Tarjeta del perfil de GitHub Sponsors | `![Sponsors](https://gitcard-studio.creativecode.com.co/api/sponsors?username=tu-usuario&theme=neon)` |
-| `/api/badge` | Insignia SVG estilo Shields.io / Contador de visitas | `![Views](https://gitcard-studio.creativecode.com.co/api/badge?username=tu-usuario&type=views&color=38bdf8)` |
+| `/api/today-status` | Insignia con el estado de commits del día actual | `![Today Status](https://gitcard-studio.creativecode.com.co/api/today-status?username=tu-usuario&theme=dark)` |
+| `/api/timeline-matrix` | Matriz horaria de distribución de commits por período | `![Timeline Matrix](https://gitcard-studio.creativecode.com.co/api/timeline-matrix?username=tu-usuario&theme=neon)` |
+| `/api/views` | Insignia SVG con contador de visitas al perfil de GitHub | `![Profile Views](https://gitcard-studio.creativecode.com.co/api/views?username=tu-usuario&color=38bdf8)` |
+| `/api/badge` | Insignia SVG estilo Shields.io personalizada | `![Badge](https://gitcard-studio.creativecode.com.co/api/badge?username=tu-usuario&type=views&color=38bdf8)` |
 
 #### **Parámetros Comunes:**
 - `username` (Obligatorio): Nombre de usuario u organización en GitHub. Valida con regex `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`.
@@ -224,12 +255,15 @@ El servicio cuenta con una interfaz web segura de analíticas en la dirección `
 
 Este microservicio implementa las siguientes medidas de seguridad para entornos de producción:
 
-- **Cabeceras Seguras (Helmet)**: Configurado con políticas de recursos de origen cruzado (`cross-origin`) para permitir incrustar de forma segura las tarjetas en READMEs externos.
-- **Rate Limiting**: Límite de 100 peticiones cada 15 minutos por dirección IP. En caso of bloqueo, responde con un SVG legible para evitar errores de renderizado de imágenes.
+- **Cabeceras Seguras (Fastify Helmet)**: Configurado con políticas de recursos de origen cruzado (`cross-origin`) para permitir incrustar de forma segura las tarjetas en READMEs externos, con `contentSecurityPolicy: false` para SVG inline.
+- **Rendimiento HTTP Optimizado**: Compresión a nivel de servidor (Brotli y Gzip vía `@fastify/compress`) y soporte de respuestas 304 Not Modified con `@fastify/etag`.
+- **Rate Limiting**: Control de peticiones por dirección IP. En caso de bloqueo, responde con un SVG legible para evitar errores de renderizado de imágenes.
 - **Validación de Parámetros por Expresión Regular**:
-  - Validado a nivel de Controller y en la capa de negocio de Use Cases.
+  - Validado a nivel de Controller (DTOs con class-validator) y en la capa de negocio de Use Cases.
   - Username: `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`
   - Repo: `/^[a-z\d-_.]{1,100}$/i`
+  - Color: componentes Hex, RGB/RGBA y HSL/HSLA reconstruidos con parseo numérico (`sanitizeColor`).
+  - Label: sanitización formal con clase de caracteres invertida (`sanitizeBadgeLabel`).
 - **Secure by Default**: Los endpoints de métricas se bloquean por defecto con error `403` si no se configura la variable `METRICS_KEY`.
 
 Para obtener información detallada sobre reporte responsable de vulnerabilidades y políticas de parches, consulta nuestra **[Política de Seguridad (SECURITY.md)](SECURITY.md)**.
@@ -270,5 +304,6 @@ Este proyecto incluye un `Dockerfile` optimizado con builds en multi-etapa y con
 4. Configura el puerto de exposición en el puerto `3000`.
 5. **Base de Datos**: Añade un servicio de base de datos **PostgreSQL** en Coolify.
 6. **Variables de Entorno**: Agrega los datos de acceso de la base de datos y tus tokens de seguridad:
-   - `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `GITHUB_TOKEN`, `METRICS_KEY`, `TRUST_PROXY`.
+   - `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `DB_SSL`, `DB_SYNCHRONIZE` (o `DATABASE_URL`), `ENCRYPTION_KEY`, `GITHUB_TOKEN`, `METRICS_KEY`.
 7. Haz clic en **Deploy**. Coolify construirá el contenedor seguro de producción y lo pondrá en marcha con SSL automático.
+
