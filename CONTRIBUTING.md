@@ -43,13 +43,19 @@ pnpm dev
 ```
 
 #### 4. Testing & Verification
-All unit tests and builds must pass clean before creating a PR:
+All unit tests, static builds, and automated scanner checks must pass cleanly before creating a PR:
 ```bash
 # Run unit tests
 pnpm test
 
 # Run build verification
 pnpm run build
+
+# Run format and lint checks
+pnpm format:check && pnpm lint
+
+# Run full agent security and integrity audit
+pnpm scan:all
 ```
 
 ---
@@ -106,13 +112,19 @@ pnpm dev
 ```
 
 #### 4. Verificación y Pruebas
-Tu contribución debe pasar todas las pruebas unitarias y el build estático antes de solicitar la revisión:
+Tu contribución debe pasar todas las pruebas unitarias, compilación y escaneos de integridad antes de solicitar la revisión:
 ```bash
 # Ejecutar suite de pruebas con Vitest
 pnpm test
 
 # Verificar compilación estática y backend
 pnpm run build
+
+# Verificar formato y linter
+pnpm format:check && pnpm lint
+
+# Ejecutar auditoría integral de agentes (seguridad, arquitectura, etc.)
+pnpm scan:all
 ```
 
 ---

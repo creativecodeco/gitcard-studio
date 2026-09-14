@@ -2,6 +2,21 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.12.2] - 2026-09-14
+
+### 📜 Actualización y Sincronización Integral de Términos y Privacidad
+- **Política de Privacidad (`privacy.astro`)**:
+  - Actualizada la especificación criptográfica para reflejar el cifrado autenticado de alta seguridad **`AES-256-GCM`** con vectores de inicialización (IV) únicos y base de datos PostgreSQL, sustituyendo referencias legadas.
+  - Documentada formalmente la integración dual: conexión 1-clic con **GitHub App** (OAuth de solo lectura de metadatos con tokens resguardados exclusivamente en backend) y **Personal Access Tokens (PAT)** Fine-grained con alcance mínimo.
+  - Documentados los mecanismos de autoservicio para el Derecho al Olvido y RGPD / Ley 1581: acción inmediata de **"Desconectar"**, purga atómica irreversible con **"Eliminar Mi Cuenta y Datos"** (`DELETE /api/users/me`) y portabilidad de datos con **"📥 Descargar mis Datos (JSON)"** (`POST /api/users/export`).
+- **Términos de Servicio (`terms.astro`)**:
+  - Actualizada la fecha de vigencia a **14 de Septiembre, 2026**.
+  - Detallada la suite completa de tarjetas y widgets SVG disponibles (matriz horaria 7x24 de hábitos de commit, racha de contribución, rango de desarrollador, trofeos, sponsors, repositorios top y contador de visitas).
+  - Incorporadas cláusulas de uso responsable para herramientas de auditoría en tiempo real y refresco de caché.
+- **Armonización de Marca y Logotipo**:
+  - Homogeneizado el encabezado del logotipo con la marca oficial **`GitCard Studio`** en todas las páginas de ayuda (`help/*.astro`), privacidad y términos.
+  - Actualizada la etiqueta por defecto en insignias SVG (`badge.presenter.ts`) a `'gitcard studio'`.
+
 ## [1.12.1] - 2026-09-14
 
 ### 🔄 Corrección del Flujo de Desconexión y Restauración de UI OAuth
@@ -632,4 +647,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.12.1
+**Versión actualmente expuesta / en producción:** v1.12.2

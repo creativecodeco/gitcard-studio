@@ -10,7 +10,7 @@ export interface BadgeOptions {
 }
 
 export function renderBadgeSVG(options: BadgeOptions): string {
-  const label = escapeXml(options.label || 'github helpers');
+  const label = escapeXml(options.label || 'gitcard studio');
   const rawValue = String(options.value);
   const value = escapeXml(rawValue);
 

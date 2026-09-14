@@ -244,10 +244,11 @@ El servicio cuenta con una interfaz web segura de analíticas en la dirección `
 
 - **Acceso:** Protegido mediante un formulario de autenticación glassmorphic que valida contra la clave configurada en la variable de entorno `METRICS_KEY`.
 - **Analíticas en Tiempo Real:**
-  - Métricas KPI para renderizados totales, usuarios únicos registrados y vistas de insignias de perfil.
+  - Métricas KPI para renderizados totales, usuarios únicos registrados, vistas de insignias y conteo de perfiles con README verificado.
   - Gráfico de dona (Doughnut) de distribución de tipos de tarjetas solicitadas.
   - Gráfico de barras apiladas (Stacked Bar) de tráfico por origen (GitHub Camo vs Web Directa).
-  - Listado de usuarios/perfiles más activos con fecha de última actualización y hits de perfil.
+  - Listado de usuarios/perfiles con fecha de última actividad, desglose de visitas y estado de verificación en GitHub.
+  - **Auditoría Automatizada de READMEs**: Herramienta interactiva para auditar en tiempo real o en lote si los usuarios están usando activamente GitCard Studio en sus perfiles de GitHub (`verify-readme` y `verify-readmes-batch`), con soporte para forzar refresco de caché (`forceRefresh`).
 
 ---
 

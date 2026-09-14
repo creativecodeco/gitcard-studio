@@ -4,7 +4,7 @@
 
 ---
 
-## Estado actual: 2026-09-07 (v1.11.0)
+## Estado actual: 2026-09-14 (v1.12.2)
 
 ### Stack
 
@@ -54,7 +54,7 @@ gitcard-studio/
 │   │   ├── app.module.ts         # NestJS Root Module
 │   │   ├── main.ts               # NestJS Fastify bootstrap con compresión, ETags y Helmet
 │   │   └── server.ts             # Punto de entrada de inicio de servidor
-│   └── tests/                    # Vitest unit tests backend (32 archivos, 146 tests pasados)
+│   └── tests/                    # Vitest unit tests backend (33 archivos, 165 tests pasados)
 ├── frontend/                     # Astro 7 — cliente web estático interactivo
 │   ├── astro.config.mjs          # outDir: ../public, format: file, compressHTML: true
 │   ├── src/
@@ -106,6 +106,8 @@ gitcard-studio/
 | GET | `/api/metrics/history` | `MetricsController.getRendersHistory` | `METRICS_KEY` requerida |
 | GET | `/api/metrics/users` | `MetricsController.getUserMetrics` | `METRICS_KEY` requerida |
 | GET | `/api/metrics/users/count` | `MetricsController.getUniqueUsersCount` | Pública |
+| POST | `/api/metrics/verify-readme` | `MetricsController.verifyReadme` | `METRICS_KEY` requerida |
+| POST | `/api/metrics/verify-readmes-batch` | `MetricsController.verifyReadmesBatch` | `METRICS_KEY` requerida |
 | GET | `/api/config` | `MetricsController.getConfig` | Pública |
 | GET | `/health` | `RootController.getHealth` | Pública |
 | GET | `/admin/metrics` | `RootController.getAdminMetrics` | UI de administración de métricas |

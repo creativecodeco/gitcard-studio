@@ -31,7 +31,7 @@ import Footer from '../components/Footer.astro';
           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
         </svg>
         <h1 style="font-size: 1.8rem; margin: 0">
-          GitHub <span class="accent-text">Helpers</span>
+          GitCard <span class="accent-text">Studio</span>
         </h1>
       </a>
     </div>
@@ -41,7 +41,7 @@ import Footer from '../components/Footer.astro';
     <div class="terms-header">
       <h2>Términos y Condiciones de Servicio</h2>
       <p style="color: var(--text-secondary); margin-top: 10px">
-        Última actualización: 20 de Julio, 2026. Condiciones generales de uso de la plataforma.
+        Última actualización: 14 de Septiembre, 2026. Condiciones generales de uso de la plataforma.
       </p>
     </div>
 
@@ -59,10 +59,12 @@ import Footer from '../components/Footer.astro';
     <section class="terms-section">
       <h3>2. Descripción del Servicio</h3>
       <p>
-        GitCard Studio proporciona una herramienta de generación dinámica de tarjetas y widgets
-        vectoriales SVG para perfiles y repositorios de GitHub. Las tarjetas son renderizadas
-        directamente en formato SVG para su inclusión en documentos Markdown (`README.md`), páginas
-        web o paneles informativos.
+        GitCard Studio proporciona una suite de generación dinámica de tarjetas y widgets
+        vectoriales SVG para perfiles y repositorios de GitHub (estadísticas generales, lenguajes
+        más usados, matriz semanal 7x24 de hábitos de commit, racha de contribuciones, grado de
+        desarrollador, trofeos de hitos, patrocinadores de GitHub Sponsors, repositorios top y
+        contador de visitas). Las tarjetas son renderizadas al vuelo directamente en formato SVG
+        para su inclusión en documentos Markdown (`README.md`), sitios web o paneles informativos.
       </p>
     </section>
 
@@ -80,8 +82,13 @@ import Footer from '../components/Footer.astro';
           la API oficial de GitHub.
         </li>
         <li>
-          Proporcionar tokens de GitHub con los permisos mínimos necesarios (`read:user`,
-          `repo:status`).
+          Utilizar preferentemente la integración recomendada con GitHub App (OAuth de solo lectura
+          de metadatos) o proporcionar Personal Access Tokens (PAT) Fine-grained configurados con
+          los permisos mínimos necesarios (`read:user`, `repo:status`).
+        </li>
+        <li>
+          Hacer un uso responsable de las funciones de auditoría y refresco de caché, respetando los
+          límites del servidor y de la infraestructura de GitHub.
         </li>
       </ul>
     </section>

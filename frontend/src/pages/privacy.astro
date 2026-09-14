@@ -30,8 +30,8 @@ import Footer from '../components/Footer.astro';
           </defs>
           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
         </svg>
-        <h1 style="font-size: 1.8rem; margin: 0">
-          GitHub <span class="accent-text">Helpers</span>
+        <h1 style="margin: 0">
+          GitCard <span class="accent-text">Studio</span>
         </h1>
       </a>
     </div>
@@ -41,7 +41,8 @@ import Footer from '../components/Footer.astro';
     <div class="privacy-header">
       <h2>Política de Privacidad</h2>
       <p style="color: var(--text-secondary); margin-top: 10px">
-        Última actualización: 20 de Julio, 2026. Transparencia y control sobre tu huella digital.
+        Última actualización: 14 de Septiembre, 2026. Transparencia y control sobre tu huella
+        digital.
       </p>
     </div>
 
@@ -65,21 +66,27 @@ import Footer from '../components/Footer.astro';
         1. Recopilación y Seguridad de Datos
       </h3>
       <p>
-        Para generar y mostrar estadísticas de tus repositorios privados, solicitamos tu
-        consentimiento para almacenar de forma cifrada un{' '}
-        <strong>Personal Access Token (PAT)</strong> con permisos estrictamente de lectura.
+        Para generar y mostrar estadísticas de tus repositorios y contribuciones privadas, GitCard
+        Studio admite dos métodos seguros: conexión directa mediante <strong>GitHub App</strong>
+        (OAuth de 1-clic con permisos de solo lectura de metadatos, sin contraseñas ni tokens
+        expuestos en el navegador) o registro voluntario de un{' '}
+        <strong>Personal Access Token (PAT)</strong> Fine-grained con permisos estrictamente de
+        lectura.
       </p>
       <ul>
         <li>
-          <strong>Cifrado Avanzado</strong>: Los tokens son cifrados mediante el algoritmo estándar
-          de la industria <code>AES-256-CBC</code> en el lado del servidor y se almacenan en una
-          base de datos segura. La llave de descifrado reside únicamente en las variables de entorno
-          de la ejecución del servidor.
+          <strong>Cifrado Autenticado Avanzado</strong>: Los tokens son cifrados mediante el
+          algoritmo estándar de alta seguridad <code>AES-256-GCM</code> con vectores de
+          inicialización (IV) únicos en el lado del servidor y se almacenan en una base de datos
+          PostgreSQL segura. La llave de descifrado reside únicamente en las variables de entorno
+          aisladas de la ejecución del servidor.
         </li>
         <li>
-          <strong>Tratamiento de Datos</strong>: Tu token nunca se expone a terceros, ni se
-          transmite fuera de los servidores de GitHub. Solo se utiliza internamente para interactuar
-          de forma segura con la API de GitHub al renderizar tus tarjetas SVG.
+          <strong>Tratamiento y Confidencialidad</strong>: Tus credenciales nunca se exponen al
+          cliente, no se comparten con terceros ni se transmiten fuera de los servidores de GitHub.
+          Solo se utilizan internamente para interactuar de forma segura con la API de GitHub al
+          renderizar tus tarjetas SVG. Cero acceso a tu código fuente; solo metadatos públicos y
+          conteos de contribución.
         </li>
       </ul>
     </section>
@@ -109,18 +116,20 @@ import Footer from '../components/Footer.astro';
       <p>Al utilizar nuestro servicio, se almacenan los siguientes conjuntos de datos:</p>
       <ul>
         <li>
-          <strong>Tokens de Acceso (PAT)</strong>: Cifrados con firma criptográfica de
-          consentimiento (huella digital basada en IP y User-Agent para auditoría de seguridad).
+          <strong>Credenciales y Tokens de Acceso</strong>: Cifrados con AES-256-GCM con firma
+          criptográfica de consentimiento (huella digital generada mediante SHA-256 basada en IP y
+          User-Agent para trazabilidad y auditoría de seguridad).
         </li>
         <li>
-          <strong>Historial de Estadísticas</strong>: Registramos instantáneas de rendimiento
-          (commits, estrellas, Pull Requests, issues y lenguajes utilizados) a intervalos mínimos de
-          12 horas por usuario. Este historial se utiliza exclusivamente para mantener los datos de
-          visualización disponibles y cargados ágilmente.
+          <strong>Historial de Estadísticas y Métricas Personales</strong>: Registramos instantáneas
+          de rendimiento (commits, estrellas, Pull Requests, issues y lenguajes utilizados) a
+          intervalos mínimos de 12 horas por usuario, así como contadores personales de visitas al
+          perfil y renders de tarjetas. Este historial se utiliza exclusivamente para mantener los
+          datos de visualización disponibles y cargados ágilmente.
         </li>
         <li>
-          <strong>Métricas de Uso y Logs</strong>: Contador de renders para cada tipo de tarjeta
-          para fines estadísticos, así como logs de peticiones HTTP básicos (Dirección IP
+          <strong>Métricas de Uso y Logs Técnicos</strong>: Contador de renders para cada tipo de
+          tarjeta para fines estadísticos, así como logs de peticiones HTTP básicos (Dirección IP
           anonimizada/abreviada, referer y User-Agent) para la prevención de abusos y control de
           tasa (rate limiting).
         </li>
@@ -152,15 +161,23 @@ import Footer from '../components/Footer.astro';
       </p>
       <ul>
         <li>
-          <strong>Revocación de Token</strong>: Puedes eliminar tu token de nuestros servidores
-          ingresándolo en el panel correspondiente. Las estadísticas privadas dejarán de mostrarse
-          inmediatamente.
+          <strong>Desconexión Inmediata de Cuenta</strong>: Puedes desconectar tu sesión en un solo
+          clic desde el panel activo de cuenta mediante el botón <strong>Desconectar</strong>. Esto
+          remueve las credenciales activas, limpia el caché local y restablece la interfaz al modo
+          no autenticado al instante.
         </li>
         <li>
-          <strong>Purga de Datos Completa</strong>: Puedes darte de baja definitivamente ingresando
-          tu nombre de usuario y tu token en la herramienta de purga de datos. Esto ejecutará una
-          transacción que eliminará de forma irreversible tu token cifrado, tu historial completo de
-          estadísticas, tus métricas de consumo de cards y todos tus registros de logs.
+          <strong>Revocación de Token</strong>: Puedes eliminar tu token PAT de nuestros servidores
+          ingresándolo en el panel correspondiente o revocándolo remotamente desde tu cuenta de
+          GitHub. Las estadísticas privadas dejarán de mostrarse inmediatamente.
+        </li>
+        <li>
+          <strong>Purga y Supresión Definitiva de Datos</strong>: Puedes darte de baja
+          definitivamente utilizando la opción <strong>"Eliminar Mi Cuenta y Datos"</strong> en el
+          modal de cuenta y confirmando tu nombre de usuario. Esto ejecutará una transacción en base
+          de datos que eliminará de forma irreversible tu token cifrado, tu historial completo de
+          estadísticas, tus métricas de consumo de cards, logs asociados e invalidará la memoria
+          caché en el servidor.
         </li>
       </ul>
     </section>
@@ -186,11 +203,12 @@ import Footer from '../components/Footer.astro';
         4. Derecho de Consulta y Portabilidad de Datos
       </h3>
       <p>
-        En cumplimiento del Derecho de Consulta de Habeas Data y el RGPD, puedes solicitar y
-        descargar en cualquier momento un informe estructurado en formato JSON con la totalidad de
-        tus datos almacenados en nuestros sistemas (registro de consentimiento, métricas personales
-        e historial de uso) utilizando la opción <strong>"Descargar mis Datos"</strong> en el panel
-        de usuario.
+        En cumplimiento del principio de Transparencia, el Derecho de Consulta de Habeas Data (Ley
+        1581) y el RGPD (Art. 20), puedes solicitar y descargar en cualquier momento un informe
+        estructurado en formato JSON con la totalidad de tus datos almacenados en nuestros sistemas
+        (registro de consentimiento, métricas personales de perfil y tarjetas, y metadatos de
+        sesión) utilizando la opción <strong>"📥 Descargar mis Datos (JSON)"</strong> en el panel de
+        usuario.
       </p>
     </section>
 
