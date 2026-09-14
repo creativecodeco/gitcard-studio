@@ -561,6 +561,9 @@
       } else if (targetTab === 'app' && modeTabApp && modePaneApp) {
         modeTabApp.classList.add('active');
         modePaneApp.classList.remove('hidden');
+        if (!activeUser) {
+          tokenUnregistered?.classList.remove('hidden');
+        }
       } else if (targetTab === 'pat' && modeTabPat && modePanePat) {
         modeTabPat.classList.add('active');
         modePanePat.classList.remove('hidden');
@@ -597,7 +600,17 @@
       if (!username) return;
       try {
         const res = await fetch(`/api/users/me/metrics?username=${encodeURIComponent(username)}`);
-        if (!res.ok) return;
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 404) {
+            localStorage.removeItem('gh_active_user');
+            localStorage.removeItem('registered-github-username');
+            activeUser = '';
+            tokenRegistered?.classList.add('hidden');
+            tokenUnregistered?.classList.remove('hidden');
+            authTabsNav?.classList.remove('hidden');
+          }
+          return;
+        }
         const data = await res.json();
         if (data && data.connected) {
           localStorage.setItem('gh_active_user', data.username);
@@ -605,6 +618,7 @@
           activeUser = data.username;
 
           tokenRegistered?.classList.remove('hidden');
+          tokenUnregistered?.classList.add('hidden');
           authTabsNav?.classList.add('hidden');
           [modePanePublic, modePaneApp, modePanePat].forEach((pane) => {
             if (pane) pane.classList.add('hidden');
@@ -634,6 +648,13 @@
           window.dispatchEvent(
             new CustomEvent('app:user-authenticated', { detail: { username: data.username } })
           );
+        } else {
+          localStorage.removeItem('gh_active_user');
+          localStorage.removeItem('registered-github-username');
+          activeUser = '';
+          tokenRegistered?.classList.add('hidden');
+          tokenUnregistered?.classList.remove('hidden');
+          authTabsNav?.classList.remove('hidden');
         }
       } catch (err) {
         console.error('Error fetching user metrics:', err);
@@ -682,8 +703,10 @@
 
       activeUser = '';
       tokenRegistered?.classList.add('hidden');
+      tokenUnregistered?.classList.remove('hidden');
       authTabsNav?.classList.remove('hidden');
-      switchModeTab('public');
+      switchModeTab('app');
+      triggerToast('Cuenta desconectada exitosamente.', 'success');
 
       window.dispatchEvent(
         new CustomEvent('app:user-disconnected', { detail: { username: targetUser } })

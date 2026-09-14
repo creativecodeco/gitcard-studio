@@ -2,6 +2,20 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.12.1] - 2026-09-14
+
+### 🔄 Corrección del Flujo de Desconexión y Restauración de UI OAuth
+- **Restauración Inmediata del Botón de Conexión (`PrivateTokenModal.astro`)**:
+  - Corregido el problema donde `#token-unregistered` retenía la clase CSS `hidden` tras desconectar la cuenta, impidiendo que el botón `[ 🐙 Conectar con GitHub App ]` reapareciera.
+  - Al pulsar "Desconectar", la interfaz ahora activa de forma directa la pestaña de GitHub App (`switchModeTab('app')`) y remueve la clase `hidden`, garantizando que el usuario visualice inmediatamente el botón de reconexión.
+  - En `switchModeTab('app')`, asegurada la remoción automática de `hidden` en `#token-unregistered` siempre que no exista una sesión activa.
+  - Se añadió notificación tipo toast (`triggerToast('Cuenta desconectada exitosamente.')`) para retroalimentación instantánea al usuario.
+- **Sincronización de Estado Global en Frontend (`index.astro`)**:
+  - Invocado `showUnregisteredState()` en el listener del evento global `app:user-disconnected` para resetear el DOM del cliente de forma sincronizada.
+- **Soporte de Desconexión para Cuentas OAuth en Backend (`auth.controller.ts`)**:
+  - Adaptada la verificación de tokens en `disconnectAccount` (`POST /api/auth/disconnect`) y `deleteUserAccount` (`DELETE /api/users/me`) para admitir la desconexión y purga de usuarios con tokens OAuth tipo `app_user` gestionados a nivel de servidor, sin requerir token en el cliente y preservando la verificación estricta para tokens PAT.
+  - Añadidas pruebas unitarias en `backend/tests/auth.test.ts` para cubrir la desconexión de cuentas OAuth y eliminación de caché.
+
 ## [1.12.0] - 2026-09-14
 
 ### 🔍 Auditoría de READMEs en GitHub & Detección en Tiempo Real
@@ -618,4 +632,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.12.0
+**Versión actualmente expuesta / en producción:** v1.12.1

@@ -238,7 +238,11 @@ export class AuthController {
     const m = getMessages(resolveLocale(query.locale));
     const username = query.username.toLowerCase();
 
-    await this.verifyTokenOwnership(username, authHeader, query.token, query.locale);
+    const existingToken = await this.tokenRepo.getToken(username);
+    const providedToken = extractBearerToken(authHeader, query.token);
+    if (providedToken || existingToken?.token_type !== 'app_user') {
+      await this.verifyTokenOwnership(username, authHeader, query.token, query.locale);
+    }
 
     try {
       await this.purgeUseCase.execute(username);
@@ -267,7 +271,15 @@ export class AuthController {
     const m = getMessages(resolveLocale(dto.locale));
     const username = dto.username.toLowerCase();
 
-    await this.verifyTokenOwnership(username, authHeader, dto.token, dto.locale);
+    const existingToken = await this.tokenRepo.getToken(username);
+    if (!existingToken) {
+      return { message: m.accountDisconnectSuccess };
+    }
+
+    const providedToken = extractBearerToken(authHeader, dto.token);
+    if (providedToken || existingToken.token_type !== 'app_user') {
+      await this.verifyTokenOwnership(username, authHeader, dto.token, dto.locale);
+    }
 
     try {
       await this.tokenRepo.deleteToken(username);

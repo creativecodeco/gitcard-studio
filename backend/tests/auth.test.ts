@@ -47,3 +47,51 @@ describe('RegisterOAuthTokenUseCase', () => {
     expect(mockGitHubRepo.clearCache).toHaveBeenCalledWith('octocat');
   });
 });
+
+describe('AuthController disconnectAccount', () => {
+  let mockTokenRepo: ITokenRepository;
+  let mockGitHubRepo: IGitHubRepository;
+  let authController: any;
+
+  beforeEach(async () => {
+    mockTokenRepo = {
+      saveToken: vi.fn().mockResolvedValue(undefined),
+      getToken: vi.fn().mockResolvedValue(null),
+      deleteToken: vi.fn().mockResolvedValue(undefined)
+    };
+
+    mockGitHubRepo = {
+      getStats: vi.fn(),
+      getLanguages: vi.fn(),
+      getTopRepos: vi.fn(),
+      getFeaturedRepo: vi.fn(),
+      getStreakStats: vi.fn(),
+      getSponsorStats: vi.fn(),
+      clearCache: vi.fn()
+    } as unknown as IGitHubRepository;
+
+    const { AuthController } = await import('@/modules/auth/auth.controller');
+    authController = new AuthController({} as any, {} as any, mockTokenRepo, mockGitHubRepo);
+  });
+
+  it('should disconnect successfully when token is app_user without requiring raw token', async () => {
+    (mockTokenRepo.getToken as any).mockResolvedValue({
+      token: 'ghu_secret',
+      token_type: 'app_user',
+      username: 'octocat'
+    });
+
+    const res = await authController.disconnectAccount({ username: 'octocat' });
+    expect(res.message).toBeDefined();
+    expect(mockTokenRepo.deleteToken).toHaveBeenCalledWith('octocat');
+    expect(mockGitHubRepo.clearCache).toHaveBeenCalledWith('octocat');
+  });
+
+  it('should return success if no token exists in repository', async () => {
+    (mockTokenRepo.getToken as any).mockResolvedValue(null);
+
+    const res = await authController.disconnectAccount({ username: 'nonexistent' });
+    expect(res.message).toBeDefined();
+    expect(mockTokenRepo.deleteToken).not.toHaveBeenCalled();
+  });
+});

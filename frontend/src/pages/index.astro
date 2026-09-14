@@ -1917,6 +1917,7 @@ import Footer from '@/components/Footer.astro';
   }) as EventListener);
 
   window.addEventListener('app:user-disconnected', ((e: CustomEvent) => {
+    showUnregisteredState();
     const user = e.detail?.username;
     if (user) {
       if (usernameInput) usernameInput.value = user;
