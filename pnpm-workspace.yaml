@@ -2,6 +2,9 @@ packages:
   - "backend"
   - "frontend"
 
+overrides:
+  fastify: "5.12.4"
+
 allowBuilds:
   esbuild: true
   sharp: true
@@ -18,9 +21,9 @@ minimumReleaseAgeExclude:
   - '@typescript-eslint/typescript-estree@8.70.0'
   - '@typescript-eslint/utils@8.70.0'
   - '@typescript-eslint/visitor-keys@8.70.0'
-  - astro@7.3.1
+  - astro@7.3.2
   - prettier@3.9.6
-  - happy-dom@20.14.0
+  - happy-dom@20.14.5
   - '@astrojs/compiler-binding-darwin-arm64@0.3.2'
   - '@astrojs/compiler-binding-darwin-x64@0.3.2'
   - '@astrojs/compiler-binding-linux-arm64-gnu@0.3.2'
@@ -36,10 +39,13 @@ minimumReleaseAgeExclude:
   - '@fastify/compress@9.2.0'
   - '@fastify/etag@6.2.0'
   - '@types/pg@8.23.1'
-  - '@types/node@26.5.0'
+  - '@types/node@26.5.1'
   - '@fastify/helmet@13.1.1'
-  - '@astrojs/internal-helpers@0.10.4'
-  - '@astrojs/markdown-satteri@0.4.0'
+  - fastify@5.12.4
+  - tsc-alias@1.9.5
+  - prettier-plugin-astro@1.0.0
+  - '@astrojs/internal-helpers@0.11.0'
+  - '@astrojs/markdown-satteri@0.4.1'
   - '@bruits/satteri-darwin-arm64@0.10.3'
   - '@bruits/satteri-darwin-x64@0.10.3'
   - '@bruits/satteri-linux-arm64-gnu@0.10.3'

@@ -15,4 +15,6 @@ export interface HitContext {
   userAgent?: string;
   referer?: string;
   ip?: string;
+  isPreview?: boolean;
+  ref?: string;
 }

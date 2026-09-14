@@ -24,4 +24,9 @@ export interface IMetricsRepository {
     context?: HitContext
   ): Promise<number>;
   getRendersHistory(days: number): Promise<any[]>;
+  updateUserReadmeVerification(
+    username: string,
+    isVerified: boolean,
+    detectedCards?: string[]
+  ): Promise<void>;
 }

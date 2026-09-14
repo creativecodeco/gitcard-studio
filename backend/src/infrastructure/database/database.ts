@@ -57,6 +57,27 @@ export async function initDatabase(): Promise<void> {
       throw err;
     }
 
+    // Ensure new columns in user_metrics exist (safe migration for existing databases)
+    try {
+      const tableExists = await AppDataSource.query(
+        "SELECT 1 FROM information_schema.tables WHERE table_name = 'user_metrics'"
+      );
+      if (Array.isArray(tableExists) && tableExists.length > 0) {
+        await AppDataSource.query(
+          `ALTER TABLE user_metrics 
+            ADD COLUMN IF NOT EXISTS readme_verified boolean DEFAULT false,
+            ADD COLUMN IF NOT EXISTS readme_verified_at timestamp with time zone,
+            ADD COLUMN IF NOT EXISTS detected_cards varchar(255),
+            ADD COLUMN IF NOT EXISTS last_github_hit timestamp with time zone,
+            ADD COLUMN IF NOT EXISTS last_web_hit timestamp with time zone;`
+        );
+      }
+    } catch (schemaErr) {
+      logger.warn('Schema migration check for user_metrics completed with note:', {
+        error: schemaErr
+      });
+    }
+
     // Initialize global counters if they do not exist
     const globalMetricRepo = AppDataSource.getRepository(GlobalMetric);
     const keys = [

@@ -9,6 +9,7 @@ import {
 import { MetricsController } from '../src/modules/metrics/metrics.controller';
 import { IMetricsRepository } from '../src/domain/repositories/IMetricsRepository';
 import { MetricsHistoryQueryDto, MetricsKeyQueryDto } from '../src/modules/metrics/dto/metrics.dto';
+import { VerifyUserReadmeUseCase } from '../src/use-cases/metrics/VerifyUserReadmeUseCase';
 
 const VALID_KEY = 'test-metrics-key-123';
 
@@ -22,7 +23,37 @@ describe('MetricsController', () => {
     getAllUserMetrics: vi.fn().mockResolvedValue([]),
     getUniqueUsersCount: vi.fn().mockResolvedValue(5),
     getOrIncrementProfileViews: vi.fn(),
-    getRendersHistory: vi.fn().mockResolvedValue([{ date: '2026-07-24', count: 10 }])
+    getRendersHistory: vi.fn().mockResolvedValue([{ date: '2026-07-24', count: 10 }]),
+    updateUserReadmeVerification: vi.fn()
+  };
+
+  const mockVerifyUserReadmeUseCase = {
+    execute: vi.fn().mockResolvedValue({
+      username: 'testuser',
+      hasProfileReadme: true,
+      isUsingGitCard: true,
+      detectedCards: ['views', 'stats'],
+      verifiedAt: new Date(),
+      cacheRefreshed: true,
+      cacheValidated: true
+    }),
+    executeBatch: vi.fn().mockResolvedValue({
+      totalAudited: 2,
+      verifiedCount: 1,
+      cacheUpdated: true,
+      cacheValidated: true,
+      results: [
+        {
+          username: 'testuser',
+          hasProfileReadme: true,
+          isUsingGitCard: true,
+          detectedCards: ['views', 'stats'],
+          verifiedAt: new Date(),
+          cacheRefreshed: true,
+          cacheValidated: true
+        }
+      ]
+    })
   };
 
   beforeEach(async () => {
@@ -31,7 +62,10 @@ describe('MetricsController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MetricsController],
-      providers: [{ provide: 'IMetricsRepository', useValue: mockMetricsRepo }]
+      providers: [
+        { provide: 'IMetricsRepository', useValue: mockMetricsRepo },
+        { provide: VerifyUserReadmeUseCase, useValue: mockVerifyUserReadmeUseCase }
+      ]
     }).compile();
 
     controller = module.get<MetricsController>(MetricsController);
@@ -139,6 +173,82 @@ describe('MetricsController', () => {
     it('should return privateStatsComingSoon as false', () => {
       const result = controller.getConfig();
       expect(result.privateStatsComingSoon).toBe(false);
+    });
+  });
+
+  describe('verifyUserReadme()', () => {
+    it('should verify readme with valid key and return result', async () => {
+      const result = await controller.verifyUserReadme({
+        username: 'testuser',
+        key: VALID_KEY
+      });
+
+      expect(mockVerifyUserReadmeUseCase.execute).toHaveBeenCalledWith('testuser', true);
+      expect(result).toMatchObject({
+        username: 'testuser',
+        hasProfileReadme: true,
+        isUsingGitCard: true,
+        detectedCards: ['views', 'stats']
+      });
+    });
+
+    it('should pass custom forceRefresh parameter to use case', async () => {
+      await controller.verifyUserReadme({
+        username: 'testuser',
+        forceRefresh: false,
+        key: VALID_KEY
+      });
+
+      expect(mockVerifyUserReadmeUseCase.execute).toHaveBeenCalledWith('testuser', false);
+    });
+
+    it('should throw UnauthorizedException when key is missing or invalid', async () => {
+      await expect(
+        controller.verifyUserReadme({
+          username: 'testuser',
+          key: 'wrong-key'
+        })
+      ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('verifyReadmesBatch()', () => {
+    it('should audit batch with valid key and return aggregated results', async () => {
+      const result = await controller.verifyReadmesBatch({
+        usernames: ['testuser'],
+        forceRefresh: true,
+        key: VALID_KEY
+      });
+
+      expect(mockVerifyUserReadmeUseCase.executeBatch).toHaveBeenCalledWith({
+        usernames: ['testuser'],
+        limit: undefined,
+        forceRefresh: true
+      });
+      expect(result).toMatchObject({
+        totalAudited: 2,
+        verifiedCount: 1,
+        cacheUpdated: true,
+        cacheValidated: true
+      });
+    });
+
+    it('should throw UnauthorizedException when key is missing or invalid', async () => {
+      await expect(
+        controller.verifyReadmesBatch({
+          key: 'invalid-key'
+        })
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should throw ForbiddenException when METRICS_KEY is not configured', async () => {
+      delete process.env.METRICS_KEY;
+
+      await expect(
+        controller.verifyReadmesBatch({
+          key: VALID_KEY
+        })
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 });

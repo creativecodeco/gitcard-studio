@@ -56,6 +56,21 @@ export class UserMetric {
   @Column({ type: 'integer', default: 0 })
   profile_views!: number;
 
+  @Column({ type: 'boolean', default: false })
+  readme_verified!: boolean;
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  readme_verified_at!: Date | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  detected_cards!: string | null;
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  last_github_hit!: Date | null;
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  last_web_hit!: Date | null;
+
   @Column({ type: 'timestamp with time zone', nullable: true })
   last_updated!: Date;
 }

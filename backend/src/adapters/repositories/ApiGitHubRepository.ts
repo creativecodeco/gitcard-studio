@@ -4,6 +4,7 @@ import { LanguageStat } from '@/domain/entities/LanguageStat';
 import { RepoStats } from '@/domain/entities/RepoStats';
 import { StreakStats } from '@/domain/entities/StreakStats';
 import { SponsorStats, SponsorItem } from '@/domain/entities/SponsorStats';
+import { GITHUB_USERNAME_REGEX } from '@/domain/entities/Validation';
 import { logger } from '@/infrastructure/logging/logger';
 
 const LANGUAGE_COLORS: Record<string, string> = {
@@ -980,6 +981,10 @@ export class ApiGitHubRepository implements IGitHubRepository {
     // No-op for the raw API client
   }
 
+  async isReadmeCached(_username: string): Promise<boolean> {
+    return false;
+  }
+
   private async getUserTopReposViaGraphQL(
     username: string,
     limit: number = 4,
@@ -1399,5 +1404,46 @@ export class ApiGitHubRepository implements IGitHubRepository {
       commitsToday,
       hourlyMatrix
     };
+  }
+
+  async getProfileReadme(username: string): Promise<string | null> {
+    if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
+      return null;
+    }
+
+    const safeUser = encodeURIComponent(username);
+
+    // 1. Try fetching via GitHub API contents/readme
+    try {
+      const apiUrl = `https://api.github.com/repos/${safeUser}/${safeUser}/readme`;
+      const data = await this.fetchGitHub(apiUrl);
+      if (data?.content && typeof data.content === 'string') {
+        return Buffer.from(data.content, 'base64').toString('utf-8');
+      }
+    } catch {
+      // API request failed or user has no special profile repository; fallback to raw CDN
+    }
+
+    // 2. Fallback to raw.githubusercontent.com for default branches
+    for (const branch of ['main', 'master']) {
+      try {
+        const rawUrl = `https://raw.githubusercontent.com/${safeUser}/${safeUser}/${branch}/README.md`;
+        const parsedUrl = new URL(rawUrl);
+        if (parsedUrl.origin !== 'https://raw.githubusercontent.com') {
+          continue;
+        }
+
+        const response = await fetch(rawUrl, {
+          headers: { 'User-Agent': 'gitcard-studio-stats' }
+        });
+        if (response.ok) {
+          return await response.text();
+        }
+      } catch {
+        // Continue to next branch
+      }
+    }
+
+    return null;
   }
 }

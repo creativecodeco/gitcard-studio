@@ -2,6 +2,28 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.12.0] - 2026-09-14
+
+### 🔍 Auditoría de READMEs en GitHub & Detección en Tiempo Real
+- **Verificación de Uso de GitCard Studio en Perfiles**: Implementado el caso de uso `VerifyUserReadmeUseCase` para auditar el contenido de los READMEs de perfil en GitHub (`https://github.com/{username}/{username}`), detectando de forma automatizada tarjetas incrustadas (`stats`, `languages`, `repo`, `streak`, `rank`, `views`, etc.) o menciones de marca.
+- **Auditoría Masiva de Perfiles (`POST /api/metrics/verify-readmes-batch`)**: Nuevo endpoint administrativo protegido con `METRICS_KEY` que ejecuta auditorías en paralelo controlado (concurrencia de 4 peticiones) sobre la totalidad de los usuarios registrados en `user_metrics`, deduplicando usuarios y actualizando métricas globales.
+- **Auditoría Individual (`POST /api/metrics/verify-readme`)**: Endpoint para auditar y validar individualmente perfiles con feedback instantáneo.
+- **Validación y Refresco Forzado de Caché**:
+  - Incorporado el parámetro `forceRefresh` para invalidar y purgar claves `readme:${username}` antes de solicitar el contenido en GitHub, evitando auditorías con datos obsoletos.
+  - Implementado `isReadmeCached` en `CachedGitHubRepository` para validar que la caché ha sido reindexada y confirmada con el contenido fresco de GitHub.
+  - El resultado de la auditoría expone indicadores `cacheRefreshed` y `cacheValidated`.
+
+### 📊 Panel de Administración de Métricas (`/admin/metrics`)
+- **Botón "Auditar Todos"**: Añadido control interactivo con indicador visual de progreso y animación para auditar en lote todos los perfiles de la base de datos.
+- **Toggle de Refresco de Caché**: Checkbox "Actualizar Caché" para controlar si la auditoría consulta en vivo GitHub o lee de caché.
+- **Insignia Dinámica de Estado**: Badge contextual (`#audit-status-badge`) con mensajes en tiempo real sobre el progreso de auditoría y validación de caché.
+- **KPI de READMEs Confirmados**: Tarjeta de métricas `#kpi-verified` que refleja en tiempo real la cantidad de usuarios activos con GitCard Studio en su README.
+- **Diferenciación de Origen de Tráfico**: Distinción clara en la tabla de usuarios entre peticiones reales desde GitHub Camo (`last_github_hit`), previsualizaciones directas de la web (`last_web_hit`) y estado de verificación del README.
+
+### 🗄️ Base de Datos & Migración Automática
+- **Ampliación de `UserMetric`**: Agregadas las columnas `readme_verified` (boolean), `readme_verified_at` (timestamp), `detected_cards` (varchar), `last_github_hit` (timestamp) y `last_web_hit` (timestamp).
+- **Migración Idempotente**: Incorporada sentencia `ALTER TABLE user_metrics ADD COLUMN IF NOT EXISTS ...` en `database.ts` para despliegues fluidos sin pérdida de datos.
+
 ## [1.11.0] - 2026-09-07
 
 ### 🛡️ Mitigación de Alertas de Seguridad CodeQL (OWASP & CWE)
@@ -596,4 +618,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.11.0
+**Versión actualmente expuesta / en producción:** v1.12.0

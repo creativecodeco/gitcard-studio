@@ -30,7 +30,9 @@ import Footer from '../../components/Footer.astro';
           </defs>
           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
         </svg>
-        <h1 style="margin: 0">GitHub <span class="accent-text">Helpers</span></h1>
+        <h1 style="margin: 0">
+          GitHub <span class="accent-text">Helpers</span>
+        </h1>
       </a>
     </div>
   </header>
@@ -60,9 +62,15 @@ import Footer from '../../components/Footer.astro';
         <li>
           Ingresa a tu cuenta de GitHub y dirígete a <strong>Settings &rarr; Profile</strong>.
         </li>
-        <li>Baja hasta la sección <strong>Contributions & Activity</strong>.</li>
-        <li>Marca la casilla <strong>Include private contributions on my profile</strong>.</li>
-        <li>Haz clic en <strong>Update profile</strong> para guardar los cambios.</li>
+        <li>
+          Baja hasta la sección <strong>Contributions & Activity</strong>.
+        </li>
+        <li>
+          Marca la casilla <strong>Include private contributions on my profile</strong>.
+        </li>
+        <li>
+          Haz clic en <strong>Update profile</strong> para guardar los cambios.
+        </li>
       </ol>
     </section>
 
@@ -70,21 +78,21 @@ import Footer from '../../components/Footer.astro';
       <h3>2. Autorizar Acceso a Organizaciones en GitHub App</h3>
       <p>
         Si formas parte de una o más Organizaciones en GitHub (como propietario o miembro), la
-        GitHub App de <strong>GitCard Studio</strong> solicitará acceso de solo lectura para listar tus
-        métricas agregadas:
+        GitHub App de <strong>GitCard Studio</strong> solicitará acceso de solo lectura para listar
+        tus métricas agregadas:
       </p>
       <ol class="steps-list">
         <li>
-          Al hacer clic en <strong>Conectar con GitHub App</strong> en nuestra plataforma, serás redirigido
-          a la pantalla oficial de autorización de GitHub.
+          Al hacer clic en <strong>Conectar con GitHub App</strong> en nuestra plataforma, serás
+          redirigido a la pantalla oficial de autorización de GitHub.
         </li>
         <li>
           En la sección <strong>Organization Access</strong>, verás el listado de tus
           organizaciones.
         </li>
         <li>
-          Junto a cada organización a la que perteneces, haz clic en el botón <strong>Grant</strong> (Conceder)
-          o <strong>Request</strong> (Solicitar acceso al administrador).
+          Junto a cada organización a la que perteneces, haz clic en el botón <strong>Grant</strong>{' '}
+          (Conceder) o <strong>Request</strong> (Solicitar acceso al administrador).
         </li>
         <li>
           Si eres propietario de la organización, el acceso se otorgará inmediatamente. Si eres
@@ -98,23 +106,24 @@ import Footer from '../../components/Footer.astro';
       <p>Si prefieres usar un token PAT Fine-grained manual en lugar de GitHub App:</p>
       <ol class="steps-list">
         <li>
-          Al generar tu token en <strong
-            >GitHub Settings &rarr; Developer Settings &rarr; Personal access tokens &rarr;
-            Fine-grained tokens</strong
-          >.
+          Al generar tu token en{' '}
+          <strong>
+            GitHub Settings &rarr; Developer Settings &rarr; Personal access tokens &rarr;
+            Fine-grained tokens
+          </strong>
+          .
         </li>
         <li>
           En el campo <strong>Resource owner</strong>, selecciona la Organización específica que
           deseas autorizar.
         </li>
         <li>
-          En <strong>Repository access</strong>, marca <em>All repositories</em> o selecciona los repositorios
-          privados específicos.
+          En <strong>Repository access</strong>, marca <em>All repositories</em> o selecciona los
+          repositorios privados específicos.
         </li>
         <li>
-          En <strong>Permissions &rarr; Repository permissions</strong>, asigna únicamente <code
-            >Metadata: Read-only</code
-          >.
+          En <strong>Permissions &rarr; Repository permissions</strong>, asigna únicamente{' '}
+          <code>Metadata: Read-only</code>.
         </li>
       </ol>
     </section>
@@ -124,11 +133,13 @@ import Footer from '../../components/Footer.astro';
       style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); padding: 20px; border-radius: 12px;"
     >
       <h3 style="margin-top: 0; color: #38bdf8;">¿Preguntas Frecuentes?</h3>
-      <p><strong>¿GitCard Studio tiene acceso al código fuente de mis organizaciones?</strong></p>
+      <p>
+        <strong>¿GitCard Studio tiene acceso al código fuente de mis organizaciones?</strong>
+      </p>
       <p style="color: var(--text-secondary); margin-bottom: 0;">
-        <strong>No.</strong> Nuestra aplicación solo solicita permisos de metadatos (conteo de estrellas,
-        forks, commits e idiomas utilizados). Nunca leemos, almacenamos ni descargamos código fuente de
-        tus repositorios.
+        <strong>No.</strong> Nuestra aplicación solo solicita permisos de metadatos (conteo de
+        estrellas, forks, commits e idiomas utilizados). Nunca leemos, almacenamos ni descargamos
+        código fuente de tus repositorios.
       </p>
     </section>
 
@@ -136,8 +147,12 @@ import Footer from '../../components/Footer.astro';
       class="help-footer-nav"
       style="margin-top: 40px; display: flex; justify-content: space-between; gap: 16px;"
     >
-      <a href="/help/security" class="secondary-btn">&larr; Seguridad y Cifrado</a>
-      <a href="/help/tokens" class="primary-btn">Guía de Tokens PAT &rarr;</a>
+      <a href="/help/security" class="secondary-btn">
+        &larr; Seguridad y Cifrado
+      </a>
+      <a href="/help/tokens" class="primary-btn">
+        Guía de Tokens PAT &rarr;
+      </a>
     </div>
   </main>
 

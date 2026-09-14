@@ -196,4 +196,29 @@ describe('github.ts integration tests (Mocked)', () => {
     expect(repo.language).toBe('Python');
     expect(repo.license).toBe('Apache-2.0');
   });
+
+  it('should cache profile README and purge it on clearCache', async () => {
+    const encodedContent = Buffer.from('# Profile README content').toString('base64');
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ content: encodedContent })
+    });
+
+    const readme = await githubRepo.getProfileReadme('cacheduser');
+    expect(readme).toBe('# Profile README content');
+
+    const isCached = await githubRepo.isReadmeCached?.('cacheduser');
+    expect(isCached).toBe(true);
+
+    // Subsequent call should hit cache without calling fetch again
+    const fetchCallsBefore = mockFetch.mock.calls.length;
+    const cachedReadme = await githubRepo.getProfileReadme('cacheduser');
+    expect(cachedReadme).toBe('# Profile README content');
+    expect(mockFetch.mock.calls).toHaveLength(fetchCallsBefore);
+
+    // Invalidate cache
+    await githubRepo.clearCache('cacheduser');
+    const isCachedAfter = await githubRepo.isReadmeCached?.('cacheduser');
+    expect(isCachedAfter).toBe(false);
+  });
 });

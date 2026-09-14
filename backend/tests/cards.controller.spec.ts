@@ -164,7 +164,9 @@ describe('CardsController', () => {
         username: 'octocat',
         userAgent: 'User-Agent-Test',
         referer: 'https://github.com',
-        ip: '127.0.0.1'
+        ip: '127.0.0.1',
+        isPreview: false,
+        ref: undefined
       }
     );
     expect(result).toContain('svg');

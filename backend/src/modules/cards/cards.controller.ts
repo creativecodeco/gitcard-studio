@@ -100,11 +100,15 @@ export class CardsController {
         ...extractThemeOverrides(query),
         ...(cardWidth ? { cardWidth } : {})
       };
+      const isPreview = query.preview === 'true' || query.preview === '1';
+      const ref = typeof query.ref === 'string' ? query.ref : undefined;
       const hitContext: HitContext = {
         username,
         userAgent,
         referer,
-        ip
+        ip,
+        isPreview,
+        ref
       };
 
       const svg = await executeUseCase(username, theme as string, overrides, hitContext);
@@ -243,7 +247,8 @@ export class CardsController {
 
     try {
       const isPreview = preview === 'true' || preview === '1';
-      const hitContext: HitContext = { username, userAgent, referer, ip };
+      const ref = typeof query.ref === 'string' ? query.ref : undefined;
+      const hitContext: HitContext = { username, userAgent, referer, ip, isPreview, ref };
 
       const viewsCount = await this.recordProfileViewUseCase.execute(
         username,

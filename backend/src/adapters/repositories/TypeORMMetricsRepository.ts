@@ -25,7 +25,7 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
     const referer = context?.referer || '';
     const ip = context?.ip || '';
 
-    const source = this.determineTrafficSource(userAgent, referer);
+    const source = this.determineTrafficSource(userAgent, referer, context?.ref);
 
     // Perform database operations in the background to not block the main request thread, matching previous SQLite repository behavior
     AppDataSource.transaction(async (transactionalEntityManager) => {
@@ -59,13 +59,20 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
         .execute();
 
       // Second, increment the column and update timestamp
+      const updateData: Record<string, unknown> = {
+        [column]: () => `"${column}" + 1`,
+        last_updated: new Date()
+      };
+      if (source === 'github') {
+        updateData.last_github_hit = new Date();
+      } else {
+        updateData.last_web_hit = new Date();
+      }
+
       await transactionalEntityManager
         .createQueryBuilder()
         .update(UserMetric)
-        .set({
-          [column]: () => `"${column}" + 1`,
-          last_updated: new Date()
-        })
+        .set(updateData)
         .where('username = :username', { username: username.toLowerCase() })
         .execute();
 
@@ -169,7 +176,12 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
         .execute();
 
       if (increment) {
-        await this.incrementProfileViewCounters(userLower);
+        const source = this.determineTrafficSource(
+          context?.userAgent,
+          context?.referer,
+          context?.ref
+        );
+        await this.incrementProfileViewCounters(userLower, source);
 
         if (context) {
           await this.logProfileViewRequest(userLower, context);
@@ -225,7 +237,45 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
     }
   }
 
-  private determineTrafficSource(userAgent: string = '', referer: string = ''): 'github' | 'web' {
+  async updateUserReadmeVerification(
+    username: string,
+    isVerified: boolean,
+    detectedCards?: string[]
+  ): Promise<void> {
+    const userLower = username.toLowerCase();
+    const cardsString = detectedCards && detectedCards.length > 0 ? detectedCards.join(',') : null;
+
+    try {
+      await AppDataSource.createQueryBuilder()
+        .insert()
+        .into(UserMetric)
+        .values({ username: userLower })
+        .orIgnore()
+        .execute();
+
+      await AppDataSource.createQueryBuilder()
+        .update(UserMetric)
+        .set({
+          readme_verified: isVerified,
+          readme_verified_at: new Date(),
+          detected_cards: cardsString
+        })
+        .where('username = :username', { username: userLower })
+        .execute();
+    } catch (err) {
+      logger.error('Error updating user readme verification:', { username: userLower, error: err });
+    }
+  }
+
+  private determineTrafficSource(
+    userAgent: string = '',
+    referer: string = '',
+    ref?: string
+  ): 'github' | 'web' {
+    if (ref === 'readme') {
+      return 'github';
+    }
+
     if (/github|camo/i.test(userAgent.toLowerCase())) {
       return 'github';
     }
@@ -249,7 +299,10 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
     }
   }
 
-  private async incrementProfileViewCounters(userLower: string): Promise<void> {
+  private async incrementProfileViewCounters(
+    userLower: string,
+    source: 'github' | 'web' = 'web'
+  ): Promise<void> {
     await AppDataSource.createQueryBuilder()
       .update(GlobalMetric)
       .set({ metric_value: () => 'metric_value + 1' })
@@ -262,12 +315,19 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       .where('metric_key = :key', { key: 'viewsRenders' })
       .execute();
 
+    const updateData: Record<string, unknown> = {
+      profile_views: () => 'profile_views + 1',
+      last_updated: new Date()
+    };
+    if (source === 'github') {
+      updateData.last_github_hit = new Date();
+    } else {
+      updateData.last_web_hit = new Date();
+    }
+
     await AppDataSource.createQueryBuilder()
       .update(UserMetric)
-      .set({
-        profile_views: () => 'profile_views + 1',
-        last_updated: new Date()
-      })
+      .set(updateData)
       .where('username = :username', { username: userLower })
       .execute();
   }
@@ -276,7 +336,7 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
     const userAgent = context.userAgent || '';
     const referer = context.referer || '';
     const ip = context.ip || '';
-    const source = this.determineTrafficSource(userAgent, referer);
+    const source = this.determineTrafficSource(userAgent, referer, context.ref);
 
     const requestLogRepo = AppDataSource.getRepository(RequestLog);
     const log = new RequestLog();

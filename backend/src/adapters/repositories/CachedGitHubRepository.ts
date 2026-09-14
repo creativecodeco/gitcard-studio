@@ -127,9 +127,31 @@ export class CachedGitHubRepository implements IGitHubRepository {
     return data;
   }
 
-  clearCache(username: string): void {
+  async getProfileReadme(username: string): Promise<string | null> {
+    const cacheKey = `readme:${username.toLowerCase()}`;
+    const cached = await this.cacheStore.get<string | null>(cacheKey);
+
+    if (cached !== undefined && cached !== null) {
+      return cached;
+    }
+
+    const data = await this.delegate.getProfileReadme(username);
+    if (data !== null) {
+      await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
+    }
+    return data;
+  }
+
+  async isReadmeCached(username: string): Promise<boolean> {
+    const cacheKey = `readme:${username.toLowerCase()}`;
+    const cached = await this.cacheStore.get<string | null>(cacheKey);
+    return cached !== null && cached !== undefined;
+  }
+
+  async clearCache(username: string): Promise<void> {
     const keyBase = username.toLowerCase();
-    this.cacheStore.flushPattern(keyBase);
+    await this.cacheStore.flushPattern(keyBase);
+    await this.cacheStore.del(`readme:${keyBase}`);
     this.delegate.clearCache(username);
   }
 }

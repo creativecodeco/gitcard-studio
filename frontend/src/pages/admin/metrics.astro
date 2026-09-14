@@ -15,9 +15,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       style="width: 100%; max-width: 400px; padding: 32px; display: flex; flex-direction: column; gap: 20px;"
     >
       <div style="text-align: center;">
-        <h1
-          style="font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #fff 0%, var(--accent-color) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;"
-        >
+        <h1 style="font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #fff 0%, var(--accent-color) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;">
           Acceso Administrativo
         </h1>
         <p style="color: var(--text-secondary); font-size: 0.85rem;">
@@ -26,7 +24,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       </div>
 
       <div class="input-group">
-        <label for="metrics-key-input" class="input-label">Clave de Métricas</label>
+        <label for="metrics-key-input" class="input-label">
+          Clave de Métricas
+        </label>
         <div class="input-wrapper" style="height: 42px;">
           <input
             type="password"
@@ -48,8 +48,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         id="auth-error-msg"
         class="hidden"
         style="color: var(--error-color); font-size: 0.8rem; font-weight: 600; text-align: center; margin-top: 4px;"
-      >
-      </p>
+      ></p>
     </div>
 
     <!-- Analytics Dashboard Content (Initially Hidden) -->
@@ -59,13 +58,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       style="width: 100%; display: flex; flex-direction: column; gap: 30px;"
     >
       <!-- Top Bar -->
-      <div
-        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px;"
-      >
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px;">
         <div>
-          <h1
-            style="font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #fff 0%, var(--accent-color) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
-          >
+          <h1 style="font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #fff 0%, var(--accent-color) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
             Métricas de Uso
           </h1>
           <p style="color: var(--text-secondary); font-size: 0.9rem;">
@@ -74,9 +69,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         </div>
         <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
           <!-- Auto Refresh Checkbox -->
-          <label
-            style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; user-select: none;"
-          >
+          <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; user-select: none;">
             <input
               type="checkbox"
               id="checkbox-auto-refresh"
@@ -99,8 +92,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
               stroke="currentColor"
               stroke-width="2.5"
               style="transition: transform 0.5s ease;"
-              ><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73"></path></svg
             >
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73"></path>
+            </svg>
             Refrescar
           </button>
 
@@ -114,110 +108,85 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       </div>
 
       <!-- KPI Grid -->
-      <div
-        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;"
-      >
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
         <!-- KPI 1: Renders -->
         <div
           class="glass-card"
-          style="padding: 24px; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden;"
+          style="padding: 20px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden;"
         >
-          <div
-            style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase;"
-          >
+          <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase;">
             Renderizados Totales
           </div>
           <div
             id="kpi-renders"
-            style="font-size: 2.25rem; font-weight: 800; color: var(--text-primary);"
+            style="font-size: 2rem; font-weight: 800; color: var(--text-primary);"
           >
             0
           </div>
-          <p style="font-size: 0.75rem; color: #4ade80;">Peticiones acumuladas del sistema</p>
-          <div
-            style="position: absolute; right: -10px; bottom: -10px; opacity: 0.05; transform: scale(3.5); color: var(--accent-color);"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="24"
-              height="24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              ><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg
-            >
-          </div>
-        </div>
-
-        <!-- KPI 2: Unique Users -->
-        <div
-          class="glass-card"
-          style="padding: 24px; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden;"
-        >
-          <div
-            style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase;"
-          >
-            Usuarios Únicos
-          </div>
-          <div
-            id="kpi-users"
-            style="font-size: 2.25rem; font-weight: 800; color: var(--accent-color);"
-          >
-            0
-          </div>
-          <p style="font-size: 0.75rem; color: var(--accent-color);">
-            Perfiles registrados en base de datos
+          <p style="font-size: 0.75rem; color: var(--text-secondary);">
+            Peticiones acumuladas globales
           </p>
-          <div
-            style="position: absolute; right: -10px; bottom: -10px; opacity: 0.05; transform: scale(3.5); color: var(--accent-color);"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="24"
-              height="24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              ><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"
-              ></path></svg
-            >
-          </div>
         </div>
 
-        <!-- KPI 3: Profile Views -->
+        <!-- KPI 2: Camo GitHub -->
         <div
           class="glass-card"
-          style="padding: 24px; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden;"
+          style="padding: 20px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden;"
         >
-          <div
-            style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase;"
-          >
+          <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase;">
+            GitHub Camo (Impresiones)
+          </div>
+          <div id="kpi-camo" style="font-size: 2rem; font-weight: 800; color: #4ade80;">
+            0
+          </div>
+          <p style="font-size: 0.75rem; color: #4ade80;">Peticiones reales desde GitHub</p>
+        </div>
+
+        <!-- KPI 3: Web Previews -->
+        <div
+          class="glass-card"
+          style="padding: 20px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden;"
+        >
+          <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase;">
+            Previews Web
+          </div>
+          <div id="kpi-web" style="font-size: 2rem; font-weight: 800; color: #38bdf8;">
+            0
+          </div>
+          <p style="font-size: 0.75rem; color: #38bdf8;">Pruebas en la web del estudio</p>
+        </div>
+
+        <!-- KPI 4: Verified READMEs -->
+        <div
+          class="glass-card"
+          style="padding: 20px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden;"
+        >
+          <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase;">
+            READMEs Confirmados
+          </div>
+          <div id="kpi-verified" style="font-size: 2rem; font-weight: 800; color: #fbbf24;">
+            0
+          </div>
+          <p style="font-size: 0.75rem; color: #fbbf24;">Perfiles con GitCard en README</p>
+        </div>
+
+        <!-- KPI 5: Profile Views -->
+        <div
+          class="glass-card"
+          style="padding: 20px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden;"
+        >
+          <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase;">
             Vistas de Perfil
           </div>
-          <div id="kpi-views" style="font-size: 2.25rem; font-weight: 800; color: #a855f7;">0</div>
-          <p style="font-size: 0.75rem; color: #a855f7;">Impresiones de insignias Views Badge</p>
-          <div
-            style="position: absolute; right: -10px; bottom: -10px; opacity: 0.05; transform: scale(3.5); color: var(--accent-color);"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="24"
-              height="24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              ><path
-                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"
-              ></path></svg
-            >
+          <div id="kpi-views" style="font-size: 2rem; font-weight: 800; color: #a855f7;">
+            0
           </div>
+          <p style="font-size: 0.75rem; color: #a855f7;">Impresiones Views Badge</p>
         </div>
       </div>
 
       <!-- Charts Row -->
-      <div
-        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;"
-      >
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
         <!-- Chart 1: Renders History -->
         <div
           class="glass-card"
@@ -226,9 +195,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">
             Evolución de Peticiones (Últimos 7 días)
           </h2>
-          <div
-            style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; max-height: 300px;"
-          >
+          <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; max-height: 300px;">
             <canvas id="chart-history"></canvas>
           </div>
         </div>
@@ -241,9 +208,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">
             Distribución por Tipo de Tarjeta
           </h2>
-          <div
-            style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; max-height: 300px;"
-          >
+          <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; max-height: 300px;">
             <canvas id="chart-distribution"></canvas>
           </div>
         </div>
@@ -256,9 +221,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">
             Tráfico por Origen (GitHub Camo vs Web Directo)
           </h2>
-          <div
-            style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; max-height: 300px;"
-          >
+          <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; max-height: 300px;">
             <canvas id="chart-sources"></canvas>
           </div>
         </div>
@@ -269,34 +232,69 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         class="glass-card"
         style="padding: 24px; display: flex; flex-direction: column; gap: 16px;"
       >
-        <div
-          style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;"
-        >
-          <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">
-            Perfiles Más Activos
-          </h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">
+              Perfiles Más Activos
+            </h2>
+            <span
+              id="audit-status-badge"
+              style="display: none; font-size: 0.75rem; padding: 4px 10px; border-radius: 9999px; background: rgba(74, 222, 128, 0.12); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); font-weight: 600;"
+            ></span>
+          </div>
 
-          <!-- Search Box -->
-          <div
-            style="width: 250px; height: 38px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); border-radius: 8px; display: flex; align-items: center; padding: 0 10px;"
-          >
-            <input
-              type="text"
-              id="search-users-input"
-              placeholder="Buscar usuario..."
-              style="font-size: 0.85rem; height: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; width: 100%;"
-            />
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <!-- Cache refresh toggle -->
+            <label
+              title="Si está activo, consulta directamente a GitHub y actualiza la memoria caché"
+              style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; user-select: none;"
+            >
+              <input
+                type="checkbox"
+                id="checkbox-force-refresh"
+                checked
+                style="accent-color: #fbbf24; cursor: pointer;"
+              />
+              <span>Actualizar Caché</span>
+            </label>
+
+            <!-- Auditar Todos Button -->
+            <button
+              id="btn-audit-all"
+              style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(251, 191, 36, 0.35); background: rgba(251, 191, 36, 0.1); color: #fbbf24; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s;"
+              title="Auditar todos los perfiles consultando sus READMEs en GitHub y validando la caché"
+            >
+              <svg
+                id="audit-all-icon"
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M9 11l3 3L22 4"></path>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+              <span id="audit-all-text">Auditar Todos</span>
+            </button>
+
+            <!-- Search Box -->
+            <div style="width: 220px; height: 38px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); border-radius: 8px; display: flex; align-items: center; padding: 0 10px;">
+              <input
+                type="text"
+                id="search-users-input"
+                placeholder="Buscar usuario..."
+                style="font-size: 0.85rem; height: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; width: 100%;"
+              />
+            </div>
           </div>
         </div>
 
         <div style="overflow-x: auto; width: 100%;">
-          <table
-            style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;"
-          >
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
             <thead>
-              <tr
-                style="border-bottom: 1px solid var(--glass-border); color: var(--text-secondary); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;"
-              >
+              <tr style="border-bottom: 1px solid var(--glass-border); color: var(--text-secondary); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">
                 <th
                   class="sortable-th"
                   data-col="username"
@@ -307,13 +305,30 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
                 </th>
                 <th
                   class="sortable-th"
-                  data-col="totalRenders"
-                  style="padding: 12px 16px; text-align: right; cursor: pointer; user-select: none; transition: color 0.2s;"
-                  title="Ordenar por Total Renders"
+                  data-col="readme_verified"
+                  style="padding: 12px 16px; text-align: center; cursor: pointer; user-select: none; transition: color 0.2s;"
+                  title="Ordenar por Estado del README"
                 >
-                  Total Renders (Camo/Web) <span id="sort-icon-totalRenders" class="sort-icon"
-                    >▼</span
-                  >
+                  Estado README <span id="sort-icon-readme_verified" class="sort-icon"></span>
+                </th>
+                <th
+                  class="sortable-th"
+                  data-col="githubRenders"
+                  style="padding: 12px 16px; text-align: right; cursor: pointer; user-select: none; transition: color 0.2s;"
+                  title="Ordenar por Renders en GitHub (Camo)"
+                >
+                  GitHub (Camo){' '}
+                  <span id="sort-icon-githubRenders" class="sort-icon">
+                    ▼
+                  </span>
+                </th>
+                <th
+                  class="sortable-th"
+                  data-col="webRenders"
+                  style="padding: 12px 16px; text-align: right; cursor: pointer; user-select: none; transition: color 0.2s;"
+                  title="Ordenar por Previews Web"
+                >
+                  Web Preview <span id="sort-icon-webRenders" class="sort-icon"></span>
                 </th>
                 <th
                   class="sortable-th"
@@ -321,7 +336,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
                   style="padding: 12px 16px; text-align: right; cursor: pointer; user-select: none; transition: color 0.2s;"
                   title="Ordenar por Vistas de Perfil"
                 >
-                  Vistas de Perfil <span id="sort-icon-profile_views" class="sort-icon"></span>
+                  Vistas <span id="sort-icon-profile_views" class="sort-icon"></span>
                 </th>
                 <th
                   class="sortable-th"
@@ -331,36 +346,40 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
                 >
                   Última Actividad <span id="sort-icon-last_updated" class="sort-icon"></span>
                 </th>
+                <th style="padding: 12px 16px; text-align: center; user-select: none;">
+                  Verificar
+                </th>
               </tr>
             </thead>
             <tbody id="users-table-body">
               <tr>
                 <td
-                  colspan="4"
+                  colspan="7"
                   style="padding: 30px; text-align: center; color: var(--text-secondary);"
-                  >Cargando perfiles...</td
                 >
+                  Cargando perfiles...
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <!-- Pagination Controls -->
-        <div
-          style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border); padding-top: 16px; font-size: 0.85rem; color: var(--text-secondary); flex-wrap: wrap; gap: 10px;"
-        >
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border); padding-top: 16px; font-size: 0.85rem; color: var(--text-secondary); flex-wrap: wrap; gap: 10px;">
           <div id="pagination-info">Mostrando 0-0 de 0 perfiles</div>
           <div style="display: flex; align-items: center; gap: 8px;">
             <button
               id="btn-prev-page"
               style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.02); color: var(--text-primary); cursor: pointer; transition: all 0.2s;"
-              >Anterior</button
             >
+              Anterior
+            </button>
             <button
               id="btn-next-page"
               style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.02); color: var(--text-primary); cursor: pointer; transition: all 0.2s;"
-              >Siguiente</button
             >
+              Siguiente
+            </button>
           </div>
         </div>
       </div>
@@ -382,6 +401,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
   // KPI elements
   const kpiRenders = document.getElementById('kpi-renders');
+  const kpiCamo = document.getElementById('kpi-camo');
+  const kpiWeb = document.getElementById('kpi-web');
+  const kpiVerified = document.getElementById('kpi-verified');
   const kpiUsers = document.getElementById('kpi-users');
   const kpiViews = document.getElementById('kpi-views');
   const usersTableBody = document.getElementById('users-table-body');
@@ -393,6 +415,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     'checkbox-auto-refresh'
   ) as HTMLInputElement | null;
   const searchInput = document.getElementById('search-users-input') as HTMLInputElement | null;
+  const btnAuditAll = document.getElementById('btn-audit-all') as HTMLButtonElement | null;
+  const auditAllIcon = document.getElementById('audit-all-icon') as SVGElement | null;
+  const auditAllText = document.getElementById('audit-all-text');
+  const checkboxForceRefresh = document.getElementById(
+    'checkbox-force-refresh'
+  ) as HTMLInputElement | null;
+  const auditStatusBadge = document.getElementById('audit-status-badge');
 
   // Pagination elements
   const paginationInfo = document.getElementById('pagination-info');
@@ -407,7 +436,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   // In-memory users, sorting and pagination state
   let usersList: any[] = [];
   let filteredUsers: any[] = [];
-  let sortColumn: 'username' | 'totalRenders' | 'profile_views' | 'last_updated' = 'totalRenders';
+  let sortColumn:
+    | 'username'
+    | 'readme_verified'
+    | 'githubRenders'
+    | 'webRenders'
+    | 'totalRenders'
+    | 'profile_views'
+    | 'last_updated' = 'githubRenders';
   let sortDirection: 'asc' | 'desc' = 'desc';
   let currentPage = 1;
   const itemsPerPage = 10;
@@ -487,31 +523,58 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       const rawUsersData = await usersRes.json();
       const historyData = historyRes.ok ? await historyRes.json() : [];
 
-      // Render KPIs
-      if (kpiRenders)
-        kpiRenders.textContent = Number(globalData.totalRenders || 0).toLocaleString();
-      if (kpiUsers) kpiUsers.textContent = Number(rawUsersData.length || 0).toLocaleString();
-      if (kpiViews) kpiViews.textContent = Number(globalData.viewsRenders || 0).toLocaleString();
+      let totalCamoHits = 0;
+      let totalWebHits = 0;
+      let totalVerified = 0;
 
       // Store users and calculate total renders
       usersList = rawUsersData
         .map((u: any) => {
-          const total =
-            (u.stats_web || 0) +
+          const githubTotal =
             (u.stats_github || 0) +
-            (u.languages_web || 0) +
             (u.languages_github || 0) +
-            (u.repo_web || 0) +
             (u.repo_github || 0) +
-            (u.rank_web || 0) +
             (u.rank_github || 0) +
-            (u.streak_web || 0) +
             (u.streak_github || 0) +
+            (u.trophies_github || 0) +
+            (u.sponsors_github || 0) +
+            (u.commit_activity_github || 0);
+
+          const webTotal =
+            (u.stats_web || 0) +
+            (u.languages_web || 0) +
+            (u.repo_web || 0) +
+            (u.rank_web || 0) +
+            (u.streak_web || 0) +
             (u.trophies_web || 0) +
-            (u.trophies_github || 0);
-          return { ...u, totalRenders: total };
+            (u.sponsors_web || 0) +
+            (u.commit_activity_web || 0);
+
+          const total = githubTotal + webTotal;
+          totalCamoHits += githubTotal;
+          totalWebHits += webTotal;
+          if (u.readme_verified) {
+            totalVerified++;
+          }
+
+          return {
+            ...u,
+            githubRenders: githubTotal,
+            webRenders: webTotal,
+            totalRenders: total,
+            readme_verified: Boolean(u.readme_verified)
+          };
         })
-        .sort((a: any, b: any) => b.totalRenders - a.totalRenders);
+        .sort((a: any, b: any) => b.githubRenders - a.githubRenders);
+
+      // Render KPIs
+      if (kpiRenders)
+        kpiRenders.textContent = Number(globalData.totalRenders || 0).toLocaleString();
+      if (kpiCamo) kpiCamo.textContent = totalCamoHits.toLocaleString();
+      if (kpiWeb) kpiWeb.textContent = totalWebHits.toLocaleString();
+      if (kpiVerified) kpiVerified.textContent = totalVerified.toLocaleString();
+      if (kpiUsers) kpiUsers.textContent = Number(rawUsersData.length || 0).toLocaleString();
+      if (kpiViews) kpiViews.textContent = Number(globalData.viewsRenders || 0).toLocaleString();
 
       applyFiltersAndResetPage();
 
@@ -768,6 +831,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       }
 
+      if (sortColumn === 'readme_verified') {
+        valA = valA ? 1 : 0;
+        valB = valB ? 1 : 0;
+        return sortDirection === 'asc' ? valA - valB : valB - valA;
+      }
+
       if (sortColumn === 'last_updated') {
         valA = valA ? new Date(valA).getTime() : 0;
         valB = valB ? new Date(valB).getTime() : 0;
@@ -781,7 +850,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   }
 
   function updateHeaderSortIndicators() {
-    const cols = ['username', 'totalRenders', 'profile_views', 'last_updated'];
+    const cols = [
+      'username',
+      'readme_verified',
+      'githubRenders',
+      'webRenders',
+      'profile_views',
+      'last_updated'
+    ];
     cols.forEach((col) => {
       const iconSpan = document.getElementById(`sort-icon-${col}`);
       const thEl = document.querySelector(`.sortable-th[data-col="${col}"]`) as HTMLElement | null;
@@ -795,6 +871,154 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         }
       }
     });
+  }
+
+  async function verifyReadme(username: string, buttonEl: HTMLButtonElement) {
+    const key = sessionStorage.getItem('gitcard-studio-metrics-key') || '';
+    if (!key) return;
+
+    buttonEl.disabled = true;
+    buttonEl.style.opacity = '0.6';
+    buttonEl.innerHTML = `
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 1s linear infinite;">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
+        <path fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+      </svg>
+      Verificando...
+    `;
+
+    const forceRefresh = checkboxForceRefresh ? checkboxForceRefresh.checked : true;
+
+    try {
+      const response = await fetch('/api/metrics/verify-readme', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key
+        },
+        body: JSON.stringify({ username, key, forceRefresh })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error en la verificación');
+      }
+
+      const result = await response.json();
+      const user = usersList.find((u) => u.username.toLowerCase() === username.toLowerCase());
+      if (user) {
+        user.readme_verified = result.isUsingGitCard;
+        user.detected_cards = (result.detectedCards || []).join(', ');
+        user.readme_verified_at = result.verifiedAt;
+      }
+
+      if (kpiVerified) {
+        const verifiedCount = usersList.filter((u) => u.readme_verified).length;
+        kpiVerified.textContent = verifiedCount.toLocaleString();
+      }
+
+      renderCurrentTablePage();
+    } catch (err) {
+      console.error('Error verifying readme:', err);
+      buttonEl.disabled = false;
+      buttonEl.style.opacity = '1';
+      buttonEl.innerHTML = '⚠️ Error';
+    }
+  }
+
+  async function auditAllUsers() {
+    const key = sessionStorage.getItem('gitcard-studio-metrics-key') || '';
+    if (!key || !btnAuditAll) return;
+
+    const forceRefresh = checkboxForceRefresh ? checkboxForceRefresh.checked : true;
+
+    btnAuditAll.disabled = true;
+    btnAuditAll.style.opacity = '0.7';
+    btnAuditAll.style.cursor = 'not-allowed';
+
+    if (auditAllIcon) {
+      auditAllIcon.style.animation = 'spin 1s linear infinite';
+    }
+    if (auditAllText) {
+      auditAllText.textContent = 'Auditando...';
+    }
+
+    if (auditStatusBadge) {
+      auditStatusBadge.style.display = 'inline-block';
+      auditStatusBadge.style.background = 'rgba(251, 191, 36, 0.15)';
+      auditStatusBadge.style.color = '#fbbf24';
+      auditStatusBadge.style.borderColor = 'rgba(251, 191, 36, 0.3)';
+      auditStatusBadge.textContent = 'Auditando perfiles y actualizando caché...';
+    }
+
+    try {
+      const response = await fetch('/api/metrics/verify-readmes-batch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key
+        },
+        body: JSON.stringify({ forceRefresh, key })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error en la auditoría masiva');
+      }
+
+      const result = await response.json();
+
+      if (Array.isArray(result.results)) {
+        result.results.forEach((auditRes: any) => {
+          const user = usersList.find(
+            (u) => u.username.toLowerCase() === auditRes.username.toLowerCase()
+          );
+          if (user) {
+            user.readme_verified = auditRes.isUsingGitCard;
+            user.detected_cards = (auditRes.detectedCards || []).join(', ');
+            user.readme_verified_at = auditRes.verifiedAt;
+          }
+        });
+      }
+
+      if (kpiVerified) {
+        const verifiedCount = usersList.filter((u) => u.readme_verified).length;
+        kpiVerified.textContent = verifiedCount.toLocaleString();
+      }
+
+      renderCurrentTablePage();
+
+      if (auditStatusBadge) {
+        auditStatusBadge.style.display = 'inline-block';
+        auditStatusBadge.style.background = 'rgba(74, 222, 128, 0.15)';
+        auditStatusBadge.style.color = '#4ade80';
+        auditStatusBadge.style.borderColor = 'rgba(74, 222, 128, 0.3)';
+        auditStatusBadge.textContent = `✅ ${result.totalAudited} auditados (${result.verifiedCount} confirmados) • Caché actualizado y validado`;
+
+        setTimeout(() => {
+          if (auditStatusBadge) {
+            auditStatusBadge.style.display = 'none';
+          }
+        }, 8000);
+      }
+    } catch (err) {
+      console.error('Error during batch audit:', err);
+      if (auditStatusBadge) {
+        auditStatusBadge.style.display = 'inline-block';
+        auditStatusBadge.style.background = 'rgba(248, 81, 73, 0.15)';
+        auditStatusBadge.style.color = '#f85149';
+        auditStatusBadge.style.borderColor = 'rgba(248, 81, 73, 0.3)';
+        auditStatusBadge.textContent = '⚠️ Error al auditar perfiles';
+      }
+    } finally {
+      btnAuditAll.disabled = false;
+      btnAuditAll.style.opacity = '1';
+      btnAuditAll.style.cursor = 'pointer';
+      if (auditAllIcon) {
+        auditAllIcon.style.animation = 'none';
+      }
+      if (auditAllText) {
+        auditAllText.textContent = 'Auditar Todos';
+      }
+    }
   }
 
   function applyFiltersAndResetPage() {
@@ -816,7 +1040,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     if (filteredUsers.length === 0) {
       usersTableBody.innerHTML = `
         <tr>
-          <td colspan="4" style="padding: 30px; text-align: center; color: var(--text-secondary);">No se encontraron perfiles.</td>
+          <td colspan="7" style="padding: 30px; text-align: center; color: var(--text-secondary);">No se encontraron perfiles.</td>
         </tr>
       `;
       if (paginationInfo) paginationInfo.textContent = 'Mostrando 0 de 0 perfiles';
@@ -836,6 +1060,45 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           : 'N/A';
         const safeUser = escapeHtml(user.username);
         const encodedUser = encodeURIComponent(user.username);
+
+        let statusBadge: string;
+        if (user.readme_verified) {
+          const cardsTooltip = escapeHtml(
+            user.detected_cards
+              ? `Tarjetas: ${user.detected_cards}`
+              : 'GitCard Studio detectado en README'
+          );
+          statusBadge = `
+            <span
+              title="${cardsTooltip}"
+              style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background: rgba(74, 222, 128, 0.12); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.25);"
+            >
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: #4ade80;"></span>
+              Verificado
+            </span>
+          `;
+        } else if (user.githubRenders > 0) {
+          statusBadge = `
+            <span
+              title="Peticiones registradas desde GitHub Camo pero el README aún no ha sido verificado"
+              style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background: rgba(250, 204, 21, 0.12); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.25);"
+            >
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: #facc15;"></span>
+              Camo Activo
+            </span>
+          `;
+        } else {
+          statusBadge = `
+            <span
+              title="Solo previsualizaciones en la interfaz web"
+              style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background: rgba(148, 163, 184, 0.12); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.25);"
+            >
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: #94a3b8;"></span>
+              Solo Web
+            </span>
+          `;
+        }
+
         return `
           <tr style="border-bottom: 1px solid var(--glass-border); transition: background 0.2s;">
             <td style="padding: 14px 16px;">
@@ -844,14 +1107,31 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
               </a>
             </td>
-            <td style="padding: 14px 16px; text-align: right; font-weight: 500; color: var(--text-primary);">
-              ${user.totalRenders.toLocaleString()}
+            <td style="padding: 14px 16px; text-align: center;">
+              ${statusBadge}
+            </td>
+            <td style="padding: 14px 16px; text-align: right; font-weight: 600; color: #4ade80;">
+              ${user.githubRenders.toLocaleString()}
+            </td>
+            <td style="padding: 14px 16px; text-align: right; color: #38bdf8;">
+              ${user.webRenders.toLocaleString()}
             </td>
             <td style="padding: 14px 16px; text-align: right; color: var(--text-secondary);">
               ${Number(user.profile_views || 0).toLocaleString()}
             </td>
             <td style="padding: 14px 16px; text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
               ${lastAct}
+            </td>
+            <td style="padding: 14px 16px; text-align: center;">
+              <button
+                class="btn-verify-readme"
+                data-user="${safeUser}"
+                style="padding: 4px 10px; font-size: 0.75rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.04); color: var(--text-primary); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px;"
+                title="Auditar si @${safeUser} tiene tarjetas en su README de GitHub"
+              >
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                Auditar
+              </button>
             </td>
           </tr>
         `;
@@ -932,6 +1212,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     if (key) loadDashboardData(key);
   });
 
+  btnAuditAll?.addEventListener('click', auditAllUsers);
+
   checkboxAutoRefresh?.addEventListener('change', setupAutoRefresh);
 
   searchInput?.addEventListener('input', applyFiltersAndResetPage);
@@ -951,10 +1233,25 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     }
   });
 
+  usersTableBody?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement)?.closest(
+      '.btn-verify-readme'
+    ) as HTMLButtonElement | null;
+    if (btn && btn.dataset.user) {
+      verifyReadme(btn.dataset.user, btn);
+    }
+  });
+
   document.querySelectorAll('.sortable-th').forEach((th) => {
     th.addEventListener('click', (e) => {
       const targetCol = (e.currentTarget as HTMLElement).getAttribute('data-col') as
-        'username' | 'totalRenders' | 'profile_views' | 'last_updated';
+        | 'username'
+        | 'readme_verified'
+        | 'githubRenders'
+        | 'webRenders'
+        | 'totalRenders'
+        | 'profile_views'
+        | 'last_updated';
 
       if (!targetCol) return;
 

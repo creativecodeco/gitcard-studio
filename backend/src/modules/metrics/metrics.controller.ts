@@ -1,10 +1,13 @@
 import {
+  Body,
   Controller,
   ForbiddenException,
   Get,
   Headers,
   Inject,
   InternalServerErrorException,
+  Optional,
+  Post,
   Query,
   UnauthorizedException
 } from '@nestjs/common';
@@ -12,11 +15,22 @@ import { IMetricsRepository } from '@/domain/repositories/IMetricsRepository';
 import { safeTimingEqual } from '@/infrastructure/security/security';
 import { logger } from '@/infrastructure/logging/logger';
 import { getMessages, resolveLocale, SupportedLocale } from '@/infrastructure/i18n/backendI18n';
-import { MetricsHistoryQueryDto, MetricsKeyQueryDto } from './dto/metrics.dto';
+import {
+  MetricsHistoryQueryDto,
+  MetricsKeyQueryDto,
+  VerifyReadmeDto,
+  VerifyReadmesBatchDto
+} from './dto/metrics.dto';
+import { VerifyUserReadmeUseCase } from '@/use-cases/metrics/VerifyUserReadmeUseCase';
 
 @Controller('api')
 export class MetricsController {
-  constructor(@Inject('IMetricsRepository') private readonly metricsRepo: IMetricsRepository) {}
+  constructor(
+    @Inject('IMetricsRepository') private readonly metricsRepo: IMetricsRepository,
+    @Optional()
+    @Inject(VerifyUserReadmeUseCase)
+    private readonly verifyUserReadmeUseCase?: VerifyUserReadmeUseCase
+  ) {}
 
   private validateMetricsKey(
     queryKey?: string,
@@ -92,5 +106,49 @@ export class MetricsController {
     return {
       privateStatsComingSoon: false
     };
+  }
+
+  @Post('metrics/verify-readme')
+  async verifyUserReadme(
+    @Body() body: VerifyReadmeDto,
+    @Headers('x-api-key') headerKey?: string
+  ): Promise<unknown> {
+    this.validateMetricsKey(body.key, headerKey, body.locale);
+
+    if (!this.verifyUserReadmeUseCase) {
+      throw new InternalServerErrorException('VerifyUserReadmeUseCase is not configured');
+    }
+
+    try {
+      const forceRefresh = body.forceRefresh ?? true;
+      return await this.verifyUserReadmeUseCase.execute(body.username, forceRefresh);
+    } catch (error: unknown) {
+      logger.error('Error in verifyUserReadme endpoint', { username: body.username, error });
+      throw new InternalServerErrorException('Error al verificar el README del usuario');
+    }
+  }
+
+  @Post('metrics/verify-readmes-batch')
+  async verifyReadmesBatch(
+    @Body() body: VerifyReadmesBatchDto,
+    @Headers('x-api-key') headerKey?: string
+  ): Promise<unknown> {
+    this.validateMetricsKey(body.key, headerKey, body.locale);
+
+    if (!this.verifyUserReadmeUseCase) {
+      throw new InternalServerErrorException('VerifyUserReadmeUseCase is not configured');
+    }
+
+    try {
+      const forceRefresh = body.forceRefresh ?? true;
+      return await this.verifyUserReadmeUseCase.executeBatch({
+        usernames: body.usernames,
+        limit: body.limit,
+        forceRefresh
+      });
+    } catch (error: unknown) {
+      logger.error('Error in verifyReadmesBatch endpoint', { error });
+      throw new InternalServerErrorException('Error al auditar los READMEs de los usuarios');
+    }
   }
 }

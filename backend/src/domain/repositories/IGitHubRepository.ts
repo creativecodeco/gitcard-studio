@@ -20,5 +20,7 @@ export interface IGitHubRepository {
     commitsToday: number;
     hourlyMatrix: number[][];
   }>;
-  clearCache(username: string): void;
+  getProfileReadme(username: string): Promise<string | null>;
+  clearCache(username: string): void | Promise<void>;
+  isReadmeCached?(username: string): Promise<boolean>;
 }

@@ -30,7 +30,9 @@ import Footer from '../../components/Footer.astro';
           </defs>
           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
         </svg>
-        <h1 style="margin: 0">GitHub <span class="accent-text">Helpers</span></h1>
+        <h1 style="margin: 0">
+          GitHub <span class="accent-text">Helpers</span>
+        </h1>
       </a>
     </div>
   </header>
@@ -59,8 +61,8 @@ import Footer from '../../components/Footer.astro';
         </div>
         <p>
           Si estás utilizando el mismo navegador desde el cual registraste tu token, abre la sección
-          de Estadísticas Privadas y simplemente haz clic en el botón <strong>Revocar Token</strong
-          >. El servidor eliminará tu token cifrado de la base de datos de manera inmediata.
+          de Estadísticas Privadas y simplemente haz clic en el botón <strong>Revocar Token</strong>
+          . El servidor eliminará tu token cifrado de la base de datos de manera inmediata.
         </p>
       </div>
 
@@ -72,9 +74,7 @@ import Footer from '../../components/Footer.astro';
         <p>
           Si has perdido el token original o deseas borrar tus datos desde un navegador diferente:
         </p>
-        <ol
-          style="margin-left: 20px; display: flex; flex-direction: column; gap: 8px; margin-top: 8px;"
-        >
+        <ol style="margin-left: 20px; display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
           <li>Genera un token temporal rápido en GitHub (incluso sin otorgarle ningún permiso).</li>
           <li>
             En la sección "Eliminar Token" del panel web, escribe tu usuario de GitHub y pega el
@@ -96,10 +96,10 @@ import Footer from '../../components/Footer.astro';
         </div>
         <p>
           Puedes invalidar el acceso de forma remota en cualquier momento. Ve a tu lista de tokens
-          en la configuración de GitHub y haz clic en <strong>Revoke</strong> o <strong
-            >Delete</strong
-          > al lado del token. A partir de ese milisegundo, cualquier consulta enviada a nuestro servidor
-          fallará por parte de GitHub y tus estadísticas privadas dejarán de mostrarse automáticamente.
+          en la configuración de GitHub y haz clic en <strong>Revoke</strong> o{' '}
+          <strong>Delete</strong> al lado del token. A partir de ese milisegundo, cualquier consulta
+          enviada a nuestro servidor fallará por parte de GitHub y tus estadísticas privadas dejarán
+          de mostrarse automáticamente.
         </p>
       </div>
 
@@ -111,8 +111,8 @@ import Footer from '../../components/Footer.astro';
         <p>
           Si deseas borrar de forma permanente tu token cifrado, tu historial de estadísticas, tus
           registros de consumo de métricas y todos los logs asociados de tu usuario, presiona el
-          botón <strong>"Eliminar todos mis datos"</strong> en el modal de la aplicación e introduce tu
-          token para autorizar la purga irreversibles.
+          botón <strong>"Eliminar todos mis datos"</strong> en el modal de la aplicación e introduce
+          tu token para autorizar la purga irreversibles.
         </p>
       </div>
     </section>
@@ -135,7 +135,10 @@ import Footer from '../../components/Footer.astro';
         </svg>
         Volver al Centro de Ayuda
       </a>
-      <a href="/" class="btn-primary-link"> Ir al Generador de Tarjetas → </a>
+      <a href="/" class="btn-primary-link">
+        {' '}
+        Ir al Generador de Tarjetas →{' '}
+      </a>
     </div>
   </main>
 

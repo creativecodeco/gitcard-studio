@@ -21,7 +21,9 @@ const {
 ---
 
 <div class="card-preview-wrapper" data-category={category}>
-  <h3 class="card-title-label" data-i18n={`title_${id}`}>{title}</h3>
+  <h3 class="card-title-label" data-i18n={`title_${id}`}>
+    {title}
+  </h3>
   <div class="image-frame" id={`${id}-frame`} style={frameStyle}>
     <div class="skeleton-shimmer hidden" id={`${id}-shimmer`}></div>
     <img
@@ -76,7 +78,9 @@ const {
         >
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
-        <span class="copy-text" data-i18n="copy_btn">Copiar</span>
+        <span class="copy-text" data-i18n="copy_btn">
+          Copiar
+        </span>
       </button>
     </div>
 

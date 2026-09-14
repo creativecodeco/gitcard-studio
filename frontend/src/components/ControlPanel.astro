@@ -23,7 +23,9 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
     </h3>
     <!-- Themes -->
     <div class="themes-group">
-      <span class="input-label" data-i18n="theme_label">Selecciona un Estilo</span>
+      <span class="input-label" data-i18n="theme_label">
+        Selecciona un Estilo
+      </span>
       <div class="themes-grid" id="themes-container">
         <button class="theme-option active" data-theme="dark" id="theme-dark">
           <span class="theme-name">Dark</span>
@@ -137,18 +139,15 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
         class="hidden"
         style="margin-top: 14px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 12px; background: rgba(0,0,0,0.3); transition: all 0.3s ease;"
       >
-        <div
-          style="font-size: 0.8rem; font-weight: 600; color: var(--accent-color); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;"
-        >
+        <div style="font-size: 0.8rem; font-weight: 600; color: var(--accent-color); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
           🎨 <span>Personalizar Paleta de Colores</span>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
-            <label
-              style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;"
-              >Fondo (BG)</label
-            >
+            <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">
+              Fondo (BG)
+            </label>
             <input
               type="color"
               id="picker-bg"
@@ -157,10 +156,9 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             />
           </div>
           <div>
-            <label
-              style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;"
-              >Título</label
-            >
+            <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">
+              Título
+            </label>
             <input
               type="color"
               id="picker-title"
@@ -169,10 +167,9 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             />
           </div>
           <div>
-            <label
-              style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;"
-              >Texto</label
-            >
+            <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">
+              Texto
+            </label>
             <input
               type="color"
               id="picker-text"
@@ -181,10 +178,9 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             />
           </div>
           <div>
-            <label
-              style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;"
-              >Iconos / Acento</label
-            >
+            <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">
+              Iconos / Acento
+            </label>
             <input
               type="color"
               id="picker-icon"
@@ -193,10 +189,9 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             />
           </div>
           <div style="grid-column: span 2;">
-            <label
-              style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;"
-              >Borde</label
-            >
+            <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">
+              Borde
+            </label>
             <input
               type="color"
               id="picker-border"
@@ -210,7 +205,9 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
 
     <!-- Card Width Control -->
     <div class="input-group" style="margin-top: 4px;">
-      <label class="input-label" data-i18n="card_width_label">Ancho de Tarjeta</label>
+      <label class="input-label" data-i18n="card_width_label">
+        Ancho de Tarjeta
+      </label>
       <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
         <button
           class="width-option active"
@@ -251,9 +248,9 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
 
     <!-- Idioma de Tarjetas (i18n) -->
     <div class="input-group" style="margin-top: 16px;">
-      <label for="locale-select" class="input-label" data-i18n="locale_label"
-        >Idioma de Tarjetas</label
-      >
+      <label for="locale-select" class="input-label" data-i18n="locale_label">
+        Idioma de Tarjetas
+      </label>
       <div class="input-wrapper" style="height: 38px;">
         <select
           id="locale-select"
