@@ -33,18 +33,15 @@ WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
 
-# Copy package and lock files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-COPY frontend/package.json ./frontend/
-COPY backend/package.json ./backend/
-
-# Install only production dependencies
-RUN pnpm install --prod --frozen-lockfile --ignore-scripts
-
-# Copy build output with ownership already assigned
+# Copy package and lock files with node ownership
 COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY --chown=node:node frontend/package.json ./frontend/
 COPY --chown=node:node backend/package.json ./backend/
+
+# Install only production dependencies and set ownership
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts && chown -R node:node /usr/src/app
+
+# Copy build output with ownership already assigned
 COPY --chown=node:node --from=builder /usr/src/app/backend/dist ./backend/dist
 COPY --chown=node:node --from=builder /usr/src/app/public ./public
 
