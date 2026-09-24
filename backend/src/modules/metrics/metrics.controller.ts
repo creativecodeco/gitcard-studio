@@ -76,6 +76,21 @@ export class MetricsController {
     }
   }
 
+  @Get('metrics/breakdown')
+  async getBreakdownMetrics(
+    @Query() query: MetricsKeyQueryDto,
+    @Headers('x-api-key') headerKey?: string
+  ): Promise<unknown> {
+    this.validateMetricsKey(query.key, headerKey, query.locale);
+
+    try {
+      return await this.metricsRepo.getBreakdownMetrics();
+    } catch (error: unknown) {
+      logger.error('Error in getBreakdownMetrics endpoint', { error });
+      throw new InternalServerErrorException('Error al obtener desglose de métricas');
+    }
+  }
+
   @Get('metrics/users')
   async getUserMetrics(
     @Query() query: MetricsKeyQueryDto,

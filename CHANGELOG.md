@@ -2,6 +2,17 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.14.0] - 2026-09-24
+
+### 📈 Desglose Analítico de Métricas (Formato, Idioma y Temas)
+- **Persistencia de Contexto Extendido en Base de Datos (`RequestLog`)**:
+  - Incorporadas columnas `theme`, `format` (SVG / PNG) y `locale` (ES / EN) en las entidades TypeORM e interfaces de dominio `HitContext`.
+  - Agregación eficiente en la base de datos PostgreSQL utilizando `COALESCE` para garantizar el conteo retrocompatible con registros históricos.
+- **Nuevo Endpoint Autenticado (`GET /api/metrics/breakdown`)**:
+  - Endpoint de métricas desglosadas por formato, idioma y temas preferidos por los usuarios, protegido con `METRICS_KEY`.
+- **Visualización en Dashboard Administrativo (`/admin/metrics`)**:
+  - Incorporado nuevo gráfico interactivo Chart.js (`#chart-breakdown`) en la interfaz de métricas para visualizar las preferencias del usuario en tiempo real.
+
 ## [1.13.0] - 2026-09-24
 
 ### ✨ Selección Multi-formato (SVG / PNG) y Generador de Temas Personalizados
@@ -662,4 +673,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.13.0
+**Versión actualmente expuesta / en producción:** v1.14.0

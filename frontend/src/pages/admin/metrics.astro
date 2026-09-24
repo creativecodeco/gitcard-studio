@@ -225,6 +225,19 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
             <canvas id="chart-sources"></canvas>
           </div>
         </div>
+
+        <!-- Chart 4: Formats & Locales Breakdown -->
+        <div
+          class="glass-card"
+          style="padding: 24px; display: flex; flex-direction: column; gap: 16px; min-height: 380px;"
+        >
+          <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">
+            Desglose de Formatos (SVG/PNG) & Idiomas (ES/EN)
+          </h2>
+          <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; max-height: 300px;">
+            <canvas id="chart-breakdown"></canvas>
+          </div>
+        </div>
       </div>
 
       <!-- Recent Users Table -->
@@ -432,6 +445,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   let distChart: any = null;
   let sourceChart: any = null;
   let historyChart: any = null;
+  let breakdownChart: any = null;
 
   // In-memory users, sorting and pagination state
   let usersList: any[] = [];
@@ -513,6 +527,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       const usersRes = await fetch(`/api/metrics/users?key=${encodeURIComponent(key)}`);
       // Fetch renders history (last 7 days)
       const historyRes = await fetch(`/api/metrics/history?days=7&key=${encodeURIComponent(key)}`);
+      // Fetch breakdown metrics (formats, themes, locales)
+      const breakdownRes = await fetch(`/api/metrics/breakdown?key=${encodeURIComponent(key)}`);
 
       if (!globalRes.ok || !usersRes.ok) {
         handleLogout();
@@ -522,6 +538,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       const globalData = await globalRes.json();
       const rawUsersData = await usersRes.json();
       const historyData = historyRes.ok ? await historyRes.json() : [];
+      const breakdownData = breakdownRes.ok
+        ? await breakdownRes.json()
+        : { formats: [], themes: [], locales: [] };
 
       let totalCamoHits = 0;
       let totalWebHits = 0;
@@ -582,6 +601,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       renderHistoryChart(historyData);
       renderDistributionChart(globalData);
       renderTrafficSourcesChart(usersList);
+      renderBreakdownChart(breakdownData);
     } catch (err) {
       console.error('Error loading dashboard data:', err);
       showError('Error cargando los datos de métricas');
@@ -815,6 +835,79 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
               }
             }
           }
+        }
+      }
+    });
+  }
+
+  function renderBreakdownChart(breakdownData: any) {
+    const canvas = document.getElementById('chart-breakdown') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    if (breakdownChart) {
+      breakdownChart.destroy();
+    }
+
+    const formats = breakdownData?.formats || [];
+    const locales = breakdownData?.locales || [];
+    const themes = (breakdownData?.themes || []).slice(0, 4);
+
+    const labels: string[] = [];
+    const values: number[] = [];
+    const bgColors: string[] = [];
+
+    // Formats (SVG / PNG)
+    const svgObj = formats.find((f: any) => f.format?.toLowerCase() === 'svg');
+    const pngObj = formats.find((f: any) => f.format?.toLowerCase() === 'png');
+    labels.push('Format: SVG', 'Format: PNG');
+    values.push(Number(svgObj?.count || 0), Number(pngObj?.count || 0));
+    bgColors.push('#38bdf8', '#818cf8');
+
+    // Locales (ES / EN)
+    const esObj = locales.find((l: any) => l.locale?.toLowerCase() === 'es');
+    const enObj = locales.find((l: any) => l.locale?.toLowerCase() === 'en');
+    labels.push('Idioma: ES', 'Idioma: EN');
+    values.push(Number(esObj?.count || 0), Number(enObj?.count || 0));
+    bgColors.push('#4ade80', '#34d399');
+
+    // Top Themes
+    themes.forEach((t: any, index: number) => {
+      const themeColors = ['#f59e0b', '#fbbf24', '#a855f7', '#ec4899'];
+      labels.push(`Tema: ${t.theme || 'default'}`);
+      values.push(Number(t.count || 0));
+      bgColors.push(themeColors[index % themeColors.length]);
+    });
+
+    // @ts-expect-error (Loaded from CDN)
+    breakdownChart = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Cantidad de Peticiones',
+            data: values,
+            backgroundColor: bgColors,
+            borderRadius: 6,
+            borderWidth: 0
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: '#94a3b8', font: { family: 'Outfit', size: 10 } }
+          },
+          y: {
+            grid: { color: '#334155', drawBorder: false },
+            ticks: { color: '#94a3b8', font: { family: 'Outfit', size: 10 }, precision: 0 }
+          }
+        },
+        plugins: {
+          legend: { display: false }
         }
       }
     });

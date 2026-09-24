@@ -108,7 +108,15 @@ export class CardsController {
         referer,
         ip,
         isPreview,
-        ref
+        ref,
+        theme: typeof theme === 'string' ? theme : 'dark',
+        format: typeof query.format === 'string' ? query.format : 'svg',
+        locale:
+          typeof query.locale === 'string'
+            ? query.locale
+            : typeof query.lang === 'string'
+              ? query.lang
+              : 'es'
       };
 
       const svg = await executeUseCase(username, theme as string, overrides, hitContext);

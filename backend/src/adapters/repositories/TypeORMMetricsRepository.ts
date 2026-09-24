@@ -85,6 +85,9 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       log.user_agent = userAgent.slice(0, 500);
       log.referer = referer.slice(0, 500);
       log.ip_address = ip.slice(0, 45);
+      log.theme = context?.theme ? context.theme.slice(0, 30) : null;
+      log.format = context?.format ? context.format.slice(0, 10) : 'svg';
+      log.locale = context?.locale ? context.locale.slice(0, 10) : 'es';
       await requestLogRepo.save(log);
     }).catch((err) => {
       logger.error('Failed to record metrics hit in TypeORM:', { error: err });
@@ -350,5 +353,58 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
     await requestLogRepo.save(log).catch((err) => {
       logger.error('Error saving request log for profile views:', { error: err });
     });
+  }
+
+  async getBreakdownMetrics(): Promise<{
+    formats: Array<{ format: string; count: number }>;
+    themes: Array<{ theme: string; count: number }>;
+    locales: Array<{ locale: string; count: number }>;
+  }> {
+    try {
+      const requestLogRepo = AppDataSource.getRepository(RequestLog);
+
+      const formatsRaw = await requestLogRepo
+        .createQueryBuilder('log')
+        .select("COALESCE(log.format, 'svg')", 'format')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('format')
+        .orderBy('count', 'DESC')
+        .getRawMany();
+
+      const themesRaw = await requestLogRepo
+        .createQueryBuilder('log')
+        .select("COALESCE(log.theme, 'dark')", 'theme')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('theme')
+        .orderBy('count', 'DESC')
+        .limit(10)
+        .getRawMany();
+
+      const localesRaw = await requestLogRepo
+        .createQueryBuilder('log')
+        .select("COALESCE(log.locale, 'es')", 'locale')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('locale')
+        .orderBy('count', 'DESC')
+        .getRawMany();
+
+      return {
+        formats: formatsRaw.map((r) => ({
+          format: r.format,
+          count: Number.parseInt(r.count, 10) || 0
+        })),
+        themes: themesRaw.map((r) => ({
+          theme: r.theme,
+          count: Number.parseInt(r.count, 10) || 0
+        })),
+        locales: localesRaw.map((r) => ({
+          locale: r.locale,
+          count: Number.parseInt(r.count, 10) || 0
+        }))
+      };
+    } catch (err) {
+      logger.error('Error fetching breakdown metrics:', { error: err });
+      return { formats: [], themes: [], locales: [] };
+    }
   }
 }

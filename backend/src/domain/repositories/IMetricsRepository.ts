@@ -29,4 +29,9 @@ export interface IMetricsRepository {
     isVerified: boolean,
     detectedCards?: string[]
   ): Promise<void>;
+  getBreakdownMetrics(): Promise<{
+    formats: Array<{ format: string; count: number }>;
+    themes: Array<{ theme: string; count: number }>;
+    locales: Array<{ locale: string; count: number }>;
+  }>;
 }

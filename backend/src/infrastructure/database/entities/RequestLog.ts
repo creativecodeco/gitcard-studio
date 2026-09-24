@@ -24,6 +24,15 @@ export class RequestLog {
   @Column({ type: 'varchar', length: 45, nullable: true })
   ip_address!: string;
 
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  theme!: string | null;
+
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  format!: string | null;
+
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  locale!: string | null;
+
   @Index()
   @CreateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   created_at!: Date;

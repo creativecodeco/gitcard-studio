@@ -17,4 +17,7 @@ export interface HitContext {
   ip?: string;
   isPreview?: boolean;
   ref?: string;
+  theme?: string;
+  format?: string;
+  locale?: string;
 }
