@@ -564,6 +564,7 @@ import Footer from '@/components/Footer.astro';
   let currentRepo = '';
   let currentCardWidth = ''; // empty = default 495px
   let currentLocale = 'es';
+  let currentFormat = 'svg';
   let currentReadmeLayout: 'vertical' | 'grid' = 'vertical';
 
   let completedImagesCount = 0;
@@ -572,6 +573,7 @@ import Footer from '@/components/Footer.astro';
   let isUsingCustomTheme = false;
 
   const localeSelect = document.getElementById('locale-select') as HTMLSelectElement | null;
+  const formatSelect = document.getElementById('format-select') as HTMLSelectElement | null;
 
   localeSelect?.addEventListener('change', () => {
     currentLocale = localeSelect.value;
@@ -579,6 +581,13 @@ import Footer from '@/components/Footer.astro';
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.set('locale', currentLocale);
     window.history.pushState({}, '', newUrl.toString());
+    if (currentUsername) {
+      updateCards();
+    }
+  });
+
+  formatSelect?.addEventListener('change', () => {
+    currentFormat = formatSelect.value;
     if (currentUsername) {
       updateCards();
     }
@@ -968,6 +977,7 @@ import Footer from '@/components/Footer.astro';
       theme: currentTheme,
       cardWidth: currentCardWidth,
       locale: currentLocale,
+      format: currentFormat,
       customColors: getCustomThemeQueryParams(),
       repo: currentRepo,
       viewsLabel: viewsLabel?.value,
@@ -1118,6 +1128,7 @@ import Footer from '@/components/Footer.astro';
       theme: currentTheme,
       cardWidth: currentCardWidth,
       locale: currentLocale,
+      format: currentFormat,
       customColors: getCustomThemeQueryParams(),
       repo: currentRepo,
       viewsLabel: viewsLabel?.value,

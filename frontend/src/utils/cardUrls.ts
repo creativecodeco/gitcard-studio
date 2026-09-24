@@ -4,6 +4,7 @@ export interface CardUrlOptions {
   theme: string;
   cardWidth?: string;
   locale?: string;
+  format?: string;
   customColors?: string;
   repo?: string;
   viewsLabel?: string;
@@ -37,6 +38,7 @@ export function buildCardUrls(options: CardUrlOptions): CardUrls {
     theme,
     cardWidth,
     locale,
+    format,
     customColors = '',
     repo,
     viewsLabel,
@@ -46,21 +48,22 @@ export function buildCardUrls(options: CardUrlOptions): CardUrls {
 
   const widthParam = cardWidth ? `&card_width=${encodeURIComponent(cardWidth)}` : '';
   const localeParam = locale ? `&locale=${encodeURIComponent(locale)}` : '';
+  const formatParam = format && format !== 'svg' ? `&format=${encodeURIComponent(format)}` : '';
   const custom = customColors;
   const tagParam = options.isPreview ? '&preview=true' : '&ref=readme';
 
-  const statsUrl = `${origin}/api/stats?username=${username}&theme=${theme}${widthParam}${localeParam}${custom}${tagParam}`;
-  const languagesUrl = `${origin}/api/languages?username=${username}&theme=${theme}${widthParam}${localeParam}${custom}${tagParam}`;
-  const rankUrl = `${origin}/api/rank?username=${username}&theme=${theme}${widthParam}${localeParam}${custom}${tagParam}`;
-  const streakUrl = `${origin}/api/streak?username=${username}&theme=${theme}${widthParam}${localeParam}${custom}${tagParam}`;
-  const trophiesUrl = `${origin}/api/trophies?username=${username}&theme=${theme}${widthParam}${localeParam}${custom}${tagParam}`;
-  const topReposUrl = `${origin}/api/top-repos?username=${username}&theme=${theme}${widthParam}${localeParam}${custom}${tagParam}`;
-  const sponsorsUrl = `${origin}/api/sponsors?username=${username}&theme=${theme}${widthParam}${localeParam}${custom}${tagParam}`;
-  const commitActivityUrl = `${origin}/api/commit-activity?username=${username}&theme=${theme}${widthParam}${localeParam}${custom}${tagParam}`;
-  const todayStatusUrl = `${origin}/api/today-status?username=${username}&theme=${theme}${localeParam}${custom}${tagParam}`;
-  const timelineMatrixUrl = `${origin}/api/timeline-matrix?username=${username}&theme=${theme}${widthParam}${localeParam}${custom}${tagParam}`;
+  const statsUrl = `${origin}/api/stats?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const languagesUrl = `${origin}/api/languages?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const rankUrl = `${origin}/api/rank?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const streakUrl = `${origin}/api/streak?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const trophiesUrl = `${origin}/api/trophies?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const topReposUrl = `${origin}/api/top-repos?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const sponsorsUrl = `${origin}/api/sponsors?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const commitActivityUrl = `${origin}/api/commit-activity?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const todayStatusUrl = `${origin}/api/today-status?username=${username}&theme=${theme}${localeParam}${formatParam}${custom}${tagParam}`;
+  const timelineMatrixUrl = `${origin}/api/timeline-matrix?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
 
-  let repoUrl = `${origin}/api/repo?username=${username}&theme=${theme}${widthParam}${localeParam}${custom}${tagParam}`;
+  let repoUrl = `${origin}/api/repo?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
   if (repo) {
     repoUrl += `&repo=${encodeURIComponent(repo)}`;
   }

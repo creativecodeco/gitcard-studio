@@ -2,15 +2,17 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
-## [1.12.3] - 2026-09-24
+## [1.13.0] - 2026-09-24
 
-### 📦 Sincronización de pnpm (12.6.0) y Actualización de Dependencias Monorepo
-- **Actualización de Gestor de Paquetes (`pnpm@12.6.0`)**:
-  - Actualizado el gestor de paquetes a **`pnpm@12.6.0`** en el `Dockerfile` (etapas `builder` y `runner`), alineado con `packageManager` en `package.json`, `pnpm-workspace.yaml` y la documentación del proyecto (`.agents/ARCHITECTURE.md`).
-- **Actualización de Librerías Estables del Monorepo**:
-  - Actualizadas dependencias principales y de desarrollo (`astro` 7.3.4, `fastify` 5.12.5, `@nestjs/*` 12.1.0, `@typescript-eslint/*` 8.70.1, `eslint` 10.11.0, `prettier` 3.9.9, `astro-eslint-parser` 3.2.0, `vitest` 5.0.1, `@types/node` 26.6.2, `tsx` 4.23.15) a sus versiones fijas exactas.
-- **Auditoría de Seguridad y Calidad**:
-  - Verificada la integridad de la política CSP (`contentSecurityPolicy: false` en Helmet para renderizado de tarjetas SVG Cross-Origin) y pasado escaneo de ciberseguridad (`pnpm security:scan`), arquitectura (`pnpm architecture:scan`) e integridad (`pnpm integrity:scan`).
+### ✨ Selección Multi-formato (SVG / PNG) y Generador de Temas Personalizados
+- **Selector de Formato de Salida en UI (`ControlPanel.astro`)**:
+  - Incorporado menú desplegable interactivo para alternar entre el formato vectorial animado (`SVG`) y la renderización en alta resolución (`PNG`) generada en backend mediante `@resvg/resvg-js`.
+- **Panel de Personalización Dinámica de Colores (Custom Theme Colors)**:
+  - Añadido selector de color (`color pickers`) interactivo para Fondo (`bg_color`), Título (`title_color`), Texto (`text_color`), Acento/Iconos (`icon_color`) y Borde (`border_color`).
+  - Actualización automática de la vista previa de las 12 tarjetas y del código Markdown listo para copiar.
+- **Sincronización de pnpm (12.6.0) y Actualización de Dependencias Monorepo**:
+  - Actualizado el gestor de paquetes a **`pnpm@12.6.0`** en el `Dockerfile` (etapas `builder` y `runner`), `package.json`, `pnpm-workspace.yaml` y la documentación (`.agents/ARCHITECTURE.md`).
+  - Actualizadas dependencias del monorepo (`astro` 7.3.4, `fastify` 5.12.5, `@nestjs/*` 12.1.0, `@typescript-eslint/*` 8.70.1, `eslint` 10.11.0, `prettier` 3.9.9, `vitest` 5.0.1) a sus versiones fijas exactas.
 
 ## [1.12.2] - 2026-09-14
 
@@ -660,4 +662,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.12.3
+**Versión actualmente expuesta / en producción:** v1.13.0

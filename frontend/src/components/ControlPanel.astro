@@ -273,5 +273,25 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
         </select>
       </div>
     </div>
+
+    <!-- Formato de Renderizado (SVG / PNG) -->
+    <div class="input-group" style="margin-top: 16px;">
+      <label for="format-select" class="input-label">
+        Formato de Salida
+      </label>
+      <div class="input-wrapper" style="height: 38px;">
+        <select
+          id="format-select"
+          style="width: 100%; height: 100%; background: transparent; border: none; color: var(--text-primary); font-family: var(--font-family); font-size: 0.85rem; padding-left: 12px; cursor: pointer; outline: none;"
+        >
+          <option value="svg" style="background: var(--bg-color); color: var(--text-primary);">
+            SVG (Vectorial Animado)
+          </option>
+          <option value="png" style="background: var(--bg-color); color: var(--text-primary);">
+            PNG (Imagen High-Res)
+          </option>
+        </select>
+      </div>
+    </div>
   </div>
 </section>
