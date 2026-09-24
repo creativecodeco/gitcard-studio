@@ -2,6 +2,16 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.12.3] - 2026-09-24
+
+### 📦 Sincronización de pnpm (12.6.0) y Actualización de Dependencias Monorepo
+- **Actualización de Gestor de Paquetes (`pnpm@12.6.0`)**:
+  - Actualizado el gestor de paquetes a **`pnpm@12.6.0`** en el `Dockerfile` (etapas `builder` y `runner`), alineado con `packageManager` en `package.json`, `pnpm-workspace.yaml` y la documentación del proyecto (`.agents/ARCHITECTURE.md`).
+- **Actualización de Librerías Estables del Monorepo**:
+  - Actualizadas dependencias principales y de desarrollo (`astro` 7.3.4, `fastify` 5.12.5, `@nestjs/*` 12.1.0, `@typescript-eslint/*` 8.70.1, `eslint` 10.11.0, `prettier` 3.9.9, `astro-eslint-parser` 3.2.0, `vitest` 5.0.1, `@types/node` 26.6.2, `tsx` 4.23.15) a sus versiones fijas exactas.
+- **Auditoría de Seguridad y Calidad**:
+  - Verificada la integridad de la política CSP (`contentSecurityPolicy: false` en Helmet para renderizado de tarjetas SVG Cross-Origin) y pasado escaneo de ciberseguridad (`pnpm security:scan`), arquitectura (`pnpm architecture:scan`) e integridad (`pnpm integrity:scan`).
+
 ## [1.12.2] - 2026-09-14
 
 ### 📜 Actualización y Sincronización Integral de Términos y Privacidad
@@ -16,6 +26,9 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 - **Armonización de Marca y Logotipo**:
   - Homogeneizado el encabezado del logotipo con la marca oficial **`GitCard Studio`** en todas las páginas de ayuda (`help/*.astro`), privacidad y términos.
   - Actualizada la etiqueta por defecto en insignias SVG (`badge.presenter.ts`) a `'gitcard studio'`.
+- **Sincronización de pnpm (12.6.0) y Actualización de Dependencias**:
+  - Actualizado el gestor de paquetes a **`pnpm@12.6.0`** en el `Dockerfile` (etapas `builder` y `runner`), alineado con `packageManager` en `package.json`, `pnpm-workspace.yaml` y la documentación del proyecto (`.agents/ARCHITECTURE.md`).
+  - Actualizadas dependencias del monorepo (`astro`, `fastify`, `@nestjs/*`, `@typescript-eslint/*`, `eslint`, `prettier`, `astro-eslint-parser`, `vitest`) a sus versiones fijas estables.
 
 ## [1.12.1] - 2026-09-14
 
@@ -647,4 +660,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.12.2
+**Versión actualmente expuesta / en producción:** v1.12.3

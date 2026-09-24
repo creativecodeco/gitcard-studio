@@ -57,7 +57,7 @@ export class RootController {
   getHealth(): { status: string; version: string; uptime: number; environment: string } {
     return {
       status: 'ok',
-      version: process.env.npm_package_version ?? '1.12.2',
+      version: process.env.npm_package_version ?? '1.12.3',
       uptime: Math.floor(process.uptime()),
       environment: process.env.NODE_ENV ?? 'development'
     };

@@ -3,26 +3,27 @@ packages:
   - "frontend"
 
 overrides:
-  fastify: "5.12.4"
+  fastify: "5.12.5"
 
 allowBuilds:
   esbuild: true
   sharp: true
   sqlite3: true
+
 minimumReleaseAgeExclude:
   - express-rate-limit@8.6.0
-  - '@typescript-eslint/eslint-plugin@8.70.0'
-  - '@typescript-eslint/parser@8.70.0'
-  - '@typescript-eslint/project-service@8.70.0'
-  - '@typescript-eslint/scope-manager@8.70.0'
-  - '@typescript-eslint/tsconfig-utils@8.70.0'
-  - '@typescript-eslint/type-utils@8.70.0'
-  - '@typescript-eslint/types@8.70.0'
-  - '@typescript-eslint/typescript-estree@8.70.0'
-  - '@typescript-eslint/utils@8.70.0'
-  - '@typescript-eslint/visitor-keys@8.70.0'
-  - astro@7.3.2
-  - prettier@3.9.6
+  - '@typescript-eslint/eslint-plugin@8.70.1'
+  - '@typescript-eslint/parser@8.70.1'
+  - '@typescript-eslint/project-service@8.70.1'
+  - '@typescript-eslint/scope-manager@8.70.1'
+  - '@typescript-eslint/tsconfig-utils@8.70.1'
+  - '@typescript-eslint/type-utils@8.70.1'
+  - '@typescript-eslint/types@8.70.1'
+  - '@typescript-eslint/typescript-estree@8.70.1'
+  - '@typescript-eslint/utils@8.70.1'
+  - '@typescript-eslint/visitor-keys@8.70.1'
+  - astro@7.3.4
+  - prettier@3.9.9
   - happy-dom@20.14.5
   - '@astrojs/compiler-binding-darwin-arm64@0.3.2'
   - '@astrojs/compiler-binding-darwin-x64@0.3.2'
@@ -39,11 +40,11 @@ minimumReleaseAgeExclude:
   - '@fastify/compress@9.2.0'
   - '@fastify/etag@6.2.0'
   - '@types/pg@8.23.1'
-  - '@types/node@26.5.1'
+  - '@types/node@26.6.2'
   - '@fastify/helmet@13.1.1'
-  - fastify@5.12.4
+  - fastify@5.12.5
   - tsc-alias@1.9.5
-  - prettier-plugin-astro@1.0.0
+  - prettier-plugin-astro@1.0.1
   - '@astrojs/internal-helpers@0.11.0'
   - '@astrojs/markdown-satteri@0.4.1'
   - '@bruits/satteri-darwin-arm64@0.10.3'
@@ -56,14 +57,15 @@ minimumReleaseAgeExclude:
   - '@bruits/satteri-win32-arm64-msvc@0.10.3'
   - '@bruits/satteri-win32-x64-msvc@0.10.3'
   - satteri@0.10.3
-  - '@nestjs/common@12.0.1'
-  - '@nestjs/core@12.0.1'
-  - '@nestjs/platform-fastify@12.0.1'
-  - '@nestjs/testing@12.0.1'
+  - '@nestjs/common@12.1.0'
+  - '@nestjs/core@12.1.0'
+  - '@nestjs/platform-fastify@12.1.0'
+  - '@nestjs/testing@12.1.0'
   - typescript@7.0.2
-  - tsx@4.23.13
-  - eslint@10.10.0
+  - tsx@4.23.15
+  - eslint@10.11.0
   - '@playwright/test@1.63.0'
-  - vitest@5.0.0
+  - vitest@5.0.1
   - playwright-core@1.63.0
   - playwright@1.63.0
+  - astro-eslint-parser@3.2.0

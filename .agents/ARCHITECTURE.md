@@ -4,7 +4,7 @@
 
 ---
 
-## Estado actual: 2026-09-14 (v1.12.2)
+## Estado actual: 2026-09-24 (v1.12.3)
 
 ### Stack
 
@@ -14,7 +14,7 @@
 | Backend | NestJS + Fastify + TypeScript | 12.0.1 / 5.12.1 / 7.0.2 |
 | Frontend | Astro (SSG estático) | 7.3.1 |
 | Base de datos | PostgreSQL + TypeORM | 8.23.0 / 1.1.1 |
-| Package Manager | pnpm (monorepo) | 12.3.4 |
+| Package Manager | pnpm (monorepo) | 12.6.0 |
 | Contenedor | Docker multi-stage, node:24-alpine | — |
 | CSS | Vanilla CSS (global.css) | — |
 | Tests | Vitest | 5.0.0 |
