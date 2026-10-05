@@ -2,6 +2,15 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.15.0] - 2026-10-04
+
+### 📦 Sincronización y Estabilización de Dependencias Monorepo
+- **Gestión Estricta de Dependencias**:
+  - Actualizadas dependencias del monorepo a versiones fijas estables (`@eslint/js` 10.0.1, `@typescript-eslint/*` 8.71.0, `eslint` 10.12.0, `eslint-config-prettier` 10.1.8, `globals` 17.13.0, `prettier` 3.9.9, `pnpm` 12.9.1).
+  - Verificación y alineación del 100% de las dependencias exactas y compartidas entre raíz, `backend` y `frontend`.
+- **Verificación de Auditoría e Integridad**:
+  - Ejecución y paso limpio del escaneo integral de agentes (`security`, `code-integrity`, `architecture`, `best-practices`, `dependencies`).
+
 ## [1.14.0] - 2026-09-24
 
 ### 📈 Desglose Analítico de Métricas (Formato, Idioma y Temas)
@@ -673,4 +682,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.14.0
+**Versión actualmente expuesta / en producción:** v1.15.0
