@@ -270,11 +270,12 @@ export function getTheme(themeName?: string, overrides?: Record<string, string>)
   };
 }
 
+const COLOR_MATCH_REGEX =
+  /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}(?:\s*,\s*[\d.]+)?\s*\)|hsla?\(\s*\d{1,3}\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%(?:\s*,\s*[\d.]+)?\s*\)/gi;
+
 export function getBackgroundDef(theme: Theme, gradientId: string = 'bg'): string {
   if (theme.bgGradient) {
-    const colorMatches = theme.bgGradient.match(
-      /(?:#[0-9a-fA-F]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\))/gi
-    );
+    const colorMatches = theme.bgGradient.match(COLOR_MATCH_REGEX);
     if (colorMatches && colorMatches.length >= 2) {
       const stops = colorMatches.map((color, idx) => {
         const offset = Math.round((idx / (colorMatches.length - 1)) * 100);

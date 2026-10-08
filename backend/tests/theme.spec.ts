@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   getTheme,
+  getBackgroundDef,
   renderBrandHeader,
   renderGlowFilter,
   renderCardFrame,
@@ -40,6 +41,31 @@ describe('theme.ts', () => {
       expect(theme.bgGradient).toBe(
         'linear-gradient(135deg, #ff007f 0%, #7928ca 50%, #00f0ff 100%)'
       );
+    });
+
+    it('should generate background SVG def for linear-gradient with hex, rgba, and hsla colors', () => {
+      const theme = {
+        ...THEMES.dark,
+        bgGradient:
+          'linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, hsla(210, 50%, 40%, 0.8) 100%)'
+      };
+      const def = getBackgroundDef(theme, 'custom-bg');
+      expect(def).toContain('id="custom-bg"');
+      expect(def).toContain('stop-color="rgba(30, 41, 59, 0.7)"');
+      expect(def).toContain('stop-color="hsla(210, 50%, 40%, 0.8)"');
+    });
+
+    it('should handle adversarial long inputs without performance degradation (ReDoS prevention)', () => {
+      const longInput = 'rgb(' + 'rgb('.repeat(500) + '255, 255, 255' + ')'.repeat(500);
+      const theme = {
+        ...THEMES.dark,
+        bgGradient: `linear-gradient(90deg, ${longInput})`
+      };
+      const startTime = performance.now();
+      const def = getBackgroundDef(theme, 'test-bg');
+      const duration = performance.now() - startTime;
+      expect(duration).toBeLessThan(100);
+      expect(def).toContain('linearGradient');
     });
   });
 
