@@ -17,7 +17,8 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       | 'trophies'
       | 'views'
       | 'sponsors'
-      | 'commit-activity',
+      | 'commit-activity'
+      | 'tech-stack',
     context?: HitContext
   ): void {
     const username = context?.username || 'unknown';
@@ -37,8 +38,18 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
         .where('metric_key = :key', { key: 'totalRenders' })
         .execute();
 
-      const normalizedType = type === 'commit-activity' ? 'commit_activity' : type;
-      const metricKey = type === 'commit-activity' ? 'commitActivityRenders' : `${type}Renders`;
+      const normalizedType =
+        type === 'commit-activity'
+          ? 'commit_activity'
+          : type === 'tech-stack'
+            ? 'tech_stack'
+            : type;
+      const metricKey =
+        type === 'commit-activity'
+          ? 'commitActivityRenders'
+          : type === 'tech-stack'
+            ? 'techStackRenders'
+            : `${type}Renders`;
       const column = `${normalizedType}_${source}`;
 
       // 2. Increment specific card type renders

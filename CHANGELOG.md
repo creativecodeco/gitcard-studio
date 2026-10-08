@@ -2,6 +2,23 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.18.0] - 2026-10-07
+
+### 🌐 Arquitectura Modular de i18n, Cobertura del 100% y Corrección en Métricas
+- **Arquitectura Modular de i18n (`frontend/src/utils/i18n/`)**:
+  - Refactorizado el diccionario de internacionalización anteriormente monolítico en 7 archivos independientes dentro de `frontend/src/utils/i18n/locales/` (`es.ts`, `en.ts`, `fr.ts`, `de.ts`, `pt.ts`, `ja.ts`, `zh.ts`).
+  - Definido `LocaleDictionary = Record<TranslationKey, string>` en `types.ts` para garantizar a nivel de compilación en TypeScript que cualquier clave añadida en Español debe existir obligatoriamente en los demás 6 idiomas.
+- **Traducción Completa de Interfaz, Notificaciones & Tooltips**:
+  - Sincronizadas 13 claves en todos los diccionarios (`loading`, `account_active_status`, `guide_public_title`, `guide_app_title`, `guide_pat_title`, `btn_download_svg_title`, `btn_download_png_title`, `privacy_banner_aria_label`, `msg_account_disconnected`, `msg_no_active_user_export`, `msg_export_success`, `msg_export_error`, `readme_preview_section_title`).
+  - Actualizada la función `updateDomTranslations()` para dar soporte a tooltips (`[data-i18n-title]`), placeholders y etiquetas accesibles (`[data-i18n-aria-label]`).
+  - Internacionalizadas notificaciones toast dinámicas en `PrivateTokenModal.astro` y textos de componentes en `CardPreview.astro` y `PrivacyConsentBanner.astro`.
+- **Corrección en Persistencia de Métricas Backend**:
+  - Corregido mapeo de la propiedad `tech-stack` a `tech_stack` en `TypeORMMetricsRepository.ts` para alinearse con la entidad `UserMetric` en TypeORM/PostgreSQL.
+- **Regla de Proyecto Registrada**:
+  - Creada la regla `.agents/rules/i18n-synchronization.md` documentando la arquitectura modular de i18n y la regla de sincronización estricta.
+- **Sincronización de Versión Monorepo**:
+  - Actualizada la versión del proyecto a **`v1.18.0`** de forma sincronizada en `root`, `backend` y `frontend`.
+
 ## [1.17.0] - 2026-10-07
 
 ### 🚫 Manejo de Usuarios Inexistentes, Cancelación de Peticiones y Notificaciones Toast
@@ -701,4 +718,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.17.0
+**Versión actualmente expuesta / en producción:** v1.18.0

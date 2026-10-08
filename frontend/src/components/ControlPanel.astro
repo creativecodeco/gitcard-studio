@@ -59,7 +59,7 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             <span class="color-dot" style="background: #e2e8f0"></span>
           </span>
         </button>
-        <button class="theme-option" data-theme="solarized" id="theme-solarized">
+        <button class="theme-option theme-extra hidden" data-theme="solarized" id="theme-solarized">
           <span class="theme-name">Solarized</span>
           <span class="theme-colors">
             <span class="color-dot" style="background: #002b36"></span>
@@ -67,7 +67,7 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             <span class="color-dot" style="background: #839496"></span>
           </span>
         </button>
-        <button class="theme-option" data-theme="radical" id="theme-radical">
+        <button class="theme-option theme-extra hidden" data-theme="radical" id="theme-radical">
           <span class="theme-name">Radical</span>
           <span class="theme-colors">
             <span class="color-dot" style="background: #141321"></span>
@@ -75,7 +75,11 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             <span class="color-dot" style="background: #a9fef7"></span>
           </span>
         </button>
-        <button class="theme-option" data-theme="tokyonight" id="theme-tokyonight">
+        <button
+          class="theme-option theme-extra hidden"
+          data-theme="tokyonight"
+          id="theme-tokyonight"
+        >
           <span class="theme-name">Tokyo</span>
           <span class="theme-colors">
             <span class="color-dot" style="background: #1a1b26"></span>
@@ -83,7 +87,11 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             <span class="color-dot" style="background: #c0caf5"></span>
           </span>
         </button>
-        <button class="theme-option" data-theme="catppuccin_mocha" id="theme-catppuccin_mocha">
+        <button
+          class="theme-option theme-extra hidden"
+          data-theme="catppuccin_mocha"
+          id="theme-catppuccin_mocha"
+        >
           <span class="theme-name">Catppuccin</span>
           <span class="theme-colors">
             <span class="color-dot" style="background: #1e1e2e"></span>
@@ -91,7 +99,43 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             <span class="color-dot" style="background: #cdd6f4"></span>
           </span>
         </button>
-        <button class="theme-option" data-theme="nord" id="theme-nord">
+        <button
+          class="theme-option theme-extra hidden"
+          data-theme="catppuccin_latte"
+          id="theme-catppuccin_latte"
+        >
+          <span class="theme-name">Catppuccin Latte</span>
+          <span class="theme-colors">
+            <span class="color-dot" style="background: #eff1f5; border: 1px solid #bcc0cc"></span>
+            <span class="color-dot" style="background: #8839ef"></span>
+            <span class="color-dot" style="background: #1e66f5"></span>
+          </span>
+        </button>
+        <button class="theme-option theme-extra hidden" data-theme="dracula" id="theme-dracula">
+          <span class="theme-name">Dracula</span>
+          <span class="theme-colors">
+            <span class="color-dot" style="background: #282a36"></span>
+            <span class="color-dot" style="background: #bd93f9"></span>
+            <span class="color-dot" style="background: #ff79c6"></span>
+          </span>
+        </button>
+        <button class="theme-option theme-extra hidden" data-theme="midnight" id="theme-midnight">
+          <span class="theme-name">Midnight OLED</span>
+          <span class="theme-colors">
+            <span class="color-dot" style="background: #000000; border: 1px solid #1e293b"></span>
+            <span class="color-dot" style="background: #38bdf8"></span>
+            <span class="color-dot" style="background: #f1f5f9"></span>
+          </span>
+        </button>
+        <button class="theme-option theme-extra hidden" data-theme="retrowave" id="theme-retrowave">
+          <span class="theme-name">Retrowave</span>
+          <span class="theme-colors">
+            <span class="color-dot" style="background: #18002e"></span>
+            <span class="color-dot" style="background: #ff007f"></span>
+            <span class="color-dot" style="background: #00f0ff"></span>
+          </span>
+        </button>
+        <button class="theme-option theme-extra hidden" data-theme="nord" id="theme-nord">
           <span class="theme-name">Nord</span>
           <span class="theme-colors">
             <span class="color-dot" style="background: #2e3440"></span>
@@ -99,7 +143,7 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             <span class="color-dot" style="background: #e5e9f0"></span>
           </span>
         </button>
-        <button class="theme-option" data-theme="cyberpunk" id="theme-cyberpunk">
+        <button class="theme-option theme-extra hidden" data-theme="cyberpunk" id="theme-cyberpunk">
           <span class="theme-name">Cyberpunk</span>
           <span class="theme-colors">
             <span class="color-dot" style="background: #0d0221"></span>
@@ -107,7 +151,7 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             <span class="color-dot" style="background: #00ff9f"></span>
           </span>
         </button>
-        <button class="theme-option" data-theme="gruvbox" id="theme-gruvbox">
+        <button class="theme-option theme-extra hidden" data-theme="gruvbox" id="theme-gruvbox">
           <span class="theme-name">Gruvbox</span>
           <span class="theme-colors">
             <span class="color-dot" style="background: #282828"></span>
@@ -115,7 +159,7 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             <span class="color-dot" style="background: #ebdbb2"></span>
           </span>
         </button>
-        <button class="theme-option" data-theme="synthwave" id="theme-synthwave">
+        <button class="theme-option theme-extra hidden" data-theme="synthwave" id="theme-synthwave">
           <span class="theme-name">Synthwave</span>
           <span class="theme-colors">
             <span class="color-dot" style="background: #1a0933"></span>
@@ -123,7 +167,7 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             <span class="color-dot" style="background: #36fdf1"></span>
           </span>
         </button>
-        <button class="theme-option" data-theme="custom" id="theme-custom">
+        <button class="theme-option theme-extra hidden" data-theme="custom" id="theme-custom">
           <span class="theme-name">Custom 🎨</span>
           <span class="theme-colors">
             <span class="color-dot" style="background: #38bdf8"></span>
@@ -133,6 +177,32 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
         </button>
       </div>
 
+      <!-- Toggle Expand/Collapse Themes Button -->
+      <button
+        type="button"
+        id="btn-toggle-themes"
+        class="btn-toggle-themes"
+        style="width: 100%; margin-top: 10px; padding: 8px 12px; border-radius: 8px; border: 1px dashed var(--glass-border); background: rgba(56, 189, 248, 0.05); color: var(--accent-color); cursor: pointer; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;"
+      >
+        <span id="btn-toggle-themes-text" data-i18n="btn_show_more">
+          Ver más estilos (13)
+        </span>
+        <svg
+          id="btn-toggle-themes-icon"
+          viewBox="0 0 24 24"
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          style="transition: transform 0.2s ease;"
+        >
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+
       <!-- Custom Theme Color Pickers Panel (Shown only when 'Custom 🎨' theme is active) -->
       <div
         id="custom-theme-picker-panel"
@@ -140,12 +210,15 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
         style="margin-top: 14px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 12px; background: rgba(0,0,0,0.3); transition: all 0.3s ease;"
       >
         <div style="font-size: 0.8rem; font-weight: 600; color: var(--accent-color); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-          🎨 <span>Personalizar Paleta de Colores</span>
+          🎨 <span data-i18n="custom_palette_title">Personalizar Paleta de Colores</span>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
-            <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">
+            <label
+              style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;"
+              data-i18n="picker_bg_label"
+            >
               Fondo (BG)
             </label>
             <input
@@ -156,7 +229,10 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             />
           </div>
           <div>
-            <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">
+            <label
+              style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;"
+              data-i18n="picker_title_label"
+            >
               Título
             </label>
             <input
@@ -167,7 +243,10 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             />
           </div>
           <div>
-            <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">
+            <label
+              style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;"
+              data-i18n="picker_text_label"
+            >
               Texto
             </label>
             <input
@@ -178,7 +257,10 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             />
           </div>
           <div>
-            <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">
+            <label
+              style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;"
+              data-i18n="picker_icon_label"
+            >
               Iconos / Acento
             </label>
             <input
@@ -189,7 +271,10 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
             />
           </div>
           <div style="grid-column: span 2;">
-            <label style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">
+            <label
+              style="font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px;"
+              data-i18n="picker_border_label"
+            >
               Borde
             </label>
             <input
@@ -270,13 +355,48 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
           >
             English (en)
           </option>
+          <option
+            value="fr"
+            style="background: var(--bg-color); color: var(--text-primary);"
+            data-i18n="locale_fr"
+          >
+            Français (fr)
+          </option>
+          <option
+            value="de"
+            style="background: var(--bg-color); color: var(--text-primary);"
+            data-i18n="locale_de"
+          >
+            Deutsch (de)
+          </option>
+          <option
+            value="pt"
+            style="background: var(--bg-color); color: var(--text-primary);"
+            data-i18n="locale_pt"
+          >
+            Português (pt)
+          </option>
+          <option
+            value="ja"
+            style="background: var(--bg-color); color: var(--text-primary);"
+            data-i18n="locale_ja"
+          >
+            日本語 (ja)
+          </option>
+          <option
+            value="zh"
+            style="background: var(--bg-color); color: var(--text-primary);"
+            data-i18n="locale_zh"
+          >
+            中文 (zh)
+          </option>
         </select>
       </div>
     </div>
 
     <!-- Formato de Renderizado (SVG / PNG) -->
     <div class="input-group" style="margin-top: 16px;">
-      <label for="format-select" class="input-label">
+      <label for="format-select" class="input-label" data-i18n="format_label">
         Formato de Salida
       </label>
       <div class="input-wrapper" style="height: 38px;">
@@ -284,10 +404,18 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
           id="format-select"
           style="width: 100%; height: 100%; background: transparent; border: none; color: var(--text-primary); font-family: var(--font-family); font-size: 0.85rem; padding-left: 12px; cursor: pointer; outline: none;"
         >
-          <option value="svg" style="background: var(--bg-color); color: var(--text-primary);">
+          <option
+            value="svg"
+            style="background: var(--bg-color); color: var(--text-primary);"
+            data-i18n="format_svg"
+          >
             SVG (Vectorial Animado)
           </option>
-          <option value="png" style="background: var(--bg-color); color: var(--text-primary);">
+          <option
+            value="png"
+            style="background: var(--bg-color); color: var(--text-primary);"
+            data-i18n="format_png"
+          >
             PNG (Imagen High-Res)
           </option>
         </select>

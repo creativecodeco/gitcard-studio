@@ -10,6 +10,24 @@ export interface Theme {
   bgGradient?: string; // CSS background linear-gradient if desired
 }
 
+const ALLOWED_FONTS: Record<string, string> = {
+  inter: "'Inter', system-ui, -apple-system, sans-serif",
+  'fira code': "'Fira Code', monospace",
+  'jetbrains mono': "'JetBrains Mono', monospace",
+  outfit: "'Outfit', sans-serif",
+  roboto: "'Roboto', sans-serif",
+  ubuntu: "'Ubuntu', sans-serif",
+  segoe: "'Segoe UI', Ubuntu, sans-serif"
+};
+
+export function getFontFamily(fontName?: string): string {
+  if (!fontName || typeof fontName !== 'string') {
+    return "'Segoe UI', Ubuntu, sans-serif";
+  }
+  const clean = fontName.toLowerCase().trim();
+  return ALLOWED_FONTS[clean] || "'Segoe UI', Ubuntu, sans-serif";
+}
+
 export const THEMES: Record<string, Theme> = {
   dark: {
     bg: '#0d1117',
@@ -42,7 +60,7 @@ export const THEMES: Record<string, Theme> = {
     title: '#38bdf8',
     accent: '#38bdf8',
     secondary: '#94a3b8',
-    border: 'rgba(255, 255, 255, 0.1)',
+    border: 'rgba(255, 255, 255, 0.15)',
     bgGradient: 'linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%)'
   },
   solarized: {
@@ -71,6 +89,33 @@ export const THEMES: Record<string, Theme> = {
     border: '#383e5a',
     bgGradient: 'linear-gradient(135deg, #1a1b26 0%, #16161e 100%)'
   },
+  catppuccin_latte: {
+    bg: '#eff1f5',
+    text: '#4c4f69',
+    title: '#8839ef',
+    accent: '#1e66f5',
+    secondary: '#6c6f85',
+    border: '#bcc0cc',
+    bgGradient: 'linear-gradient(135deg, #eff1f5 0%, #e6e9ef 100%)'
+  },
+  catppuccin_frappe: {
+    bg: '#303446',
+    text: '#c6d0f5',
+    title: '#ca9ee6',
+    accent: '#8caaee',
+    secondary: '#838ba7',
+    border: '#51576d',
+    bgGradient: 'linear-gradient(135deg, #303446 0%, #232634 100%)'
+  },
+  catppuccin_macchiato: {
+    bg: '#24273a',
+    text: '#cad3f5',
+    title: '#c6a0f6',
+    accent: '#8aadf4',
+    secondary: '#8087a2',
+    border: '#494d64',
+    bgGradient: 'linear-gradient(135deg, #24273a 0%, #181926 100%)'
+  },
   catppuccin_mocha: {
     bg: '#1e1e2e',
     text: '#cdd6f4',
@@ -79,6 +124,15 @@ export const THEMES: Record<string, Theme> = {
     secondary: '#a6adc8',
     border: '#45475a',
     bgGradient: 'linear-gradient(135deg, #1e1e2e 0%, #11111b 100%)'
+  },
+  dracula: {
+    bg: '#282a36',
+    text: '#f8f8f2',
+    title: '#bd93f9',
+    accent: '#ff79c6',
+    secondary: '#6272a4',
+    border: '#44475a',
+    bgGradient: 'linear-gradient(135deg, #282a36 0%, #191a21 100%)'
   },
   nord: {
     bg: '#2e3440',
@@ -114,6 +168,24 @@ export const THEMES: Record<string, Theme> = {
     secondary: '#b39ddb',
     border: '#ff7edb',
     bgGradient: 'linear-gradient(135deg, #1a102f 0%, #2d124d 100%)'
+  },
+  midnight: {
+    bg: '#000000',
+    text: '#f1f5f9',
+    title: '#38bdf8',
+    accent: '#38bdf8',
+    secondary: '#64748b',
+    border: '#1e293b',
+    bgGradient: 'linear-gradient(135deg, #000000 0%, #0f172a 100%)'
+  },
+  retrowave: {
+    bg: '#18002e',
+    text: '#ffe6f9',
+    title: '#ff007f',
+    accent: '#00f0ff',
+    secondary: '#9e00ff',
+    border: '#ff007f',
+    bgGradient: 'linear-gradient(135deg, #18002e 0%, #30005c 100%)'
   }
 };
 
@@ -163,6 +235,18 @@ export function sanitizeGradient(val?: string): string | undefined {
   if (GRADIENT_REGEX.test(trimmed)) {
     return trimmed;
   }
+  // Support comma-separated hex list (e.g., "ff007f,7928ca" or "#ff007f,#7928ca,#00f0ff")
+  if (/^[0-9a-fA-F,#\s]+$/.test(trimmed)) {
+    const rawParts = trimmed.split(',').map((p) => p.trim().replace(/^#/, ''));
+    const validHexes = rawParts.filter((p) => HEX_REGEX.test(`#${p}`));
+    if (validHexes.length >= 2) {
+      const stops = validHexes.map((hex, idx) => {
+        const percent = Math.round((idx / (validHexes.length - 1)) * 100);
+        return `#${hex} ${percent}%`;
+      });
+      return `linear-gradient(135deg, ${stops.join(', ')})`;
+    }
+  }
   return undefined;
 }
 
@@ -187,15 +271,69 @@ export function getTheme(themeName?: string, overrides?: Record<string, string>)
 }
 
 export function getBackgroundDef(theme: Theme, gradientId: string = 'bg'): string {
-  return theme.bgGradient
-    ? `<linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
-         <stop offset="0%" stop-color="${theme.bgGradient.match(/#[0-9a-fA-F]{3,8}/g)?.[0] || theme.bg}" />
-         <stop offset="100%" stop-color="${theme.bgGradient.match(/#[0-9a-fA-F]{3,8}/g)?.[1] || theme.bg}" />
-       </linearGradient>`
-    : `<linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
-         <stop offset="0%" stop-color="${theme.bg}" />
-         <stop offset="100%" stop-color="${theme.bg}" />
-       </linearGradient>`;
+  if (theme.bgGradient) {
+    const colorMatches = theme.bgGradient.match(
+      /(?:#[0-9a-fA-F]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\))/gi
+    );
+    if (colorMatches && colorMatches.length >= 2) {
+      const stops = colorMatches.map((color, idx) => {
+        const offset = Math.round((idx / (colorMatches.length - 1)) * 100);
+        return `<stop offset="${offset}%" stop-color="${color}" />`;
+      });
+      return `<linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+        ${stops.join('\n        ')}
+      </linearGradient>`;
+    }
+  }
+  return `<linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+       <stop offset="0%" stop-color="${theme.bg}" />
+       <stop offset="100%" stop-color="${theme.bg}" />
+     </linearGradient>`;
+}
+
+/**
+ * Renders an SVG glow filter element.
+ */
+export function renderGlowFilter(id: string = 'glow', color?: string): string {
+  const filterColor = color || '#38bdf8';
+  return `<filter id="${id}" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="2.5" result="blur" />
+    <feFlood flood-color="${filterColor}" flood-opacity="0.5" result="color" />
+    <feComposite in="color" in2="blur" operator="in" result="glow" />
+    <feMerge>
+      <feMergeNode in="glow" />
+      <feMergeNode in="SourceGraphic" />
+    </feMerge>
+  </filter>`;
+}
+
+export interface CardFrameOptions {
+  width: number;
+  height: number;
+  theme: Theme;
+  gradientId?: string;
+  borderRadius?: number;
+  showBorder?: boolean;
+  borderColor?: string;
+}
+
+/**
+ * Renders the main outer card background rectangle with border radius & styling.
+ */
+export function renderCardFrame(options: CardFrameOptions): string {
+  const {
+    width,
+    height,
+    theme,
+    gradientId = 'bg',
+    borderRadius = 12,
+    showBorder = true,
+    borderColor
+  } = options;
+  const rx = Math.min(24, Math.max(0, borderRadius));
+  const border = borderColor || theme.border;
+  const strokeAttr = showBorder ? `stroke="${border}" stroke-width="1.5"` : '';
+  return `<rect width="${width}" height="${height}" rx="${rx}" fill="url(#${gradientId})" ${strokeAttr} />`;
 }
 
 /**
@@ -216,4 +354,46 @@ export function renderBrandHeader(
   const displayPath = cleanTarget ? `github.com/${cleanTarget}` : 'github.com';
   const safeDisplayUrl = escapeXml(displayPath);
   return `<text x="${x}" y="${y}" text-anchor="end" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="600" font-size="9px" fill="${currentTheme.secondary}" opacity="0.6">${safeDisplayUrl}</text>`;
+}
+
+/**
+ * Renders SVG keyframe animation CSS rules.
+ */
+export function renderAnimationStyles(animationType?: string): string {
+  if (!animationType || typeof animationType !== 'string') return '';
+
+  const clean = animationType.toLowerCase().trim();
+
+  if (clean === 'pulse') {
+    return `
+      @keyframes pulseAnim {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      .pulse-anim { animation: pulseAnim 2s ease-in-out infinite; }
+    `;
+  }
+
+  if (clean === 'fade-in' || clean === 'fade') {
+    return `
+      @keyframes fadeInAnim {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      svg { animation: fadeInAnim 0.6s ease-out forwards; }
+    `;
+  }
+
+  if (clean === 'shimmer') {
+    return `
+      @keyframes shimmerAnim {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+      }
+      .shimmer-anim { animation: shimmerAnim 2.5s ease-in-out infinite; }
+    `;
+  }
+
+  return '';
 }

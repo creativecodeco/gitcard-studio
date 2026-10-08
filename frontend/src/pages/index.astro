@@ -452,6 +452,30 @@ import Footer from '@/components/Footer.astro';
               <line x1="6" y1="20" x2="6" y2="16"></line>
             </svg>
           </CardPreview>
+
+          <!-- Tech Stack & Ecosystem Card Preview -->
+          <CardPreview
+            id="tech-stack"
+            title="Ecosistema & Tech Stack"
+            codeLabel="Ecosistema Tech Stack"
+            category="stats"
+          >
+            <svg
+              slot="placeholder-icon"
+              class="placeholder-svg"
+              viewBox="0 0 24 24"
+              width="48"
+              height="48"
+              fill="none"
+              stroke="#a855f7"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+          </CardPreview>
         </div>
       </div>
 
@@ -519,6 +543,9 @@ import Footer from '@/components/Footer.astro';
   const viewsImg = document.getElementById('views-img') as HTMLImageElement | null;
   const viewsPlaceholder = document.getElementById('views-placeholder');
 
+  const techStackImg = document.getElementById('tech-stack-img') as HTMLImageElement | null;
+  const techStackPlaceholder = document.getElementById('tech-stack-placeholder');
+
   const codeBlockWrappers = document.querySelectorAll('.code-block-wrapper');
   const markdownStatsCode = document.getElementById('markdown-stats-code');
   const markdownLanguagesCode = document.getElementById('markdown-languages-code');
@@ -532,6 +559,7 @@ import Footer from '@/components/Footer.astro';
   const markdownTodayStatusCode = document.getElementById('markdown-today-status-code');
   const markdownTimelineMatrixCode = document.getElementById('markdown-timeline-matrix-code');
   const markdownViewsCode = document.getElementById('markdown-views-code');
+  const markdownTechStackCode = document.getElementById('markdown-tech-stack-code');
 
   const btnCopyStats = document.getElementById('btn-copy-stats');
   const btnCopyLanguages = document.getElementById('btn-copy-languages');
@@ -568,7 +596,7 @@ import Footer from '@/components/Footer.astro';
   let currentReadmeLayout: 'vertical' | 'grid' = 'vertical';
 
   let completedImagesCount = 0;
-  const totalImagesToLoad = 12; // stats, languages, repo, rank, streak, trophies, top-repos, sponsors, commit-activity, today-status, timeline-matrix, views
+  const totalImagesToLoad = 13; // stats, languages, repo, rank, streak, trophies, top-repos, sponsors, commit-activity, today-status, timeline-matrix, views, tech-stack
   let isGeneratingAllCards = false;
   let isUsingCustomTheme = false;
   let activeCardFetchController: AbortController | null = null;
@@ -714,6 +742,34 @@ import Footer from '@/components/Footer.astro';
   const pickerText = document.getElementById('picker-text') as HTMLInputElement | null;
   const pickerIcon = document.getElementById('picker-icon') as HTMLInputElement | null;
   const pickerBorder = document.getElementById('picker-border') as HTMLInputElement | null;
+
+  // --- Toggle Expand / Collapse Themes ---
+  const btnToggleThemes = document.getElementById('btn-toggle-themes');
+  const btnToggleThemesText = document.getElementById('btn-toggle-themes-text');
+  const btnToggleThemesIcon = document.getElementById('btn-toggle-themes-icon');
+  let isThemesExpanded = false;
+
+  btnToggleThemes?.addEventListener('click', () => {
+    isThemesExpanded = !isThemesExpanded;
+    const extraThemes = document.querySelectorAll('.theme-extra');
+
+    extraThemes.forEach((el) => {
+      if (isThemesExpanded) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    });
+
+    if (btnToggleThemesText) {
+      btnToggleThemesText.textContent = isThemesExpanded
+        ? t('btn_show_less', currentLocale)
+        : t('btn_show_more', currentLocale, { count: String(extraThemes.length) });
+    }
+    if (btnToggleThemesIcon) {
+      btnToggleThemesIcon.style.transform = isThemesExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+  });
 
   // --- SVG Themes Selection logic ---
   themesContainer?.addEventListener('click', (e) => {
@@ -1061,6 +1117,12 @@ import Footer from '@/components/Footer.astro';
         title: t('title_repo', currentLocale),
         cleanUrl: cardUrls.repoUrl,
         getPreviewUrl: () => repoImg?.src
+      },
+      {
+        id: 'tech-stack',
+        title: t('code_label_tech_stack', currentLocale),
+        cleanUrl: cardUrls.techStackUrl,
+        getPreviewUrl: () => techStackImg?.src
       }
     ];
 
@@ -1140,7 +1202,8 @@ import Footer from '@/components/Footer.astro';
       commitActivityImg,
       todayStatusImg,
       timelineMatrixImg,
-      viewsImg
+      viewsImg,
+      techStackImg
     ];
     imgs.forEach((img) => {
       if (img) {
@@ -1161,7 +1224,8 @@ import Footer from '@/components/Footer.astro';
       commitActivityPlaceholder,
       todayStatusPlaceholder,
       timelineMatrixPlaceholder,
-      viewsPlaceholder
+      viewsPlaceholder,
+      techStackPlaceholder
     ];
     placeholders.forEach((ph) => {
       if (ph) {
@@ -1175,7 +1239,7 @@ import Footer from '@/components/Footer.astro';
           pulseIcon.innerHTML = `
             <svg class="placeholder-svg error" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#f85149" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
           `;
@@ -1260,7 +1324,8 @@ import Footer from '@/components/Footer.astro';
       todayStatusUrl,
       timelineMatrixUrl,
       repoUrl,
-      viewsUrl
+      viewsUrl,
+      techStackUrl
     } = cardUrls;
 
     // 1. Show Loading State
@@ -1276,6 +1341,7 @@ import Footer from '@/components/Footer.astro';
     showImageLoading(todayStatusImg, todayStatusPlaceholder);
     showImageLoading(timelineMatrixImg, timelineMatrixPlaceholder);
     showImageLoading(viewsImg, viewsPlaceholder);
+    showImageLoading(techStackImg, techStackPlaceholder);
 
     // 2. Set image sources with cache buster
     const cacheBuster = forceRefresh
@@ -1340,6 +1406,10 @@ import Footer from '@/components/Footer.astro';
       viewsImg.src = viewsUrl + '&preview=true' + cacheBuster;
       viewsImg.alt = `Contador de visitas de GitHub para el usuario @${currentUsername}`;
     }
+    if (techStackImg) {
+      techStackImg.src = techStackUrl + cacheBuster;
+      techStackImg.alt = `Tarjeta de Ecosistema Tech Stack de GitHub para el usuario @${currentUsername}`;
+    }
 
     // 3. Update Markdown Codes
     const markdownStats = `![${t('code_label_stats', currentLocale)}](${statsUrl})`;
@@ -1354,6 +1424,7 @@ import Footer from '@/components/Footer.astro';
     const markdownTodayStatus = `![${t('code_label_today_status', currentLocale)}](${todayStatusUrl})`;
     const markdownTimelineMatrix = `![${t('code_label_timeline_matrix', currentLocale)}](${timelineMatrixUrl})`;
     const markdownViews = `![${t('code_label_views', currentLocale)}](${viewsUrl})`;
+    const markdownTechStack = `![${t('code_label_tech_stack', currentLocale)}](${techStackUrl})`;
 
     if (markdownStatsCode) markdownStatsCode.textContent = markdownStats;
     if (markdownLanguagesCode) markdownLanguagesCode.textContent = markdownLanguages;
@@ -1367,6 +1438,7 @@ import Footer from '@/components/Footer.astro';
     if (markdownTodayStatusCode) markdownTodayStatusCode.textContent = markdownTodayStatus;
     if (markdownTimelineMatrixCode) markdownTimelineMatrixCode.textContent = markdownTimelineMatrix;
     if (markdownViewsCode) markdownViewsCode.textContent = markdownViews;
+    if (markdownTechStackCode) markdownTechStackCode.textContent = markdownTechStack;
 
     codeBlockWrappers.forEach((cb) => {
       const parent = cb.closest('.card-preview-wrapper');
@@ -1550,6 +1622,7 @@ import Footer from '@/components/Footer.astro';
     'Error al cargar línea de tiempo.'
   );
   setupImageEvents(viewsImg, viewsPlaceholder, 'Error al cargar contador de visitas.');
+  setupImageEvents(techStackImg, techStackPlaceholder, 'Error al cargar ecosistema tech stack.');
 
   // Setup Clipboard Copy handlers
   const btnCopyCommitActivity = document.getElementById('btn-copy-commit-activity');
@@ -2155,7 +2228,6 @@ import Footer from '@/components/Footer.astro';
       localStorage.getItem('gh_active_user') ||
       localStorage.getItem('registered-github-username');
     const themeParam = urlParams.get('theme');
-    const localeParam = urlParams.get('locale');
 
     if (themeParam) {
       currentTheme = themeParam;
@@ -2166,10 +2238,22 @@ import Footer from '@/components/Footer.astro';
       }
     }
 
-    if (localeParam === 'en' || localeParam === 'es') {
-      currentLocale = localeParam;
-      if (localeSelect) {
-        localeSelect.value = localeParam;
+    const SUPPORTED_LOCALES = ['es', 'en', 'fr', 'de', 'pt', 'ja', 'zh'];
+    if (urlParams.has('locale')) {
+      const localeParam = urlParams.get('locale') || '';
+      if (SUPPORTED_LOCALES.includes(localeParam)) {
+        currentLocale = localeParam;
+        if (localeSelect) {
+          localeSelect.value = localeParam;
+        }
+      } else {
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete('locale');
+        window.history.replaceState(
+          {},
+          document.title,
+          cleanUrl.pathname + (cleanUrl.search ? cleanUrl.search : '')
+        );
       }
     }
 

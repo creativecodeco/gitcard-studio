@@ -1,5 +1,12 @@
 import { LanguageStat } from '@/domain/entities/LanguageStat';
-import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
+import {
+  getTheme,
+  getBackgroundDef,
+  renderBrandHeader,
+  getFontFamily,
+  renderGlowFilter,
+  renderCardFrame
+} from './theme';
 import { getTranslations } from './i18n';
 
 export function renderLanguagesCard(
@@ -10,45 +17,78 @@ export function renderLanguagesCard(
 ): string {
   const theme = getTheme(themeName, overrides);
   const t = getTranslations(overrides?.locale);
+  const fontFamily = getFontFamily(overrides?.font);
+
+  const isCompact = overrides?.layout === 'compact';
   const cardWidth = 495;
-  const cardHeight = 195;
+  const cardHeight = isCompact ? 130 : 195;
   const widthAttr = overrides?.cardWidth || `${cardWidth}`;
 
-  // Background style: gradient support
-  const backgroundDef = getBackgroundDef(theme, 'bg');
+  const borderRadius = overrides?.borderRadius ? parseInt(overrides.borderRadius, 10) : 12;
+  const showBorder = overrides?.showBorder !== 'false';
+  const enableGlow = overrides?.glow === 'true';
 
-  // Filter languages with percentage > 0 to render in the bar
-  const validLanguages = languages.filter((l) => l.percentage > 0);
+  const backgroundDef = getBackgroundDef(theme, 'bg');
+  const glowDef = enableGlow ? renderGlowFilter('card-glow', theme.accent) : '';
+
+  // Parse hidden languages
+  const hiddenLangs = new Set(
+    (overrides?.hide_languages || '')
+      .toLowerCase()
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  );
+
+  // Filter languages
+  let filteredLanguages = languages.filter(
+    (l) => l.percentage > 0 && !hiddenLangs.has(l.name.toLowerCase())
+  );
+
+  // Recalculate percentages relative to remaining languages
+  const totalPercent = filteredLanguages.reduce((acc, l) => acc + l.percentage, 0);
+  if (totalPercent > 0 && filteredLanguages.length > 0) {
+    filteredLanguages = filteredLanguages.map((l) => ({
+      ...l,
+      percentage: Number(((l.percentage / totalPercent) * 100).toFixed(1))
+    }));
+  }
 
   // Generate stacked bar segments
   let currentX = 25;
   const barWidth = 445;
   const barSegments: string[] = [];
 
-  validLanguages.forEach((lang) => {
+  filteredLanguages.forEach((lang) => {
     const segmentWidth = (lang.percentage / 100) * barWidth;
     barSegments.push(
-      `<rect x="${currentX}" y="65" width="${segmentWidth}" height="12" fill="${lang.color}" />`
+      `<rect x="${currentX}" y="${isCompact ? '55' : '65'}" width="${segmentWidth}" height="${isCompact ? '10' : '12'}" fill="${lang.color}" />`
     );
     currentX += segmentWidth;
   });
 
-  // Generate Legend (2 columns layout)
-  // Col 1: indices 0, 2, 4, 6
-  // Col 2: indices 1, 3, 5
+  // Generate Legend
   const legendItems: string[] = [];
-  languages.forEach((lang, index) => {
+  filteredLanguages.forEach((lang, index) => {
     const isCol2 = index % 2 !== 0;
     const colX = isCol2 ? 260 : 25;
-    const rowY = 105 + Math.floor(index / 2) * 23;
+    const rowY = (isCompact ? 80 : 105) + Math.floor(index / 2) * (isCompact ? 18 : 23);
 
     legendItems.push(`
       <g transform="translate(${colX}, ${rowY})">
-        <circle cx="6" cy="6" r="6" fill="${lang.color}" />
-        <text x="20" y="10" class="legend-name">${lang.name}</text>
-        <text x="140" y="10" class="legend-percent">${lang.percentage}%</text>
+        <circle cx="6" cy="6" r="5" fill="${lang.color}" />
+        <text x="18" y="9" class="legend-name">${lang.name}</text>
+        <text x="140" y="9" class="legend-percent">${lang.percentage}%</text>
       </g>
     `);
+  });
+
+  const cardFrame = renderCardFrame({
+    width: cardWidth,
+    height: cardHeight,
+    theme,
+    borderRadius,
+    showBorder
   });
 
   return `
@@ -57,21 +97,22 @@ export function renderLanguagesCard(
       <desc>Top programming languages stats card</desc>
       <defs>
         ${backgroundDef}
+        ${glowDef}
         <clipPath id="bar-clip">
-          <rect x="25" y="65" width="${barWidth}" height="12" rx="6" />
+          <rect x="25" y="${isCompact ? '55' : '65'}" width="${barWidth}" height="${isCompact ? '10' : '12'}" rx="6" />
         </clipPath>
         <style>
-          .title { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 700; font-size: 16px; fill: ${theme.title}; }
-          .legend-name { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 600; font-size: 12.5px; fill: ${theme.text}; }
-          .legend-percent { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 500; font-size: 12.5px; fill: ${theme.secondary}; }
+          .title { font-family: ${fontFamily}; font-weight: 700; font-size: ${isCompact ? '15px' : '16px'}; fill: ${theme.title}; }
+          .legend-name { font-family: ${fontFamily}; font-weight: 600; font-size: ${isCompact ? '11.5px' : '12.5px'}; fill: ${theme.text}; }
+          .legend-percent { font-family: ${fontFamily}; font-weight: 500; font-size: ${isCompact ? '11.5px' : '12.5px'}; fill: ${theme.secondary}; }
         </style>
       </defs>
 
       <!-- Card Background -->
-      <rect width="${cardWidth}" height="${cardHeight}" rx="12" fill="url(#bg)" stroke="${theme.border}" stroke-width="1.5" />
+      ${cardFrame}
 
       <!-- Title -->
-      <text x="25" y="42" class="title">${t.languages.title}</text>
+      <text x="25" y="${isCompact ? '35' : '42'}" class="title">${t.languages.title}</text>
 
       <!-- Stacked Progress Bar -->
       <g clip-path="url(#bar-clip)">
@@ -84,7 +125,7 @@ export function renderLanguagesCard(
       </g>
 
       <!-- Brand Logo / Subtitle -->
-      ${renderBrandHeader(username || '', theme)}
+      ${renderBrandHeader(username || '', theme, 470, isCompact ? 22 : 25)}
     </svg>
   `.trim();
 }

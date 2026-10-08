@@ -26,10 +26,11 @@ export interface CardUrls {
   timelineMatrixUrl: string;
   repoUrl: string;
   viewsUrl: string;
+  techStackUrl: string;
 }
 
 /**
- * Builds API endpoint URLs for all 12 SVG cards.
+ * Builds API endpoint URLs for all 13 SVG cards.
  */
 export function buildCardUrls(options: CardUrlOptions): CardUrls {
   const {
@@ -62,6 +63,7 @@ export function buildCardUrls(options: CardUrlOptions): CardUrls {
   const commitActivityUrl = `${origin}/api/commit-activity?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
   const todayStatusUrl = `${origin}/api/today-status?username=${username}&theme=${theme}${localeParam}${formatParam}${custom}${tagParam}`;
   const timelineMatrixUrl = `${origin}/api/timeline-matrix?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const techStackUrl = `${origin}/api/tech-stack?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
 
   let repoUrl = `${origin}/api/repo?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
   if (repo) {
@@ -89,6 +91,7 @@ export function buildCardUrls(options: CardUrlOptions): CardUrls {
     todayStatusUrl,
     timelineMatrixUrl,
     repoUrl,
-    viewsUrl
+    viewsUrl,
+    techStackUrl
   };
 }

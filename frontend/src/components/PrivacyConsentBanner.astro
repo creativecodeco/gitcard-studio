@@ -7,6 +7,7 @@
   class="privacy-consent-banner hidden"
   role="region"
   aria-label="Aviso de privacidad y almacenamiento local"
+  data-i18n-aria-label="privacy_banner_aria_label"
 >
   <div class="banner-content">
     <div class="banner-icon">
@@ -25,7 +26,7 @@
       </svg>
     </div>
     <div class="banner-text">
-      <p>
+      <p data-i18n="privacy_banner_text">
         <strong>Transparencia y Privacidad:</strong> Utilizamos almacenamiento local (
         <code>localStorage</code>) únicamente para recordar tus preferencias de tema y
         configuración. No usamos cookies de rastreo publicitario de terceros. Consulta nuestra{' '}
@@ -40,7 +41,12 @@
       </p>
     </div>
     <div class="banner-actions">
-      <button type="button" id="btn-accept-privacy" class="btn-banner-accept">
+      <button
+        type="button"
+        id="btn-accept-privacy"
+        class="btn-banner-accept"
+        data-i18n="btn_accept_privacy"
+      >
         Entendido
       </button>
     </div>

@@ -1,6 +1,13 @@
 import { UserStats } from '@/domain/entities/UserStats';
 import { escapeXml, minifySvg } from '@/utils/escape';
-import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
+import {
+  getTheme,
+  getBackgroundDef,
+  renderBrandHeader,
+  getFontFamily,
+  renderGlowFilter,
+  renderCardFrame
+} from './theme';
 import { getTranslations } from './i18n';
 import { fetchAvatarBase64 } from './avatar';
 
@@ -23,21 +30,84 @@ export async function renderStatsCard(
   const t = getTranslations(overrides?.locale);
   const avatarBase64 = await fetchAvatarBase64(stats.avatarUrl);
 
-  const safeName = escapeXml(stats.name || '');
-  const safeUsername = escapeXml(stats.username || '');
+  const isPrivacyMode = overrides?.hide_username === 'true';
+  const isBlurAvatar = overrides?.blur_avatar === 'true';
+  const fontFamily = getFontFamily(overrides?.font);
 
+  const safeName = escapeXml(isPrivacyMode ? 'Developer' : stats.name || '');
+  const safeUsername = escapeXml(isPrivacyMode ? 'developer' : stats.username || '');
+
+  const isCompact = overrides?.layout === 'compact';
   const cardWidth = 495;
-  const cardHeight = 195;
+  const cardHeight = isCompact ? 130 : 195;
   const widthAttr = overrides?.cardWidth || `${cardWidth}`;
 
-  // Background style: gradient support
-  const backgroundDef = getBackgroundDef(theme, 'bg');
+  const borderRadius = overrides?.borderRadius ? parseInt(overrides.borderRadius, 10) : 12;
+  const showBorder = overrides?.showBorder !== 'false';
+  const enableGlow = overrides?.glow === 'true';
 
-  // Fallback avatar icon if fetch failed
+  const backgroundDef = getBackgroundDef(theme, 'bg');
+  const glowDef = enableGlow ? renderGlowFilter('card-glow', theme.accent) : '';
+
+  const avatarFilterAttr = isBlurAvatar ? 'filter="url(#avatar-blur)"' : '';
+  const avatarBlurDef = isBlurAvatar
+    ? `<filter id="avatar-blur"><feGaussianBlur stdDeviation="4" /></filter>`
+    : '';
+
+  // Avatar SVG element
   const avatarSvg = avatarBase64
-    ? `<image href="${avatarBase64}" x="25" y="25" width="70" height="70" clip-path="url(#circle-clip)" />`
-    : `<circle cx="60" cy="60" r="35" fill="${theme.secondary}" opacity="0.3"/>
+    ? `<image href="${avatarBase64}" x="25" y="${isCompact ? '15' : '25'}" width="${isCompact ? '50' : '70'}" height="${isCompact ? '50' : '70'}" clip-path="url(#circle-clip)" ${avatarFilterAttr} />`
+    : `<circle cx="60" cy="${isCompact ? '40' : '60'}" r="${isCompact ? '25' : '35'}" fill="${theme.secondary}" opacity="0.3" ${avatarFilterAttr}/>
        <path d="M60 45a10 10 0 100 20 10 10 0 000-20zm0 25c-11.5 0-21 5.2-21 12v3h42v-3c0-6.8-9.5-12-21-12z" fill="${theme.text}" />`;
+
+  // Parse hidden metrics
+  const hiddenItems = new Set(
+    (overrides?.hide || '')
+      .toLowerCase()
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  );
+
+  const allMetrics = [
+    { key: 'commits', label: t.stats.commits, value: stats.totalCommits, icon: ICONS.commit },
+    { key: 'stars', label: t.stats.stars, value: stats.totalStars, icon: ICONS.star, glow: true },
+    { key: 'followers', label: t.stats.followers, value: stats.followers, icon: ICONS.followers },
+    { key: 'prs', label: t.stats.prs, value: stats.totalPRs, icon: ICONS.pr },
+    { key: 'issues', label: t.stats.issues, value: stats.totalIssues, icon: ICONS.issue },
+    { key: 'forks', label: t.stats.forks, value: stats.forksReceived, icon: ICONS.fork }
+  ];
+
+  const visibleMetrics = allMetrics.filter((m) => !hiddenItems.has(m.key));
+
+  // Render metrics grid dynamically based on visible count
+  const itemsPerRow = isCompact ? 3 : 3;
+  const metricItemsSvg: string[] = [];
+
+  visibleMetrics.forEach((m, idx) => {
+    const row = Math.floor(idx / itemsPerRow);
+    const col = idx % itemsPerRow;
+    const posX = col * 150;
+    const posY = isCompact ? row * 26 : row * 30;
+
+    metricItemsSvg.push(`
+      <g transform="translate(${posX}, ${posY})">
+        <svg class="stat-icon ${m.glow && enableGlow ? 'glow' : ''}" viewBox="0 0 24 24" width="18" height="18" x="0" y="0">
+          ${m.icon}
+        </svg>
+        <text x="24" y="14" class="label">${m.label}</text>
+        <text x="105" y="14" class="value">${m.value}</text>
+      </g>
+    `);
+  });
+
+  const cardFrame = renderCardFrame({
+    width: cardWidth,
+    height: cardHeight,
+    theme,
+    borderRadius,
+    showBorder
+  });
 
   return minifySvg(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
@@ -45,95 +115,41 @@ export async function renderStatsCard(
       <desc>GitHub Profile Statistics card for ${safeUsername}</desc>
       <defs>
         ${backgroundDef}
+        ${glowDef}
+        ${avatarBlurDef}
         <clipPath id="circle-clip">
-          <circle cx="60" cy="60" r="35" />
+          <circle cx="60" cy="${isCompact ? '40' : '60'}" r="${isCompact ? '25' : '35'}" />
         </clipPath>
         <style>
-          .title { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 700; font-size: 18px; fill: ${theme.title}; }
-          .username { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 400; font-size: 13px; fill: ${theme.secondary}; }
-          .label { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 500; font-size: 13.5px; fill: ${theme.text}; }
-          .value { font-family: 'Segoe UI', Ubuntu, Sans-Serif; font-weight: 700; font-size: 14px; fill: ${theme.accent}; }
+          .title { font-family: ${fontFamily}; font-weight: 700; font-size: ${isCompact ? '16px' : '18px'}; fill: ${theme.title}; }
+          .username { font-family: ${fontFamily}; font-weight: 400; font-size: 13px; fill: ${theme.secondary}; }
+          .label { font-family: ${fontFamily}; font-weight: 500; font-size: 13.5px; fill: ${theme.text}; }
+          .value { font-family: ${fontFamily}; font-weight: 700; font-size: 14px; fill: ${theme.accent}; }
           .stat-icon { fill: ${theme.accent}; }
-          .glow { filter: drop-shadow(0px 0px 4px ${theme.accent}33); }
+          .glow { filter: url(#card-glow); }
         </style>
       </defs>
 
-      <!-- Card Background -->
-      <rect width="${cardWidth}" height="${cardHeight}" rx="12" fill="url(#bg)" stroke="${theme.border}" stroke-width="1.5" />
+      <!-- Card Background Frame -->
+      ${cardFrame}
 
       <!-- Avatar & Name -->
-      <g>
+      <g transform="translate(0, 0)">
         ${avatarSvg}
-        <text x="110" y="55" class="title">${safeName}</text>
-        <text x="110" y="73" class="username">@${safeUsername}</text>
+        <text x="${isCompact ? '90' : '110'}" y="${isCompact ? '38' : '55'}" class="title">${safeName}</text>
+        <text x="${isCompact ? '90' : '110'}" y="${isCompact ? '54' : '73'}" class="username">@${safeUsername}</text>
       </g>
 
       <!-- Decorative Divider -->
-      <line x1="25" y1="110" x2="470" y2="110" stroke="${theme.border}" stroke-dasharray="2, 2" stroke-width="1" />
+      <line x1="25" y1="${isCompact ? '75' : '110'}" x2="470" y2="${isCompact ? '75' : '110'}" stroke="${theme.border}" stroke-dasharray="2, 2" stroke-width="1" />
 
       <!-- Statistics Grid -->
-      <!-- Row 1: Commits, Stars, Followers -->
-      <g transform="translate(25, 125)">
-        <!-- Commits -->
-        <g transform="translate(0, 0)">
-          <svg class="stat-icon" viewBox="0 0 24 24" width="18" height="18" x="0" y="0">
-            ${ICONS.commit}
-          </svg>
-          <text x="24" y="14" class="label">${t.stats.commits}</text>
-          <text x="100" y="14" class="value">${stats.totalCommits}</text>
-        </g>
-        
-        <!-- Stars -->
-        <g transform="translate(150, 0)">
-          <svg class="stat-icon glow" viewBox="0 0 24 24" width="18" height="18" x="0" y="0">
-            ${ICONS.star}
-          </svg>
-          <text x="24" y="14" class="label">${t.stats.stars}</text>
-          <text x="100" y="14" class="value">${stats.totalStars}</text>
-        </g>
-
-        <!-- Followers -->
-        <g transform="translate(300, 0)">
-          <svg class="stat-icon" viewBox="0 0 24 24" width="18" height="18" x="0" y="0">
-            ${ICONS.followers}
-          </svg>
-          <text x="24" y="14" class="label">${t.stats.followers}</text>
-          <text x="110" y="14" class="value">${stats.followers}</text>
-        </g>
-      </g>
-
-      <!-- Row 2: Pull Requests, Issues, Forks -->
-      <g transform="translate(25, 155)">
-        <!-- PRs -->
-        <g transform="translate(0, 0)">
-          <svg class="stat-icon" viewBox="0 0 24 24" width="18" height="18" x="0" y="0">
-            ${ICONS.pr}
-          </svg>
-          <text x="24" y="14" class="label">${t.stats.prs}</text>
-          <text x="100" y="14" class="value">${stats.totalPRs}</text>
-        </g>
-
-        <!-- Issues -->
-        <g transform="translate(150, 0)">
-          <svg class="stat-icon" viewBox="0 0 24 24" width="18" height="18" x="0" y="0">
-            ${ICONS.issue}
-          </svg>
-          <text x="24" y="14" class="label">${t.stats.issues}</text>
-          <text x="100" y="14" class="value">${stats.totalIssues}</text>
-        </g>
-
-        <!-- Forks -->
-        <g transform="translate(300, 0)">
-          <svg class="stat-icon" viewBox="0 0 24 24" width="18" height="18" x="0" y="0">
-            ${ICONS.fork}
-          </svg>
-          <text x="24" y="14" class="label">${t.stats.forks}</text>
-          <text x="110" y="14" class="value">${stats.forksReceived}</text>
-        </g>
+      <g transform="translate(25, ${isCompact ? '88' : '125'})">
+        ${metricItemsSvg.join('\n')}
       </g>
       
       <!-- Brand Logo / Subtitle -->
-      ${renderBrandHeader(stats.username, theme)}
+      ${renderBrandHeader(isPrivacyMode ? '' : stats.username, theme, 470, isCompact ? 20 : 25)}
     </svg>
   `);
 }

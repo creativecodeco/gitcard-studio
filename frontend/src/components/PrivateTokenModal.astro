@@ -43,7 +43,9 @@
           </div>
           <div style="font-size: 0.72rem; color: #4ade80; display: flex; align-items: center; gap: 4px;">
             <span style="width: 6px; height: 6px; border-radius: 50%; background: #4ade80; display: inline-block;"></span>
-            <span id="connected-token-type">GitHub App Activa</span>
+            <span id="connected-token-type" data-i18n="account_active_status">
+              GitHub App Activa
+            </span>
           </div>
         </div>
       </div>
@@ -134,13 +136,13 @@
 
   <!-- Mode Selection Tabs Header -->
   <div id="auth-tabs-nav" class="auth-tabs-nav">
-    <button type="button" id="mode-tab-public" class="mode-tab-btn active">
+    <button type="button" id="mode-tab-public" class="mode-tab-btn active" data-i18n="tab_public">
       🌐 Público
     </button>
-    <button type="button" id="mode-tab-app" class="mode-tab-btn">
+    <button type="button" id="mode-tab-app" class="mode-tab-btn" data-i18n="tab_app">
       ⚡ GitHub App
     </button>
-    <button type="button" id="mode-tab-pat" class="mode-tab-btn">
+    <button type="button" id="mode-tab-pat" class="mode-tab-btn" data-i18n="tab_pat">
       🔑 PAT
     </button>
   </div>
@@ -152,7 +154,10 @@
       style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;"
     >
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-        <span style="font-weight: 700; font-size: 0.8rem; color: #38bdf8;">
+        <span
+          style="font-weight: 700; font-size: 0.8rem; color: #38bdf8;"
+          data-i18n="help_public_title"
+        >
           🌐 Modo Público (Sin Cuenta)
         </span>
         <a
@@ -166,14 +171,14 @@
         </a>
       </div>
       <ul style="margin: 0; padding-left: 16px; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45;">
-        <li>
+        <li data-i18n="help_public_b1">
           <b>Lo que obtienes:</b> Tarjetas de repositorios públicos, lenguajes y contador de
           visitas.
         </li>
-        <li>
+        <li data-i18n="help_public_b2">
           <b>Ventaja:</b> No requiere inicio de sesión ni permisos.
         </li>
-        <li>
+        <li data-i18n="help_public_b3">
           <b>Limitación:</b> Excluye repositorios y organizaciones privadas.
         </li>
       </ul>
@@ -245,7 +250,10 @@
       style="background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;"
     >
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-        <span style="font-weight: 700; font-size: 0.8rem; color: #4ade80;">
+        <span
+          style="font-weight: 700; font-size: 0.8rem; color: #4ade80;"
+          data-i18n="help_app_title"
+        >
           ⚡ GitHub App (Recomendado)
         </span>
         <a
@@ -259,15 +267,15 @@
         </a>
       </div>
       <ul style="margin: 0; padding-left: 16px; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45;">
-        <li>
+        <li data-i18n="help_app_b1">
           <b>Lo que obtienes:</b> Agregación automática de tus repositorios personales y de
           organizaciones privadas.
         </li>
-        <li>
+        <li data-i18n="help_app_b2">
           <b>Ventajas:</b> Conexión 1-clic con OAuth de solo lectura. Sin contraseñas ni tokens
           expuestos.
         </li>
-        <li>
+        <li data-i18n="help_app_b3">
           <b>Seguridad:</b> Cero acceso a tu código fuente; solo metadatos y conteo de commits.
         </li>
       </ul>
@@ -310,7 +318,10 @@
       style="background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;"
     >
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-        <span style="font-weight: 700; font-size: 0.8rem; color: #a855f7;">
+        <span
+          style="font-weight: 700; font-size: 0.8rem; color: #a855f7;"
+          data-i18n="help_pat_title"
+        >
           🔑 Personal Access Token (PAT)
         </span>
         <a
@@ -324,14 +335,14 @@
         </a>
       </div>
       <ul style="margin: 0; padding-left: 16px; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45;">
-        <li>
+        <li data-i18n="help_pat_b1">
           <b>Lo que obtienes:</b> Acceso a repositorios privados seleccionados mediante token
           manual.
         </li>
-        <li>
+        <li data-i18n="help_pat_b2">
           <b>Cifrado:</b> Almacenamiento cifrado hermético con AES-256 en PostgreSQL.
         </li>
-        <li>
+        <li data-i18n="help_pat_b3">
           <b>Revocación:</b> Puedes eliminar o revocar tu token cuando desees en 1-clic.
         </li>
       </ul>
@@ -517,6 +528,12 @@
 </div>
 
 <script>
+  import { t } from '../utils/i18n';
+
+  function getLocale(): string {
+    return document.documentElement.lang || localStorage.getItem('app_locale') || 'es';
+  }
+
   // Dynamic client script for OAuth status & personal metrics handling
   function initPrivateTokenModal() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -706,7 +723,7 @@
       tokenUnregistered?.classList.remove('hidden');
       authTabsNav?.classList.remove('hidden');
       switchModeTab('app');
-      triggerToast('Cuenta desconectada exitosamente.', 'success');
+      triggerToast(t('msg_account_disconnected', getLocale()), 'success');
 
       window.dispatchEvent(
         new CustomEvent('app:user-disconnected', { detail: { username: targetUser } })
@@ -767,7 +784,7 @@
         localStorage.getItem('registered-github-username') ||
         localStorage.getItem('gh_active_user');
       if (!activeUser) {
-        triggerToast('No se encontró un usuario activo para exportar.', 'error');
+        triggerToast(t('msg_no_active_user_export', getLocale()), 'error');
         return;
       }
       const storedToken =
@@ -797,18 +814,18 @@
           document.body.appendChild(downloadAnchor);
           downloadAnchor.click();
           downloadAnchor.remove();
-          triggerToast('Datos exportados exitosamente.', 'success');
+          triggerToast(t('msg_export_success', getLocale()), 'success');
         } else {
           const errData = await res.json().catch(() => ({}));
           const errMsg =
             typeof errData.message === 'string'
               ? errData.message
-              : 'No se pudieron exportar los datos. Verifica tu sesión.';
+              : t('msg_export_error', getLocale());
           triggerToast(errMsg, 'error');
         }
       } catch (err) {
         console.error('Error exporting user data:', err);
-        triggerToast('Error inesperado al exportar tus datos.', 'error');
+        triggerToast(t('msg_export_error', getLocale()), 'error');
       }
     });
 

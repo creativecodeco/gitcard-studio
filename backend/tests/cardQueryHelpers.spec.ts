@@ -31,10 +31,26 @@ describe('card-query.helpers.ts', () => {
       expect(result.bgGradient).toBeUndefined();
     });
 
-    it('should support Spanish and English locale aliases', () => {
+    it('should support multi-language locales (es, en, fr, de, pt, ja, zh)', () => {
       expect(extractThemeOverrides({ locale: 'ES' }).locale).toBe('es');
       expect(extractThemeOverrides({ lang: 'EN' }).locale).toBe('en');
-      expect(extractThemeOverrides({ locale: 'fr' }).locale).toBeUndefined();
+      expect(extractThemeOverrides({ locale: 'FR' }).locale).toBe('fr');
+      expect(extractThemeOverrides({ locale: 'de' }).locale).toBe('de');
+      expect(extractThemeOverrides({ locale: 'pt' }).locale).toBe('pt');
+      expect(extractThemeOverrides({ locale: 'ja' }).locale).toBe('ja');
+      expect(extractThemeOverrides({ locale: 'zh' }).locale).toBe('zh');
+      expect(extractThemeOverrides({ locale: 'invalid' }).locale).toBeUndefined();
+    });
+
+    it('should extract border_radius, show_border, and glow parameters', () => {
+      const result = extractThemeOverrides({
+        border_radius: '16',
+        hide_border: 'true',
+        glow: '1'
+      });
+      expect(result.borderRadius).toBe('16');
+      expect(result.showBorder).toBe('false');
+      expect(result.glow).toBe('true');
     });
   });
 

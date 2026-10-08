@@ -21,7 +21,7 @@ const {
 ---
 
 <div class="card-preview-wrapper" data-category={category}>
-  <h3 class="card-title-label" data-i18n={`title_${id}`}>
+  <h3 class="card-title-label" data-i18n={`title_${id.replace(/-/g, '_')}`}>
     {title}
   </h3>
   <div class="image-frame" id={`${id}-frame`} style={frameStyle}>
@@ -43,7 +43,7 @@ const {
   <!-- Code Block -->
   <div class="hidden code-block-wrapper">
     <div class="code-container">
-      <pre><code id={`markdown-${id}-code`}>Cargando...</code></pre>
+      <pre><code id={`markdown-${id}-code`} data-i18n="loading">Cargando...</code></pre>
       <button
         class="copy-btn"
         id={`btn-copy-${id}`}
@@ -90,6 +90,7 @@ const {
         class="download-btn btn-download-svg"
         id={`btn-download-svg-${id}`}
         title="Descargar imagen SVG vectorial"
+        data-i18n-title="btn_download_svg_title"
         style="flex: 1; height: 34px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(56,189,248,0.08); color: var(--text-primary); cursor: pointer; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;"
       >
         <svg
@@ -106,12 +107,13 @@ const {
           <polyline points="7 10 12 15 17 10"></polyline>
           <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>
-        <span>Descargar SVG</span>
+        <span data-i18n="btn_download_svg">Descargar SVG</span>
       </button>
       <button
         class="download-btn btn-download-png"
         id={`btn-download-png-${id}`}
         title="Descargar imagen PNG de alta resolución"
+        data-i18n-title="btn_download_png_title"
         style="flex: 1; height: 34px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(168,85,247,0.08); color: var(--text-primary); cursor: pointer; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;"
       >
         <svg
@@ -128,7 +130,7 @@ const {
           <circle cx="8.5" cy="8.5" r="1.5"></circle>
           <polyline points="21 15 16 10 5 21"></polyline>
         </svg>
-        <span>Descargar PNG</span>
+        <span data-i18n="btn_download_png">Descargar PNG</span>
       </button>
     </div>
   </div>

@@ -14,6 +14,7 @@ describe('CardsController', () => {
   let mockTopReposUseCase: any;
   let mockSponsorsUseCase: any;
   let mockCommitActivityUseCase: any;
+  let mockTechStackUseCase: any;
   let mockGithubRepo: any;
   let mockRes: Partial<FastifyReply>;
 
@@ -29,6 +30,9 @@ describe('CardsController', () => {
     mockSponsorsUseCase = { execute: vi.fn().mockResolvedValue('<svg>sponsors</svg>') };
     mockCommitActivityUseCase = {
       execute: vi.fn().mockResolvedValue('<svg>commit-activity</svg>')
+    };
+    mockTechStackUseCase = {
+      execute: vi.fn().mockResolvedValue('<svg>tech-stack</svg>')
     };
     mockGithubRepo = {
       clearCache: vi.fn(),
@@ -64,6 +68,7 @@ describe('CardsController', () => {
       mockTopReposUseCase,
       mockSponsorsUseCase,
       mockCommitActivityUseCase,
+      mockTechStackUseCase,
       mockGithubRepo
     );
   });

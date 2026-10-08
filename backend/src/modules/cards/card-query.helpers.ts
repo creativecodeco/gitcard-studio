@@ -37,9 +37,70 @@ export function extractThemeOverrides(query: Record<string, unknown>): Record<st
   const loc = query.locale ?? query.lang;
   if (typeof loc === 'string') {
     const normalized = loc.toLowerCase().trim();
-    if (normalized === 'en' || normalized === 'es') {
+    if (['en', 'es', 'fr', 'de', 'pt', 'ja', 'zh'].includes(normalized)) {
       overrides.locale = normalized;
     }
+  }
+
+  // Border radius extraction (0 to 24px)
+  const borderRadiusVal = query.border_radius ?? query.borderRadius;
+  if (typeof borderRadiusVal === 'string' && /^\d+$/.test(borderRadiusVal.trim())) {
+    const radiusNum = parseInt(borderRadiusVal.trim(), 10);
+    overrides.borderRadius = String(Math.min(24, Math.max(0, radiusNum)));
+  }
+
+  // Border visibility extraction
+  if (query.hide_border === 'true' || query.show_border === 'false') {
+    overrides.showBorder = 'false';
+  } else if (query.show_border === 'true') {
+    overrides.showBorder = 'true';
+  }
+
+  // Glow filter extraction
+  if (query.glow === 'true' || query.glow === '1') {
+    overrides.glow = 'true';
+  }
+
+  // Font family extraction
+  if (typeof query.font === 'string' && query.font.trim() !== '') {
+    overrides.font = query.font.trim();
+  }
+
+  // Hide parameters extraction
+  if (typeof query.hide === 'string' && query.hide.trim() !== '') {
+    overrides.hide = query.hide.trim();
+  }
+  const hideLangs = query.hide_languages ?? query.hide_langs;
+  if (typeof hideLangs === 'string' && hideLangs.trim() !== '') {
+    overrides.hide_languages = hideLangs.trim();
+  }
+  if (typeof query.hide_repos === 'string' && query.hide_repos.trim() !== '') {
+    overrides.hide_repos = query.hide_repos.trim();
+  }
+
+  // Privacy parameters extraction
+  if (query.hide_username === 'true' || query.hide_username === '1' || query.hide_name === 'true') {
+    overrides.hide_username = 'true';
+  }
+  if (query.blur_avatar === 'true' || query.blur_avatar === '1') {
+    overrides.blur_avatar = 'true';
+  }
+
+  // Layout mode extraction (compact, mini, detailed, default)
+  if (typeof query.layout === 'string') {
+    const layoutClean = query.layout.toLowerCase().trim();
+    if (['compact', 'mini', 'detailed'].includes(layoutClean)) {
+      overrides.layout = layoutClean;
+    }
+  }
+
+  // Tech stack & custom title extraction
+  const stackVal = query.stack ?? query.tech;
+  if (typeof stackVal === 'string' && stackVal.trim() !== '') {
+    overrides.stack = stackVal.trim();
+  }
+  if (typeof query.title === 'string' && query.title.trim() !== '') {
+    overrides.title = query.title.trim();
   }
 
   return overrides;

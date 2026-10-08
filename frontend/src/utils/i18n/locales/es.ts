@@ -1,0 +1,201 @@
+export const es = {
+  // Configuration panel
+  settings_title: 'Configuración',
+  username_label: 'Usuario de GitHub',
+  username_placeholder: 'ej. octocat',
+  repo_label: 'Repositorio Específico (Opcional)',
+  repo_placeholder: 'ej. gitcard-studio (o el más popular)',
+  btn_generate: 'Generar Tarjetas',
+  btn_refresh: 'Refrescar Tarjetas',
+  theme_label: 'Selecciona un Estilo',
+  card_customization_title: 'Estilo & Personalización',
+  btn_download_svg: 'Descargar SVG',
+  btn_download_png: 'Descargar PNG',
+  title_tech_stack: 'Ecosistema & Tech Stack',
+  code_label_tech_stack: 'Ecosistema Tech Stack',
+  export_data_btn: 'Descargar mis Datos (JSON)',
+  card_width_label: 'Ancho de Tarjeta',
+  width_standard: 'Estándar (495px)',
+  width_full: 'Ancho Completo (100%)',
+  custom_width_placeholder: 'Personalizado, ej: 600',
+  btn_apply: 'Aplicar',
+  custom_palette_title: 'Personalizar Paleta de Colores',
+  picker_bg_label: 'Fondo (BG)',
+  picker_title_label: 'Título',
+  picker_text_label: 'Texto',
+  picker_icon_label: 'Iconos / Acento',
+  picker_border_label: 'Borde',
+  format_label: 'Formato de Salida',
+  format_svg: 'SVG (Vectorial Animado)',
+  format_png: 'PNG (Imagen High-Res)',
+  privacy_banner_text:
+    '<strong>Transparencia y Privacidad:</strong> Utilizamos almacenamiento local (<code>localStorage</code>) únicamente para recordar tus preferencias de tema y configuración. No usamos cookies de rastreo publicitario de terceros. Consulta nuestra <a href="/privacy.html" class="banner-link">Política de Privacidad</a> y <a href="/terms.html" class="banner-link">Términos</a>.',
+  btn_accept_privacy: 'Entendido',
+  btn_show_more: 'Ver más estilos ({count})',
+  btn_show_less: 'Ver menos estilos',
+  locale_label: 'Idioma de Tarjetas',
+  locale_es: 'Español (es)',
+  locale_en: 'English (en)',
+  locale_fr: 'Francés (fr)',
+  locale_de: 'Alemán (de)',
+  locale_pt: 'Portugués (pt)',
+  locale_ja: 'Japonés (ja)',
+  locale_zh: 'Chino (zh)',
+  preview_title: 'Vista Previa',
+  header_subtitle:
+    'Potencia la visibilidad de tus proyectos. Genera métricas y tarjetas estéticas en caliente para tu README.md.',
+  header_metrics_label: 'Usuarios usando las cards: ',
+
+  // Sample README elements
+  sample_readme_title: 'README.md de Ejemplo',
+  sample_readme_desc:
+    'Plantilla completa lista para copiar e insertar en tu repositorio de perfil.',
+  btn_copy_sample_readme: 'Copiar README.md Completo',
+  profile_help_link: '¿Cómo crear tu perfil en GitHub?',
+  sample_readme_placeholder: 'Genera tus tarjetas para ver el README.md de ejemplo...',
+  readme_layout_label: 'Diseño:',
+  readme_layout_vertical: 'Vertical',
+  readme_layout_grid: 'Tabla (2 Col)',
+  tab_readme_code: 'Código Markdown',
+  tab_readme_preview: 'Vista Previa Live',
+
+  // Category Filter Tabs
+  cat_all: 'Todas',
+  cat_stats: 'Estadísticas',
+  cat_activity: 'Actividad',
+  cat_repos: 'Repositorios',
+  cat_badges: 'Badges',
+
+  // Card titles & labels
+  title_views: 'Contador de Visitas del Perfil',
+  code_label_views: 'Contador de Visitas',
+  title_stats: 'Estadísticas Generales',
+  code_label_stats: 'Estadísticas Generales',
+  title_languages: 'Lenguajes más Usados',
+  code_label_languages: 'Lenguajes más Usados',
+  title_streak: 'Racha de Commits',
+  code_label_streak: 'Racha de Commits',
+  title_trophies: 'Trofeos de GitHub',
+  code_label_trophies: 'Trofeos de GitHub',
+  title_top_repos: 'Top Repositorios',
+  code_label_top_repos: 'Top Repositorios',
+  title_sponsors: 'GitHub Sponsors',
+  code_label_sponsors: 'GitHub Sponsors',
+  title_commit_activity: 'Matriz de Hábitos de Commit',
+  code_label_commit_activity: 'Matriz de Hábitos',
+  title_today_status: 'Estado de Actividad de Hoy',
+  code_label_today_status: 'Estado de Actividad Hoy',
+  title_timeline_matrix: 'Línea de Tiempo de Productividad',
+  code_label_timeline_matrix: 'Línea de Tiempo',
+  title_rank: 'Rango de Desarrollador',
+  title_repo: 'Repositorio Destacado',
+  placeholder_msg: 'Ingresa tu usuario de GitHub para cargar la vista previa',
+  copy_btn: 'Copiar',
+  theme_toggle_btn: 'Cambiar tema claro/oscuro',
+
+  // Footer elements
+  footer_rights: 'Todos los derechos reservados.',
+  footer_help: 'Ayuda',
+  footer_terms: 'Términos',
+  footer_privacy: 'Privacidad',
+
+  // Private stats elements
+  private_stats_title: 'Estadísticas Privadas & Cuenta',
+  private_stats_desc:
+    'Conecta tu cuenta de GitHub mediante nuestra App de solo lectura o registra un PAT para incluir repositorios privados y organizaciones.',
+  private_stats_guide: 'Leer Guía de Ayuda →',
+  connect_github_app: 'Conectar con GitHub App',
+  connect_github_desc:
+    'Conexión transparente y segura con Refresh Tokens automáticos (solo lectura de metadata).',
+  connect_pat_option: 'O ingresa un Personal Access Token (PAT) manualmente',
+  tab_public: '🌐 Público',
+  tab_app: '⚡ GitHub App',
+  tab_pat: '🔑 PAT',
+  help_public_title: '🌐 Modo Público (Sin Cuenta)',
+  help_public_b1:
+    '<b>Lo que obtienes:</b> Tarjetas de repositorios públicos, lenguajes y contador de visitas.',
+  help_public_b2: '<b>Ventaja:</b> No requiere inicio de sesión ni permisos.',
+  help_public_b3: '<b>Limitación:</b> Excluye repositorios y organizaciones privadas.',
+  help_app_title: '⚡ GitHub App (Recomendado)',
+  help_app_b1:
+    '<b>Lo que obtienes:</b> Agregación automática de tus repositorios personales y de organizaciones privadas.',
+  help_app_b2:
+    '<b>Ventajas:</b> Conexión 1-clic con OAuth de solo lectura. Sin contraseñas ni tokens expuestos.',
+  help_app_b3:
+    '<b>Seguridad:</b> Cero acceso a tu código fuente; solo metadatos y conteo de commits.',
+  help_pat_title: '🔑 Personal Access Token (PAT)',
+  help_pat_b1:
+    '<b>Lo que obtienes:</b> Acceso a repositorios privados seleccionados mediante token manual.',
+  help_pat_b2: '<b>Cifrado:</b> Almacenamiento cifrado hermético con AES-256 en PostgreSQL.',
+  help_pat_b3: '<b>Revocación:</b> Puedes eliminar o revocar tu token cuando desees en 1-clic.',
+  private_stats_username: 'Usuario de GitHub',
+  private_stats_pat: 'Personal Access Token (PAT)',
+  private_stats_consent:
+    'Acepto que esta aplicación guarde mi token cifrado en su base de datos para consultar mis estadísticas. Puedo revocarlo cuando quiera.',
+  private_stats_register_btn: 'Registrar Token PAT',
+  private_stats_active_label: 'Cuenta Vinculada Activa',
+  private_stats_active_desc:
+    'Tus repositorios privados y organizaciones ya se están incluyendo en la generación de tarjetas.',
+  private_stats_revoke_label: 'Introduce tu token para confirmar revocación',
+  private_stats_revoke_btn: 'Revocar Token',
+  private_stats_purge_label: '¿Deseas eliminar todo tu registro de forma permanente?',
+  private_stats_purge_open_btn: 'Eliminar todos mis datos',
+  user_metrics_title: 'Tus Métricas Personales',
+  user_views_label: 'Visitas de Perfil:',
+  card_renders_label: 'Renders de Tarjetas:',
+  connected_as: 'Conectado como @{username}',
+  disconnect_account_btn: 'Desconectar Cuenta',
+  delete_account_btn: 'Eliminar Mi Cuenta y Datos',
+  delete_account_modal_title: 'Confirmar Eliminación de Cuenta',
+  delete_account_modal_desc:
+    'Esta acción eliminará de forma irreversible tus tokens cifrados, tu historial y todas tus métricas de consumo en el servidor.',
+
+  // Purge modal elements
+  purge_modal_title: 'Eliminar todos mis datos',
+  purge_modal_desc:
+    'Esta acción es permanente e irreversible. Eliminará tu token cifrado, tu historial de estadísticas, tus métricas de consumo de cards y todos tus registros de logs del servidor.',
+  purge_modal_confirm_label: 'Escribe tu usuario de GitHub para confirmar',
+  purge_modal_token_label: 'Introduce tu Token de Acceso para autorizar',
+  purge_modal_cancel_btn: 'Cancelar',
+  purge_modal_confirm_btn: 'Eliminar todo definitivamente',
+
+  // Dynamic Notifications & Toast Messages
+  msg_network_error: 'Error de red al intentar comunicarse con el servidor.',
+  msg_copy_readme_success: '¡README.md de ejemplo copiado al portapapeles con éxito!',
+  msg_copy_readme_error: 'Error al copiar el README de ejemplo al portapapeles',
+  msg_copy_code_success: 'Código copiado al portapapeles con éxito',
+  msg_copy_code_error: 'Error al copiar al portapapeles',
+
+  // Form Validation & Status Messages
+  msg_user_not_found: 'El usuario de GitHub @{username} no existe o no se pudo encontrar.',
+  msg_enter_username: 'Por favor, ingresa tu usuario de GitHub.',
+  msg_enter_token: 'Por favor, ingresa tu Personal Access Token (PAT).',
+  msg_accept_consent: 'Debes aceptar el almacenamiento cifrado de datos.',
+  msg_register_token_error: 'Error al registrar el token.',
+  msg_no_registered_user: 'No se reconoce ningún usuario registrado.',
+  msg_token_required_revoke:
+    'Debes ingresar un token de GitHub válido tuyo para verificar tu propiedad antes de revocar.',
+  msg_revoke_token_error: 'Error al revocar el token.',
+  msg_purge_error: 'Error al intentar purgar los datos.',
+
+  // Live README HTML preview
+  readme_preview_greeting: '¡Hola! Soy @{username} 👋',
+  readme_preview_welcome: 'Bienvenido/a a mi perfil de GitHub.',
+  readme_preview_desc:
+    'Bienvenido/a a mi perfil de GitHub. Aquí puedes ver algunas de mis estadísticas de GitHub en tiempo real:',
+  readme_preview_section_title: '📊 Estadísticas de GitHub',
+  readme_preview_footer: '⚡ Tarjetas de estadísticas de GitHub generadas en tiempo real',
+
+  loading: 'Cargando...',
+  account_active_status: 'GitHub App Activa',
+  guide_public_title: 'Ver guía del modo público',
+  guide_app_title: 'Ver guía de seguridad y permisos de la App',
+  guide_pat_title: 'Ver guía para generar un PAT Fine-grained',
+  btn_download_svg_title: 'Descargar imagen SVG vectorial',
+  btn_download_png_title: 'Descargar imagen PNG de alta resolución',
+  privacy_banner_aria_label: 'Aviso de privacidad y almacenamiento local',
+  msg_account_disconnected: 'Cuenta desconectada exitosamente.',
+  msg_no_active_user_export: 'No se encontró un usuario activo para exportar.',
+  msg_export_success: 'Datos exportados exitosamente.',
+  msg_export_error: 'Error al exportar los datos.'
+} as const;

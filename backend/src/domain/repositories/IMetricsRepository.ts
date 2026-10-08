@@ -11,7 +11,8 @@ export interface IMetricsRepository {
       | 'trophies'
       | 'views'
       | 'sponsors'
-      | 'commit-activity',
+      | 'commit-activity'
+      | 'tech-stack',
     context?: HitContext
   ): void;
   getMetrics(): Promise<Metrics>;

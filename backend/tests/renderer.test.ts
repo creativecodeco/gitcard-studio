@@ -186,4 +186,58 @@ describe('renderer tests', () => {
     expect(svg).toContain('REPOSITORIES');
     expect(svg).toContain('LANGUAGES');
   });
+
+  it('should support Phase 2 controls in renderStatsCard (font, privacy, hide metrics, compact layout)', async () => {
+    const mockStats: UserStats = {
+      username: 'creativecode',
+      name: 'Creative Code',
+      avatarUrl: 'https://creativecode.com.co/logo.png',
+      followers: 1500,
+      publicRepos: 42,
+      totalStars: 980,
+      totalCommits: 3200,
+      totalPRs: 210,
+      totalIssues: 45,
+      forksReceived: 120,
+      rank: 'S',
+      collaborationIndex: 8
+    };
+
+    const overrides = {
+      hide_username: 'true',
+      font: 'fira code',
+      hide: 'prs,issues',
+      layout: 'compact'
+    };
+
+    const svg = await renderStatsCard(mockStats, 'dark', overrides);
+
+    expect(svg).toContain('Developer');
+    expect(svg).toContain('@developer');
+    expect(svg).toContain('Fira Code');
+    expect(svg).toContain('height="130"');
+    expect(svg).not.toContain('Pull Requests');
+  });
+
+  it('should support Phase 2 controls in renderLanguagesCard (hide_languages, compact layout)', () => {
+    const mockLangs: LanguageStat[] = [
+      { name: 'TypeScript', count: 12, size: 500, percentage: 50, color: '#3178c6' },
+      { name: 'JavaScript', count: 8, size: 300, percentage: 30, color: '#f1e05a' },
+      { name: 'CSS', count: 4, size: 200, percentage: 20, color: '#563d7c' }
+    ];
+
+    const overrides = {
+      hide_languages: 'CSS',
+      layout: 'compact',
+      font: 'Inter'
+    };
+
+    const svg = renderLanguagesCard(mockLangs, 'dark', overrides);
+
+    expect(svg).toContain('TypeScript');
+    expect(svg).toContain('JavaScript');
+    expect(svg).not.toContain('CSS');
+    expect(svg).toContain('Inter');
+    expect(svg).toContain('height="130"');
+  });
 });

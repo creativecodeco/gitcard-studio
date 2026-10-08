@@ -2,19 +2,32 @@ import { describe, it, expect } from 'vitest';
 import { t, TRANSLATIONS, type TranslationKey } from '../src/utils/i18n';
 
 describe('Frontend i18n Utility', () => {
-  it('should contain matching keys between ES and EN dictionaries', () => {
+  it('should contain matching keys across all 7 supported locale dictionaries', () => {
     const esKeys = Object.keys(TRANSLATIONS.es).sort();
-    const enKeys = Object.keys(TRANSLATIONS.en).sort();
-    expect(esKeys).toEqual(enKeys);
+    const locales = ['en', 'fr', 'de', 'pt', 'ja', 'zh'] as const;
+    locales.forEach((loc) => {
+      const keys = Object.keys(TRANSLATIONS[loc]).sort();
+      expect(keys).toEqual(esKeys);
+    });
   });
 
-  it('should return correct translation for ES and EN', () => {
+  it('should return correct translation for supported locales', () => {
     expect(t('btn_generate', 'es')).toBe('Generar Tarjetas');
     expect(t('btn_generate', 'en')).toBe('Generate Cards');
+    expect(t('btn_generate', 'fr')).toBe('Générer les Cartes');
+    expect(t('btn_generate', 'de')).toBe('Karten Generieren');
+    expect(t('btn_generate', 'pt')).toBe('Gerar Cartões');
+    expect(t('btn_generate', 'ja')).toBe('カードを生成');
+    expect(t('btn_generate', 'zh')).toBe('生成卡片');
+
+    expect(t('title_tech_stack', 'en')).toBe('Ecosystem & Tech Stack');
+    expect(t('btn_download_svg', 'fr')).toBe('Télécharger SVG');
+    expect(t('footer_terms', 'de')).toBe('Nutzungsbedingungen');
+    expect(t('export_data_btn', 'pt')).toBe('Baixar meus Dados (JSON)');
   });
 
   it('should fallback to ES if unknown locale is provided', () => {
-    expect(t('btn_generate', 'fr' as any)).toBe('Generar Tarjetas');
+    expect(t('btn_generate', 'unknown' as any)).toBe('Generar Tarjetas');
   });
 
   it('should interpolate parameters correctly', () => {

@@ -9,6 +9,7 @@ import { GetUserTrophiesCardUseCase } from '@/use-cases/cards/GetUserTrophiesCar
 import { GetUserTopReposCardUseCase } from '@/use-cases/cards/GetUserTopReposCardUseCase';
 import { GetUserSponsorsCardUseCase } from '@/use-cases/cards/GetUserSponsorsCardUseCase';
 import { GetUserCommitActivityCardUseCase } from '@/use-cases/cards/GetUserCommitActivityCardUseCase';
+import { GetTechStackCardUseCase } from '@/use-cases/cards/GetTechStackCardUseCase';
 import { RecordProfileViewUseCase } from '@/use-cases/metrics/RecordProfileViewUseCase';
 import { renderViewsBadge } from '@/adapters/presenters/viewsBadge';
 import { renderErrorCard } from '@/adapters/presenters/errorCard';
@@ -48,6 +49,8 @@ export class CardsController {
     private readonly sponsorsCardUseCase: GetUserSponsorsCardUseCase,
     @Inject(GetUserCommitActivityCardUseCase)
     private readonly commitActivityCardUseCase: GetUserCommitActivityCardUseCase,
+    @Inject(GetTechStackCardUseCase)
+    private readonly techStackCardUseCase: GetTechStackCardUseCase,
     @Inject('IGitHubRepository')
     private readonly githubRepo: IGitHubRepository
   ) {}
@@ -479,5 +482,18 @@ export class CardsController {
         .status(500);
       return renderBadgeSVG({ label: 'gitcard studio', value: 'error', valueColor: '#ef4444' });
     }
+  }
+
+  @Get('tech-stack')
+  async getTechStack(
+    @Query() query: Record<string, unknown>,
+    @Headers('user-agent') userAgent: string | undefined,
+    @Headers('referer') referer: string | undefined,
+    @Ip() ip: string,
+    @Res({ passthrough: true }) res: FastifyReply
+  ): Promise<string> {
+    return this.handleCardRequest(query, userAgent, referer, ip, res, 'TechStack', (u, t, o, h) =>
+      this.techStackCardUseCase.execute(u, t, o, h)
+    );
   }
 }

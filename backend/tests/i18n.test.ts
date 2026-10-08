@@ -111,4 +111,21 @@ describe('i18n Cards Translations', () => {
     const svgEn = renderTopReposCard(mockRepos, 'dark', { locale: 'en' });
     expect(svgEn).toContain('Top Repositories');
   });
+
+  it('should support new Phase 4 locales fr, de, pt, ja, zh', () => {
+    const svgFr = renderLanguagesCard(mockLanguages, 'dark', { locale: 'fr' });
+    expect(svgFr).toContain('Langages Les Plus Utilisés');
+
+    const svgDe = renderLanguagesCard(mockLanguages, 'dark', { locale: 'de' });
+    expect(svgDe).toContain('Meistgenutzte Sprachen');
+
+    const svgPt = renderLanguagesCard(mockLanguages, 'dark', { locale: 'pt' });
+    expect(svgPt).toContain('Linguagens Mais Usadas');
+
+    const svgJa = renderLanguagesCard(mockLanguages, 'dark', { locale: 'ja' });
+    expect(svgJa).toContain('使用言語ランキング');
+
+    const svgZh = renderLanguagesCard(mockLanguages, 'dark', { locale: 'zh' });
+    expect(svgZh).toContain('最常用编程语言');
+  });
 });
