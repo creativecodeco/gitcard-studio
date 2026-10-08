@@ -571,6 +571,8 @@ import Footer from '@/components/Footer.astro';
   const totalImagesToLoad = 12; // stats, languages, repo, rank, streak, trophies, top-repos, sponsors, commit-activity, today-status, timeline-matrix, views
   let isGeneratingAllCards = false;
   let isUsingCustomTheme = false;
+  let activeCardFetchController: AbortController | null = null;
+  let userNotFoundHandled = false;
 
   const localeSelect = document.getElementById('locale-select') as HTMLSelectElement | null;
   const formatSelect = document.getElementById('format-select') as HTMLSelectElement | null;
@@ -1111,9 +1113,96 @@ import Footer from '@/components/Footer.astro';
     }
   }
 
+  function handleUserNotFound(username: string) {
+    if (userNotFoundHandled) return;
+    userNotFoundHandled = true;
+
+    if (activeCardFetchController) {
+      activeCardFetchController.abort();
+      activeCardFetchController = null;
+    }
+
+    isGeneratingAllCards = false;
+
+    if (globalLoading) {
+      globalLoading.classList.add('hidden');
+    }
+
+    const imgs = [
+      statsImg,
+      languagesImg,
+      repoImg,
+      rankImg,
+      streakImg,
+      trophiesImg,
+      topReposImg,
+      sponsorsImg,
+      commitActivityImg,
+      todayStatusImg,
+      timelineMatrixImg,
+      viewsImg
+    ];
+    imgs.forEach((img) => {
+      if (img) {
+        img.classList.add('hidden');
+        img.removeAttribute('src');
+      }
+    });
+
+    const placeholders = [
+      statsPlaceholder,
+      languagesPlaceholder,
+      repoPlaceholder,
+      rankPlaceholder,
+      streakPlaceholder,
+      trophiesPlaceholder,
+      topReposPlaceholder,
+      sponsorsPlaceholder,
+      commitActivityPlaceholder,
+      todayStatusPlaceholder,
+      timelineMatrixPlaceholder,
+      viewsPlaceholder
+    ];
+    placeholders.forEach((ph) => {
+      if (ph) {
+        ph.classList.remove('hidden');
+        const shimmer = ph.closest('.card-preview-wrapper')?.querySelector('.skeleton-shimmer');
+        if (shimmer) shimmer.classList.add('hidden');
+
+        const pulseIcon = ph.querySelector('.pulse-icon');
+        const pText = ph.querySelector('p');
+        if (pulseIcon) {
+          pulseIcon.innerHTML = `
+            <svg class="placeholder-svg error" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#f85149" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          `;
+        }
+        if (pText) {
+          pText.textContent =
+            t('msg_user_not_found', currentLocale, { username }) ||
+            `El usuario @${username} no existe.`;
+        }
+      }
+    });
+
+    const notFoundMessage =
+      t('msg_user_not_found', currentLocale, { username }) ||
+      `El usuario de GitHub @${username} no existe o no se pudo encontrar.`;
+    showToast(notFoundMessage, 'error');
+  }
+
   // Update image previews and Markdown blocks
   function updateCards(forceRefresh = false) {
     if (!currentUsername) return;
+
+    if (activeCardFetchController) {
+      activeCardFetchController.abort();
+    }
+    activeCardFetchController = new AbortController();
+    userNotFoundHandled = false;
 
     applyPreviewWidth();
     isGeneratingAllCards = true;
@@ -1121,6 +1210,28 @@ import Footer from '@/components/Footer.astro';
     if (globalLoading) {
       globalLoading.classList.remove('hidden');
     }
+
+    const checkUsername = currentUsername;
+    const signal = activeCardFetchController.signal;
+
+    fetch(`/api/stats?username=${encodeURIComponent(checkUsername)}&theme=${currentTheme}`, {
+      signal
+    })
+      .then(async (res) => {
+        const text = await res.text();
+        if (
+          !res.ok ||
+          text.includes('Usuario no encontrado') ||
+          text.includes('No se encontró el usuario') ||
+          text.includes('User not found') ||
+          text.includes('especificado no existe')
+        ) {
+          handleUserNotFound(checkUsername);
+        }
+      })
+      .catch((err) => {
+        if (err.name === 'AbortError') return;
+      });
 
     const cardUrls = buildCardUrls({
       origin: window.location.origin,
@@ -1387,6 +1498,11 @@ import Footer from '@/components/Footer.astro';
     });
 
     imgElement.addEventListener('error', () => {
+      if (imgElement === statsImg && !userNotFoundHandled && currentUsername) {
+        handleUserNotFound(currentUsername);
+        return;
+      }
+
       const wrapper = imgElement.closest('.card-preview-wrapper');
       const shimmer = wrapper?.querySelector('.skeleton-shimmer');
       if (shimmer) shimmer.classList.add('hidden');

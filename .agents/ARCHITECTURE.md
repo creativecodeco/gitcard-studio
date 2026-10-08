@@ -4,7 +4,7 @@
 
 ---
 
-## Estado actual: 2026-10-07 (v1.16.0)
+## Estado actual: 2026-10-07 (v1.17.0)
 
 ### Stack
 

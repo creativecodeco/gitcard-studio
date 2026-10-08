@@ -124,6 +124,7 @@ export const TRANSLATIONS = {
     msg_copy_code_error: 'Error al copiar al portapapeles',
 
     // Form Validation & Status Messages
+    msg_user_not_found: 'El usuario de GitHub @{username} no existe o no se pudo encontrar.',
     msg_enter_username: 'Por favor, ingresa tu usuario de GitHub.',
     msg_enter_token: 'Por favor, ingresa tu Personal Access Token (PAT).',
     msg_accept_consent: 'Debes aceptar el almacenamiento cifrado de datos.',
@@ -265,6 +266,7 @@ export const TRANSLATIONS = {
     msg_copy_code_error: 'Failed to copy to clipboard',
 
     // Form Validation & Status Messages
+    msg_user_not_found: 'GitHub user @{username} does not exist or could not be found.',
     msg_enter_username: 'Please enter your GitHub username.',
     msg_enter_token: 'Please enter your Personal Access Token (PAT).',
     msg_accept_consent: 'You must accept the encrypted data storage consent.',

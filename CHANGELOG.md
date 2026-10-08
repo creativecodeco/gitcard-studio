@@ -2,6 +2,16 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.17.0] - 2026-10-07
+
+### 🚫 Manejo de Usuarios Inexistentes, Cancelación de Peticiones y Notificaciones Toast
+- **Cancelación Activa de Peticiones (`AbortController`)**:
+  - Implementado un `AbortController` global (`activeCardFetchController`) en la vista del frontend (`index.astro`) para abortar de inmediato las peticiones HTTP y descargas de tarjetas en vuelo al consultar un usuario o cambiar de búsqueda.
+- **Detección Temprana y Toast de Error (`msg_user_not_found`)**:
+  - Incorporada verificación síncrona/asíncrona de existencia de usuario en GitHub. Si el usuario no existe (`404` / `Usuario no encontrado`), se abortan todas las demás solicitudes de tarjetas, se oculta el overlay de carga, se limpian las imágenes en vista previa configurando placeholders de error y se dispara un Toast de notificación localizado (`msg_user_not_found`).
+- **Sincronización de Versión Monorepo**:
+  - Actualizada la versión del proyecto a **`v1.17.0`** de forma sincronizada entre `root`, `backend` y `frontend`.
+
 ## [1.16.0] - 2026-10-07
 
 ### 📦 Actualización de Versión, Documentación e Integridad Monorepo
@@ -691,4 +701,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.16.0
+**Versión actualmente expuesta / en producción:** v1.17.0
