@@ -2,6 +2,15 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.16.0] - 2026-10-07
+
+### 📦 Actualización de Versión, Documentación e Integridad Monorepo
+- **Gestión Estricta de Versiones Monorepo**:
+  - Incrementada la versión del proyecto a **`v1.16.0`** de forma sincronizada en los paquetes raíz (`gitcard-studio`), backend (`gitcard-studio-backend`) y frontend (`gitcard-studio-frontend`).
+  - Sincronización y actualización de dependencias monorepo (`@typescript-eslint/*` 8.71.1, `dotenv` 18.0.6, `nanoid` 3.3.20, `postcss` 8.5.29, `vite` 8.3.3, `@playwright/test` 1.64.0) alineadas con la configuración del proyecto.
+- **Verificación Completa de Integridad y Arquitectura**:
+  - Ejecución de la suite completa de agentes de escaneo (`security`, `code-integrity`, `architecture`, `best-practices`, `dependencies`) y verificación previa a la liberación del build de producción.
+
 ## [1.15.0] - 2026-10-04
 
 ### 📦 Sincronización y Estabilización de Dependencias Monorepo
@@ -682,4 +691,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.15.0
+**Versión actualmente expuesta / en producción:** v1.16.0

@@ -1,6 +1,6 @@
 {
   "name": "gitcard-studio",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "description": "High-performance NestJS & Fastify API server and interactive Astro web frontend for GitCard Studio real-time customizable profile README stats cards, commit habit heatmaps, streak counters, developer ranks, trophies, badges, and metrics tracking.",
   "keywords": [
     "astro",
@@ -35,7 +35,7 @@
     "typeorm",
     "typescript"
   ],
-  "packageManager": "pnpm@12.9.1",
+  "packageManager": "pnpm@12.10.1",
   "scripts": {
     "build": "pnpm --filter gitcard-studio-frontend build && pnpm --filter gitcard-studio-backend build",
     "start": "pnpm --filter gitcard-studio-backend start",
@@ -59,8 +59,8 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@typescript-eslint/eslint-plugin": "8.71.0",
-    "@typescript-eslint/parser": "8.71.0",
+    "@typescript-eslint/eslint-plugin": "8.71.1",
+    "@typescript-eslint/parser": "8.71.1",
     "astro-eslint-parser": "3.2.0",
     "eslint": "10.12.0",
     "eslint-config-prettier": "10.1.8",
