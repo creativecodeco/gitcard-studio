@@ -35,7 +35,7 @@ export function renderRankCard(
 
   const colBarWidth = 280;
   const rawCollab = Number(stats?.collaborationIndex);
-  const collabIndex = !isNaN(rawCollab) ? Math.min(100, Math.max(0, rawCollab)) : 0;
+  const collabIndex = !Number.isNaN(rawCollab) ? Math.min(100, Math.max(0, rawCollab)) : 0;
   const filledWidth = Math.round((collabIndex / 100) * colBarWidth);
 
   const safeName = escapeXml(stats?.name || stats?.username || 'Developer');

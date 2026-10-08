@@ -52,7 +52,8 @@ function parseErrorMessage(
   }
 
   // Case 4: General fallback - clean raw internal URLs from error string
-  const cleanBody = msg.replace(/\s*for URL https?:\/\/[^\s]+/gi, '').trim();
+  const urlIdx = msg.toLowerCase().indexOf('for url ');
+  const cleanBody = (urlIdx !== -1 ? msg.slice(0, urlIdx) : msg).trim();
 
   return {
     title: 'Error en GitCard Studio',

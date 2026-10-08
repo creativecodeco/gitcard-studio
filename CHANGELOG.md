@@ -2,6 +2,19 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.18.1] - 2026-10-07
+
+### 🧹 Correcciones de SonarCloud & Calidad de Código
+- **Corrección de Code Smells & Advertencias de SonarCloud**:
+  - Extraído el inicializador de conexión asíncrono de Redis fuera del constructor en `RedisCacheAdapter.ts` mediante `initRedisConnection()`.
+  - Simplificada la expresión regular de limpieza de URLs en `errorCard.ts` (`\S+`) para prevenir el cálculo de tiempo super-lineal debido a backtracking.
+  - Reemplazadas las funciones globales `parseInt` y `parseFloat` por `Number.parseInt` y `Number.parseFloat` en los presentadores de tarjetas y ayudantes de consulta (`languagesCard.ts`, `statsCard.ts`, `theme.ts`, `card-query.helpers.ts`).
+  - Reemplazado `isNaN` por `Number.isNaN` en `rankCard.ts`.
+  - Removido el operador ternario redundante en `statsCard.ts` (`itemsPerRow = 3`).
+  - Agregado manejo explícito con `await` en todas las llamadas a `clearCache` en repositorios, controladores de Fastify/NestJS y Casos de Uso (`CachedGitHubRepository.ts`, `auth.controller.ts`, `cards.controller.ts`, `tokens.controller.ts`, `RegisterOAuthTokenUseCase.ts`, `RegisterUserTokenUseCase.ts`, `RevokeUserTokenUseCase.ts`).
+- **Sincronización de Versión Monorepo**:
+  - Actualizada la versión del proyecto a **`v1.18.1`** de forma sincronizada entre los paquetes de `root`, `backend` y `frontend`.
+
 ## [1.18.0] - 2026-10-07
 
 ### 🌐 Arquitectura Modular de i18n, Cobertura del 100% y Corrección en Métricas
@@ -718,4 +731,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.18.0
+**Versión actualmente expuesta / en producción:** v1.18.1

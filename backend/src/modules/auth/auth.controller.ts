@@ -246,7 +246,7 @@ export class AuthController {
 
     try {
       await this.purgeUseCase.execute(username);
-      this.githubRepo.clearCache(username);
+      await this.githubRepo.clearCache(username);
       logger.info(`User account ${query.username} purged self successfully via UI`, {
         username: query.username
       });
@@ -283,7 +283,7 @@ export class AuthController {
 
     try {
       await this.tokenRepo.deleteToken(username);
-      this.githubRepo.clearCache(username);
+      await this.githubRepo.clearCache(username);
       logger.info(`Disconnected GitHub account for user ${dto.username}`, {
         username: dto.username
       });

@@ -45,7 +45,7 @@ export function extractThemeOverrides(query: Record<string, unknown>): Record<st
   // Border radius extraction (0 to 24px)
   const borderRadiusVal = query.border_radius ?? query.borderRadius;
   if (typeof borderRadiusVal === 'string' && /^\d+$/.test(borderRadiusVal.trim())) {
-    const radiusNum = parseInt(borderRadiusVal.trim(), 10);
+    const radiusNum = Number.parseInt(borderRadiusVal.trim(), 10);
     overrides.borderRadius = String(Math.min(24, Math.max(0, radiusNum)));
   }
 

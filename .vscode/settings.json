@@ -25,7 +25,8 @@
     "resvg",
     "rgba",
     "Segoe",
-    "sqlite"
+    "sqlite",
+    "Vitest"
   ],
   "sonarlint.connectedMode.project": {
     "connectionId": "creativecodeco",
