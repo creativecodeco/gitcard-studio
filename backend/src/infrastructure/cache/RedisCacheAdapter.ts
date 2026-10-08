@@ -104,12 +104,7 @@ export class RedisCacheAdapter implements CacheStore {
         });
 
         // Attempt non-blocking initial connection
-        this.client.connect().catch((err) => {
-          this.isConnected = false;
-          logger.warn(
-            `Initial Redis connection skipped, using memory cache fallback: ${err.message}`
-          );
-        });
+        this.initRedisConnection(this.client);
       } catch (err) {
         this.client = null;
         this.isConnected = false;
@@ -118,6 +113,13 @@ export class RedisCacheAdapter implements CacheStore {
         );
       }
     }
+  }
+
+  private initRedisConnection(client: Redis): void {
+    void client.connect().catch((err: Error) => {
+      this.isConnected = false;
+      logger.warn(`Initial Redis connection skipped, using memory cache fallback: ${err.message}`);
+    });
   }
 
   async get<T>(key: string): Promise<T | null> {

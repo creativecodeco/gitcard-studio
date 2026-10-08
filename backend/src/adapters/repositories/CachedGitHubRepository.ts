@@ -152,6 +152,6 @@ export class CachedGitHubRepository implements IGitHubRepository {
     const keyBase = username.toLowerCase();
     await this.cacheStore.flushPattern(keyBase);
     await this.cacheStore.del(`readme:${keyBase}`);
-    this.delegate.clearCache(username);
+    await this.delegate.clearCache(username);
   }
 }

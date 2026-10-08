@@ -43,7 +43,7 @@ export class RevokeUserTokenUseCase {
     await this.tokenRepo.deleteToken(username);
 
     // 5. Clear caches
-    this.githubRepo.clearCache(username);
+    await this.githubRepo.clearCache(username);
 
     return {
       message: 'Token revocado y eliminado exitosamente de nuestros servidores.'

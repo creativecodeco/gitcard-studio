@@ -71,7 +71,7 @@ export class TokensController {
         ip,
         agent
       );
-      this.githubRepo.clearCache(dto.username);
+      await this.githubRepo.clearCache(dto.username);
       logger.info(`Token registered successfully for user ${dto.username}`, {
         username: dto.username
       });
@@ -99,7 +99,7 @@ export class TokensController {
 
     try {
       const result = await this.revokeUseCase.execute(dto.username, providedToken);
-      this.githubRepo.clearCache(dto.username);
+      await this.githubRepo.clearCache(dto.username);
       logger.info(`Token revoked successfully for user ${dto.username}`, {
         username: dto.username
       });
@@ -146,7 +146,7 @@ export class TokensController {
 
     try {
       await this.purgeUseCase.execute(dto.username);
-      this.githubRepo.clearCache(dto.username);
+      await this.githubRepo.clearCache(dto.username);
       logger.info(`GDPR data purge completed for user ${dto.username}`, { username: dto.username });
       return { message: m.purgeSuccess };
     } catch (error: unknown) {

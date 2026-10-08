@@ -42,7 +42,7 @@ export async function renderStatsCard(
   const cardHeight = isCompact ? 130 : 195;
   const widthAttr = overrides?.cardWidth || `${cardWidth}`;
 
-  const borderRadius = overrides?.borderRadius ? parseInt(overrides.borderRadius, 10) : 12;
+  const borderRadius = overrides?.borderRadius ? Number.parseInt(overrides.borderRadius, 10) : 12;
   const showBorder = overrides?.showBorder !== 'false';
   const enableGlow = overrides?.glow === 'true';
 
@@ -81,7 +81,7 @@ export async function renderStatsCard(
   const visibleMetrics = allMetrics.filter((m) => !hiddenItems.has(m.key));
 
   // Render metrics grid dynamically based on visible count
-  const itemsPerRow = isCompact ? 3 : 3;
+  const itemsPerRow = 3;
   const metricItemsSvg: string[] = [];
 
   visibleMetrics.forEach((m, idx) => {

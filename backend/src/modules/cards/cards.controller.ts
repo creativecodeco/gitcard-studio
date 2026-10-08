@@ -94,7 +94,7 @@ export class CardsController {
       query.cache_bust !== undefined;
 
     if (isCacheBypass) {
-      this.githubRepo.clearCache(username);
+      await this.githubRepo.clearCache(username);
     }
 
     try {

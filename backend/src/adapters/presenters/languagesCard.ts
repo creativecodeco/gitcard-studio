@@ -24,7 +24,7 @@ export function renderLanguagesCard(
   const cardHeight = isCompact ? 130 : 195;
   const widthAttr = overrides?.cardWidth || `${cardWidth}`;
 
-  const borderRadius = overrides?.borderRadius ? parseInt(overrides.borderRadius, 10) : 12;
+  const borderRadius = overrides?.borderRadius ? Number.parseInt(overrides.borderRadius, 10) : 12;
   const showBorder = overrides?.showBorder !== 'false';
   const enableGlow = overrides?.glow === 'true';
 

@@ -49,7 +49,7 @@ export class RegisterOAuthTokenUseCase {
     });
 
     // Clear caches to force reloading with the new OAuth token
-    this.githubRepo.clearCache(username);
+    await this.githubRepo.clearCache(username);
 
     return {
       message:
