@@ -2,6 +2,24 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.19.0] - 2026-10-13
+
+### 🚀 Vitrina Visual de Tarjetas y Enlaces Clicables de Adquisición
+- **Vitrina Visual en Vivo en README (`README.md`)**:
+  - Incorporada una galería visual responsiva en tablas con previsualizaciones reales generadas por la API en producción en diversos temas (`dark`, `tokyonight`, `neon`, `radical`, `glassmorphism`, `solarized`).
+  - Añadida una matriz comparativa detallada (*Why GitCard Studio?*) contrastando el proyecto frente a alternativas tradicionales en resiliencia de límites de tasa, soporte de repositorios privados, compatibilidad con proxy Camo de GitHub, matriz de hábitos de commit 7x24 y cumplimiento OWASP Top 10.
+  - Sincronizada la documentación completa en inglés y español con insignias interactivas.
+- **Formato de Enlace Markdown en el Panel de Control (`ControlPanel.astro` & `index.astro`)**:
+  - Añadido el control *Enlace en Markdown* (`link-style-select`) con modos *Tarjeta Clicable (Recomendado)* y *Solo Imagen*.
+  - Actualizada la generación dinámica para envolver el código copiado de cada tarjeta individual y el `README.md de Ejemplo` con enlaces clicables hacia el estudio web interactivo (`[![Título](url)](generator_url)`).
+- **Utilidad de Generación de README (`readmeGenerator.ts`)**:
+  - Añadido el parámetro opcional `linkCards` para envolver tarjetas en enlaces clicables preservando retrocompatibilidad total.
+  - Añadida suite de pruebas unitarias en `sampleReadme.test.ts`.
+- **Sincronización de Internacionalización (7 Idiomas)**:
+  - Añadidas las claves `link_style_label`, `link_style_linked` y `link_style_raw` a todos los diccionarios de i18n (`es.ts`, `en.ts`, `fr.ts`, `de.ts`, `pt.ts`, `ja.ts`, `zh.ts`).
+- **Sincronización de Versión Monorepo**:
+  - Actualizada la versión del proyecto a **`v1.19.0`** de forma sincronizada en `root`, `backend`, `frontend` y `sonar-project.properties`.
+
 ## [1.18.1] - 2026-10-07
 
 ### 🧹 Correcciones de SonarCloud & Calidad de Código
@@ -731,4 +749,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.18.1
+**Versión actualmente expuesta / en producción:** v1.19.0
