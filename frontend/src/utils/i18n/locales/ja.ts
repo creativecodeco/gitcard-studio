@@ -177,5 +177,8 @@ export const ja: LocaleDictionary = {
   msg_account_disconnected: 'アカウントの連携を解除しました。',
   msg_no_active_user_export: 'エクスポートするアクティブなユーザーが見つかりません。',
   msg_export_success: 'データを正常にエクスポートしました。',
-  msg_export_error: 'データのエクスポートエラー。'
+  msg_export_error: 'データのエクスポートエラー。',
+  link_style_label: 'Markdownリンクスタイル',
+  link_style_linked: 'クリック可能なカード（推奨）',
+  link_style_raw: '画像のみ'
 };

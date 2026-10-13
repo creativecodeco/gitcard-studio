@@ -174,5 +174,8 @@ export const zh: LocaleDictionary = {
   msg_account_disconnected: '账号已成功断开连接。',
   msg_no_active_user_export: '未找到要导出的活跃用户。',
   msg_export_success: '数据导出成功。',
-  msg_export_error: '导出数据时出错。'
+  msg_export_error: '导出数据时出错。',
+  link_style_label: 'Markdown 链接样式',
+  link_style_linked: '可点击卡片（推荐）',
+  link_style_raw: '仅图片'
 };

@@ -196,5 +196,8 @@ export const en: LocaleDictionary = {
   msg_account_disconnected: 'Account disconnected successfully.',
   msg_no_active_user_export: 'No active user found to export.',
   msg_export_success: 'Data exported successfully.',
-  msg_export_error: 'Error exporting data.'
+  msg_export_error: 'Error exporting data.',
+  link_style_label: 'Markdown Link Style',
+  link_style_linked: 'Clickable Card (Recommended)',
+  link_style_raw: 'Image Only'
 };

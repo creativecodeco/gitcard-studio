@@ -594,6 +594,7 @@ import Footer from '@/components/Footer.astro';
   let currentLocale = 'es';
   let currentFormat = 'svg';
   let currentReadmeLayout: 'vertical' | 'grid' = 'vertical';
+  let currentLinkStyle: 'linked' | 'raw' = 'linked';
 
   let completedImagesCount = 0;
   const totalImagesToLoad = 13; // stats, languages, repo, rank, streak, trophies, top-repos, sponsors, commit-activity, today-status, timeline-matrix, views, tech-stack
@@ -604,6 +605,7 @@ import Footer from '@/components/Footer.astro';
 
   const localeSelect = document.getElementById('locale-select') as HTMLSelectElement | null;
   const formatSelect = document.getElementById('format-select') as HTMLSelectElement | null;
+  const linkStyleSelect = document.getElementById('link-style-select') as HTMLSelectElement | null;
 
   localeSelect?.addEventListener('change', () => {
     currentLocale = localeSelect.value;
@@ -618,6 +620,13 @@ import Footer from '@/components/Footer.astro';
 
   formatSelect?.addEventListener('change', () => {
     currentFormat = formatSelect.value;
+    if (currentUsername) {
+      updateCards();
+    }
+  });
+
+  linkStyleSelect?.addEventListener('change', () => {
+    currentLinkStyle = (linkStyleSelect.value as 'linked' | 'raw') || 'linked';
     if (currentUsername) {
       updateCards();
     }
@@ -1147,7 +1156,8 @@ import Footer from '@/components/Footer.astro';
       activeCardsForMarkdown,
       currentLocale,
       currentReadmeLayout,
-      pageUrl
+      pageUrl,
+      currentLinkStyle === 'linked'
     );
 
     if (renderedContainer) {
@@ -1412,19 +1422,55 @@ import Footer from '@/components/Footer.astro';
     }
 
     // 3. Update Markdown Codes
-    const markdownStats = `![${t('code_label_stats', currentLocale)}](${statsUrl})`;
-    const markdownLanguages = `![${t('code_label_languages', currentLocale)}](${languagesUrl})`;
-    const markdownRepo = `![${t('title_repo', currentLocale)}](${repoUrl})`;
-    const markdownRank = `![${t('title_rank', currentLocale)}](${rankUrl})`;
-    const markdownStreak = `![${t('code_label_streak', currentLocale)}](${streakUrl})`;
-    const markdownTrophies = `![${t('code_label_trophies', currentLocale)}](${trophiesUrl})`;
-    const markdownTopRepos = `![${t('code_label_top_repos', currentLocale)}](${topReposUrl})`;
-    const markdownSponsors = `![${t('code_label_sponsors', currentLocale)}](${sponsorsUrl})`;
-    const markdownCommitActivity = `![${t('code_label_commit_activity', currentLocale)}](${commitActivityUrl})`;
-    const markdownTodayStatus = `![${t('code_label_today_status', currentLocale)}](${todayStatusUrl})`;
-    const markdownTimelineMatrix = `![${t('code_label_timeline_matrix', currentLocale)}](${timelineMatrixUrl})`;
-    const markdownViews = `![${t('code_label_views', currentLocale)}](${viewsUrl})`;
-    const markdownTechStack = `![${t('code_label_tech_stack', currentLocale)}](${techStackUrl})`;
+    const getPageLink = () => {
+      const origin = window.location.origin;
+      return `${origin}/?user=${encodeURIComponent(currentUsername)}&theme=${encodeURIComponent(currentTheme)}`;
+    };
+
+    const formatCardMarkdown = (title: string, cardUrl: string) => {
+      if (currentLinkStyle === 'linked') {
+        return `[![${title}](${cardUrl})](${getPageLink()})`;
+      }
+      return `![${title}](${cardUrl})`;
+    };
+
+    const markdownStats = formatCardMarkdown(t('code_label_stats', currentLocale), statsUrl);
+    const markdownLanguages = formatCardMarkdown(
+      t('code_label_languages', currentLocale),
+      languagesUrl
+    );
+    const markdownRepo = formatCardMarkdown(t('title_repo', currentLocale), repoUrl);
+    const markdownRank = formatCardMarkdown(t('title_rank', currentLocale), rankUrl);
+    const markdownStreak = formatCardMarkdown(t('code_label_streak', currentLocale), streakUrl);
+    const markdownTrophies = formatCardMarkdown(
+      t('code_label_trophies', currentLocale),
+      trophiesUrl
+    );
+    const markdownTopRepos = formatCardMarkdown(
+      t('code_label_top_repos', currentLocale),
+      topReposUrl
+    );
+    const markdownSponsors = formatCardMarkdown(
+      t('code_label_sponsors', currentLocale),
+      sponsorsUrl
+    );
+    const markdownCommitActivity = formatCardMarkdown(
+      t('code_label_commit_activity', currentLocale),
+      commitActivityUrl
+    );
+    const markdownTodayStatus = formatCardMarkdown(
+      t('code_label_today_status', currentLocale),
+      todayStatusUrl
+    );
+    const markdownTimelineMatrix = formatCardMarkdown(
+      t('code_label_timeline_matrix', currentLocale),
+      timelineMatrixUrl
+    );
+    const markdownViews = formatCardMarkdown(t('code_label_views', currentLocale), viewsUrl);
+    const markdownTechStack = formatCardMarkdown(
+      t('code_label_tech_stack', currentLocale),
+      techStackUrl
+    );
 
     if (markdownStatsCode) markdownStatsCode.textContent = markdownStats;
     if (markdownLanguagesCode) markdownLanguagesCode.textContent = markdownLanguages;
@@ -1472,7 +1518,11 @@ import Footer from '@/components/Footer.astro';
       viewsImg.src = viewsUrl + '&preview=true' + cacheBuster;
     }
 
-    const markdownViews = `![${t('code_label_views', currentLocale)}](${viewsUrl})`;
+    const getViewsPageLink = `${origin}/?user=${encodeURIComponent(currentUsername)}&theme=${encodeURIComponent(currentTheme)}`;
+    const markdownViews =
+      currentLinkStyle === 'linked'
+        ? `[![${t('code_label_views', currentLocale)}](${viewsUrl})](${getViewsPageLink})`
+        : `![${t('code_label_views', currentLocale)}](${viewsUrl})`;
     if (markdownViewsCode) markdownViewsCode.textContent = markdownViews;
 
     updateSampleReadmeText();

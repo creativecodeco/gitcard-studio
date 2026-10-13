@@ -3,6 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/creativecodeco/gitcard-studio?style=flat-square)](https://github.com/creativecodeco/gitcard-studio/stargazers)
 [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-ea4aaa?style=flat-square&logo=github)](https://github.com/sponsors/joaltoroc)
+[![Profile Views](https://gitcard-studio.creativecode.com.co/api/badge?username=joaltoroc&type=views&color=38bdf8)](https://gitcard-studio.creativecode.com.co/)
 
 [🌐 English Version](#-english-summary--quick-start) | [🇪🇸 Versión en Español](#-documentación-en-español)
 
@@ -11,15 +12,57 @@
 <a name="-english-summary--quick-start"></a>
 ## 🌐 English Summary & Quick Start
 
-> **Generate dynamic and customizable SVG cards with your GitHub & Git statistics to showcase your profile and projects.**
+> **Generate dynamic, high-definition SVG cards with your real-time GitHub statistics to elevate your developer profile and repositories.**
 
 **GitCard Studio** is an open-source, production-grade microservice and web application built with **TypeScript, NestJS, and Astro**. It allows you to query real-time general stats, commit activity habits, streak counters, developer ranks, trophies, top repositories, and programming language distributions for any developer profile, generating high-definition vector SVG cards ready to embed directly into your `README.md`.
 
 Developed and maintained by **[CreativeCode.com.co](https://creativecode.com.co)**.
 
-### 🚀 Live Web Generator
-Interactively customize and preview your cards in real time at:  
+### 🚀 Live Interactive Studio
+Customize themes, layout, languages, and card widths with instant live preview at:  
 👉 **[https://gitcard-studio.creativecode.com.co/](https://gitcard-studio.creativecode.com.co/)**
+
+---
+
+### ✨ Visual Showcase (Live SVG Previews)
+
+*Click on any card to open and customize it in the Live Studio:*
+
+<div align="center">
+
+| 📊 General Stats (`dark`) | 💻 Most Used Languages (`tokyonight`) |
+| :---: | :---: |
+| [![General Stats Card](https://gitcard-studio.creativecode.com.co/api/stats?username=joaltoroc&theme=dark&locale=en)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=dark) | [![Languages Card](https://gitcard-studio.creativecode.com.co/api/languages?username=joaltoroc&theme=tokyonight&locale=en)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=tokyonight) |
+
+| 📅 Commit Habit Heatmap Matrix (`neon`) | 🔥 Contribution Streak Counter (`radical`) |
+| :---: | :---: |
+| [![Commit Activity Matrix](https://gitcard-studio.creativecode.com.co/api/commit-activity?username=joaltoroc&theme=neon&locale=en)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=neon) | [![Contribution Streak Card](https://gitcard-studio.creativecode.com.co/api/streak?username=joaltoroc&theme=radical&locale=en)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=radical) |
+
+| 🎖️ Developer Rank (`glassmorphism`) | ⭐ Top Repositories Highlight (`solarized`) |
+| :---: | :---: |
+| [![Developer Rank Card](https://gitcard-studio.creativecode.com.co/api/rank?username=joaltoroc&theme=glassmorphism&locale=en)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=glassmorphism) | [![Top Repositories Card](https://gitcard-studio.creativecode.com.co/api/top-repos?username=joaltoroc&theme=solarized&locale=en)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=solarized) |
+
+| 🏆 Milestone Achievements & Trophies (`dark`) |
+| :---: |
+| [![GitHub Trophies Card](https://gitcard-studio.creativecode.com.co/api/trophies?username=joaltoroc&theme=dark&locale=en)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=dark) |
+
+</div>
+
+---
+
+### 🥊 Why GitCard Studio?
+
+| Feature | GitCard Studio | Traditional Alternatives (`github-readme-stats`, etc.) |
+| :--- | :--- | :--- |
+| **Uptime & Rate Limit Resistance** | **Dual LRU + Redis Cache (2h TTL)** prevents hitting GitHub's 5,000 req/h API limit. | ⚠️ Frequently rate-limited, causing broken badges on GitHub profiles. |
+| **Private Repos & Org Contributions** | **1-click GitHub App OAuth** with AES-256-GCM encrypted tokens. | ❌ Requires manual PAT creation or does not support private statistics. |
+| **GitHub Camo Proxy Compatibility** | **Server-side Base64 embedding** guarantees avatar rendering on `camo.githubusercontent.com`. | ⚠️ External avatar URLs frequently fail to load behind Camo proxy. |
+| **Commit Habits Heatmap (7x24)** | **Complete weekly hourly matrix** (168 cells) revealing actual coding routines. | ❌ Not available or limited to basic day-level contribution totals. |
+| **Visual Themes & Polish** | **Modern curated themes** (Glassmorphism, TokyoNight, Neon, Radical, Solarized, Dark, Light). | ⚠️ Limited legacy styling or plain solid colors. |
+| **Enterprise-Grade Security** | **OWASP Top 10 audited**, strict regex sanitization, Helmet headers, non-root Docker runner. | ⚠️ Prone to SVG script injections, ReDoS, and SSRF vulnerabilities. |
+| **Interactive Studio & 1-Click README** | **Astro & Glassmorphism web studio** generates a full ready-to-paste `README.md` template. | ❌ Requires manually tweaking query string parameters in raw URLs. |
+
+---
 
 ### ⚡ Key Features
 - **Clean Architecture:** Domain-Driven Design (DDD) with decoupled Domain, Use Cases, Adapters, and Infrastructure layers.
@@ -40,17 +83,17 @@ Interactively customize and preview your cards in real time at:
 ### 📡 Quick Markdown Usage
 
 ```markdown
-<!-- General Stats Card -->
-![GitHub Stats](https://gitcard-studio.creativecode.com.co/api/stats?username=your-username&theme=dark&locale=en)
+<!-- General Stats Card (Clickable to Generator) -->
+[![GitHub Stats](https://gitcard-studio.creativecode.com.co/api/stats?username=your-username&theme=dark&locale=en)](https://gitcard-studio.creativecode.com.co/)
 
 <!-- Most Used Languages Card -->
-![Top Languages](https://gitcard-studio.creativecode.com.co/api/languages?username=your-username&theme=tokyonight&locale=en)
+[![Top Languages](https://gitcard-studio.creativecode.com.co/api/languages?username=your-username&theme=tokyonight&locale=en)](https://gitcard-studio.creativecode.com.co/)
 
 <!-- Commit Activity Heatmap Matrix -->
-![Commit Activity](https://gitcard-studio.creativecode.com.co/api/commit-activity?username=your-username&theme=neon&locale=en)
+[![Commit Activity](https://gitcard-studio.creativecode.com.co/api/commit-activity?username=your-username&theme=neon&locale=en)](https://gitcard-studio.creativecode.com.co/)
 
 <!-- Profile Views Badge -->
-![Profile Views](https://gitcard-studio.creativecode.com.co/api/badge?username=your-username&type=views&color=38bdf8)
+[![Profile Views](https://gitcard-studio.creativecode.com.co/api/badge?username=your-username&type=views&color=38bdf8)](https://gitcard-studio.creativecode.com.co/)
 ```
 
 ---
@@ -70,6 +113,46 @@ Desarrollado y mantenido por **[CreativeCode.com.co](https://creativecode.com.co
 
 Diseña y personaliza tus tarjetas interactivamente en:  
 👉 **[https://gitcard-studio.creativecode.com.co/](https://gitcard-studio.creativecode.com.co/)**
+
+---
+
+### ✨ Galería Visual de Tarjetas en Vivo
+
+*Haz clic en cualquier tarjeta para abrirla y personalizarla en el estudio interactivo:*
+
+<div align="center">
+
+| 📊 Estadísticas Generales (`dark`) | 💻 Lenguajes más Usados (`tokyonight`) |
+| :---: | :---: |
+| [![Tarjeta de Estadísticas](https://gitcard-studio.creativecode.com.co/api/stats?username=joaltoroc&theme=dark&locale=es)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=dark) | [![Tarjeta de Lenguajes](https://gitcard-studio.creativecode.com.co/api/languages?username=joaltoroc&theme=tokyonight&locale=es)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=tokyonight) |
+
+| 📅 Matriz de Hábitos de Commit 7x24 (`neon`) | 🔥 Racha de Contribuciones (`radical`) |
+| :---: | :---: |
+| [![Matriz de Hábitos](https://gitcard-studio.creativecode.com.co/api/commit-activity?username=joaltoroc&theme=neon&locale=es)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=neon) | [![Racha de Contribuciones](https://gitcard-studio.creativecode.com.co/api/streak?username=joaltoroc&theme=radical&locale=es)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=radical) |
+
+| 🎖️ Rango de Desarrollador (`glassmorphism`) | ⭐ Repositorios Destacados (`solarized`) |
+| :---: | :---: |
+| [![Rango de Desarrollador](https://gitcard-studio.creativecode.com.co/api/rank?username=joaltoroc&theme=glassmorphism&locale=es)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=glassmorphism) | [![Repositorios Destacados](https://gitcard-studio.creativecode.com.co/api/top-repos?username=joaltoroc&theme=solarized&locale=es)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=solarized) |
+
+| 🏆 Trofeos e Hitos Alcanzados (`dark`) |
+| :---: |
+| [![Trofeos en GitHub](https://gitcard-studio.creativecode.com.co/api/trophies?username=joaltoroc&theme=dark&locale=es)](https://gitcard-studio.creativecode.com.co/?user=joaltoroc&theme=dark) |
+
+</div>
+
+---
+
+### 🥊 ¿Por qué GitCard Studio? (Comparativa)
+
+| Característica | GitCard Studio | Alternativas Tradicionales (`github-readme-stats`, etc.) |
+| :--- | :--- | :--- |
+| **Alta Disponibilidad y Resistencia a Límites** | **Doble Caché LRU + Redis (2h)** evita alcanzar el límite de 5.000 req/h de la API de GitHub. | ⚠️ Frecuentemente bloqueadas o caídas por agotar los rate limits. |
+| **Repositorios Privados y Organizaciones** | **GitHub App OAuth en 1 clic** con cifrado criptográfico AES-256-GCM. | ❌ Requiere crear tokens PAT manuales o carece de soporte. |
+| **Compatibilidad con Proxy Camo de GitHub** | **Incrustación de avatares en Base64** para garantizar renderizado en `camo.githubusercontent.com`. | ⚠️ Las imágenes externas suelen fallar detrás del proxy Camo. |
+| **Matriz de Hábitos de Commit (7x24)** | **Mapa de calor semanal por horas** (168 celdas) que refleja tu rutina real de código. | ❌ No disponible o limitado a conteos totales por día. |
+| **Variedad de Temas y Estética** | **Temas modernos y pulidos** (Glassmorphism, TokyoNight, Neon, Radical, Solarized, Dark, Light). | ⚠️ Diseños planos o paletas anticuadas. |
+| **Seguridad de Grado Empresarial** | **Alineación OWASP Top 10**, validación regex estricta, cabeceras Helmet, Docker sin root. | ⚠️ Susceptibles a inyecciones SVG, ReDoS o SSRF. |
+| **Panel Web Interactivo y README en 1 Clic** | **Generador web en Astro con Glassmorphism** que exporta plantillas completas de `README.md`. | ❌ Configuración manual adivinando parámetros en URLs crudas. |
 
 ---
 
@@ -215,21 +298,21 @@ Una vez ejecutado, el panel de configuración estará disponible en:
 
 Las tarjetas se pueden incrustar en cualquier archivo Markdown usando la siguiente sintaxis:
 
-| Endpoint | Descripción | Ejemplo de Uso |
+| Endpoint | Descripción | Ejemplo de Uso (Clicable al Generador) |
 | :--- | :--- | :--- |
-| `/api/stats` | Estadísticas generales (commits, PRs, estrellas, seguidores) | `![Stats](https://gitcard-studio.creativecode.com.co/api/stats?username=tu-usuario&theme=dark)` |
-| `/api/languages` | Gráfico de distribución de lenguajes | `![Languages](https://gitcard-studio.creativecode.com.co/api/languages?username=tu-usuario&theme=tokyonight)` |
-| `/api/commit-activity` | Matriz semanal 7x24 de hábitos de commit | `![Commit Activity](https://gitcard-studio.creativecode.com.co/api/commit-activity?username=tu-usuario&theme=neon)` |
-| `/api/streak` | Racha de contribuciones activas y récords | `![Streak](https://gitcard-studio.creativecode.com.co/api/streak?username=tu-usuario&theme=radical)` |
-| `/api/rank` | Tarjeta de grado / rango de desarrollador (S+, A+, B) | `![Rank](https://gitcard-studio.creativecode.com.co/api/rank?username=tu-usuario&theme=glassmorphism)` |
-| `/api/trophies` | Trofeos e hitos alcanzados en GitHub | `![Trophies](https://gitcard-studio.creativecode.com.co/api/trophies?username=tu-usuario&theme=dark)` |
-| `/api/top-repos` | Tarjeta con los repositorios más destacados | `![Top Repos](https://gitcard-studio.creativecode.com.co/api/top-repos?username=tu-usuario&theme=solarized)` |
-| `/api/repo` | Tarjeta de un repositorio destacado individual | `![Featured Repo](https://gitcard-studio.creativecode.com.co/api/repo?username=tu-usuario&repo=tu-repo&theme=dark)` |
-| `/api/sponsors` | Tarjeta del perfil de GitHub Sponsors | `![Sponsors](https://gitcard-studio.creativecode.com.co/api/sponsors?username=tu-usuario&theme=neon)` |
-| `/api/today-status` | Insignia con el estado de commits del día actual | `![Today Status](https://gitcard-studio.creativecode.com.co/api/today-status?username=tu-usuario&theme=dark)` |
-| `/api/timeline-matrix` | Matriz horaria de distribución de commits por período | `![Timeline Matrix](https://gitcard-studio.creativecode.com.co/api/timeline-matrix?username=tu-usuario&theme=neon)` |
-| `/api/views` | Insignia SVG con contador de visitas al perfil de GitHub | `![Profile Views](https://gitcard-studio.creativecode.com.co/api/views?username=tu-usuario&color=38bdf8)` |
-| `/api/badge` | Insignia SVG estilo Shields.io personalizada | `![Badge](https://gitcard-studio.creativecode.com.co/api/badge?username=tu-usuario&type=views&color=38bdf8)` |
+| `/api/stats` | Estadísticas generales (commits, PRs, estrellas, seguidores) | `[![Stats](https://gitcard-studio.creativecode.com.co/api/stats?username=tu-usuario&theme=dark)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/languages` | Gráfico de distribución de lenguajes | `[![Languages](https://gitcard-studio.creativecode.com.co/api/languages?username=tu-usuario&theme=tokyonight)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/commit-activity` | Matriz semanal 7x24 de hábitos de commit | `[![Commit Activity](https://gitcard-studio.creativecode.com.co/api/commit-activity?username=tu-usuario&theme=neon)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/streak` | Racha de contribuciones activas y récords | `[![Streak](https://gitcard-studio.creativecode.com.co/api/streak?username=tu-usuario&theme=radical)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/rank` | Tarjeta de grado / rango de desarrollador (S+, A+, B) | `[![Rank](https://gitcard-studio.creativecode.com.co/api/rank?username=tu-usuario&theme=glassmorphism)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/trophies` | Trofeos e hitos alcanzados en GitHub | `[![Trophies](https://gitcard-studio.creativecode.com.co/api/trophies?username=tu-usuario&theme=dark)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/top-repos` | Tarjeta con los repositorios más destacados | `[![Top Repos](https://gitcard-studio.creativecode.com.co/api/top-repos?username=tu-usuario&theme=solarized)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/repo` | Tarjeta de un repositorio destacado individual | `[![Featured Repo](https://gitcard-studio.creativecode.com.co/api/repo?username=tu-usuario&repo=tu-repo&theme=dark)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/sponsors` | Tarjeta del perfil de GitHub Sponsors | `[![Sponsors](https://gitcard-studio.creativecode.com.co/api/sponsors?username=tu-usuario&theme=neon)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/today-status` | Insignia con el estado de commits del día actual | `[![Today Status](https://gitcard-studio.creativecode.com.co/api/today-status?username=tu-usuario&theme=dark)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/timeline-matrix` | Matriz horaria de distribución de commits por período | `[![Timeline Matrix](https://gitcard-studio.creativecode.com.co/api/timeline-matrix?username=tu-usuario&theme=neon)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/views` | Insignia SVG con contador de visitas al perfil de GitHub | `[![Profile Views](https://gitcard-studio.creativecode.com.co/api/views?username=tu-usuario&color=38bdf8)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/badge` | Insignia SVG estilo Shields.io personalizada | `[![Badge](https://gitcard-studio.creativecode.com.co/api/badge?username=tu-usuario&type=views&color=38bdf8)](https://gitcard-studio.creativecode.com.co/)` |
 
 #### **Parámetros Comunes:**
 - `username` (Obligatorio): Nombre de usuario u organización en GitHub. Valida con regex `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`.

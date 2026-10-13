@@ -180,5 +180,8 @@ export const fr: LocaleDictionary = {
   msg_account_disconnected: 'Compte déconnecté avec succès.',
   msg_no_active_user_export: 'Aucun utilisateur actif trouvé à exporter.',
   msg_export_success: 'Données exportées avec succès.',
-  msg_export_error: 'Erreur lors de l’exportation des données.'
+  msg_export_error: 'Erreur lors de l’exportation des données.',
+  link_style_label: 'Lien Markdown',
+  link_style_linked: 'Carte Cliquable (Recommandé)',
+  link_style_raw: 'Image Seule'
 };

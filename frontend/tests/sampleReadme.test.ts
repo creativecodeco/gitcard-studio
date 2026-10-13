@@ -29,6 +29,15 @@ describe('Sample README Generator Utility', () => {
     expect(result).toContain('Generated with [GitCard Studio]');
   });
 
+  it('should generate clickable card markdown links when linkCards is true', () => {
+    const cards: CardItem[] = [
+      { id: 'stats', title: 'GitHub Stats', url: 'https://example.com/api/stats?username=octocat' }
+    ];
+
+    const result = generateSampleReadme('octocat', cards, 'en', 'vertical', 'https://gitcard-studio.creativecode.com.co/?user=octocat', true);
+    expect(result).toContain('[![GitHub Stats](https://example.com/api/stats?username=octocat)](https://gitcard-studio.creativecode.com.co/?user=octocat)');
+  });
+
   it('should fallback gracefully when no cards are active', () => {
     const result = generateSampleReadme('octocat', [], 'es');
     expect(result).toContain('# ¡Hola! Soy @octocat 👋');

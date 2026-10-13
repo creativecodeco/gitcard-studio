@@ -197,5 +197,8 @@ export const es = {
   msg_account_disconnected: 'Cuenta desconectada exitosamente.',
   msg_no_active_user_export: 'No se encontró un usuario activo para exportar.',
   msg_export_success: 'Datos exportados exitosamente.',
-  msg_export_error: 'Error al exportar los datos.'
+  msg_export_error: 'Error al exportar los datos.',
+  link_style_label: 'Enlace en Markdown',
+  link_style_linked: 'Tarjeta Clicable (Recomendado)',
+  link_style_raw: 'Solo Imagen'
 } as const;

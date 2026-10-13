@@ -421,5 +421,34 @@ import PrivateTokenModal from './PrivateTokenModal.astro';
         </select>
       </div>
     </div>
+
+    <!-- Estilo de Enlace en Markdown (Clicable al Generador vs Solo Imagen) -->
+    <div class="input-group" style="margin-top: 16px;">
+      <label for="link-style-select" class="input-label" data-i18n="link_style_label">
+        Enlace en Markdown
+      </label>
+      <div class="input-wrapper" style="height: 38px;">
+        <select
+          id="link-style-select"
+          style="width: 100%; height: 100%; background: transparent; border: none; color: var(--text-primary); font-family: var(--font-family); font-size: 0.85rem; padding-left: 12px; cursor: pointer; outline: none;"
+        >
+          <option
+            value="linked"
+            style="background: var(--bg-color); color: var(--text-primary);"
+            data-i18n="link_style_linked"
+            selected
+          >
+            Tarjeta Clicable (Recomendado)
+          </option>
+          <option
+            value="raw"
+            style="background: var(--bg-color); color: var(--text-primary);"
+            data-i18n="link_style_raw"
+          >
+            Solo Imagen
+          </option>
+        </select>
+      </div>
+    </div>
   </div>
 </section>

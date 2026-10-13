@@ -14,7 +14,8 @@ export function generateSampleReadme(
   activeCards: CardItem[],
   locale: string = 'es',
   layout: ReadmeLayout = 'vertical',
-  generatorUrl?: string
+  generatorUrl?: string,
+  linkCards: boolean = false
 ): string {
   const cleanUsername = username.trim() || 'username';
   const isEn = locale === 'en';
@@ -34,8 +35,14 @@ export function generateSampleReadme(
 
   const cardsMarkdown =
     layout === 'grid'
-      ? formatGridCards(activeCards)
-      : activeCards.map((card) => `![${card.title}](${card.url})`).join('\n\n');
+      ? formatGridCards(activeCards, linkCards ? pageUrl : undefined)
+      : activeCards
+          .map((card) =>
+            linkCards
+              ? `[![${card.title}](${card.url})](${pageUrl})`
+              : `![${card.title}](${card.url})`
+          )
+          .join('\n\n');
 
   const footer = isEn
     ? `\n\n---\n*Generated with [GitCard Studio](${pageUrl})*`
@@ -44,25 +51,32 @@ export function generateSampleReadme(
   return `${header}\n${cardsMarkdown}${footer}`;
 }
 
-function formatGridCards(activeCards: CardItem[]): string {
+function formatGridCards(activeCards: CardItem[], linkUrl?: string): string {
   const rows: string[] = [];
   for (let i = 0; i < activeCards.length; i += 2) {
     const card1 = activeCards[i];
     const card2 = activeCards[i + 1];
 
+    const img1 = `<img src="${card1.url}" alt="${card1.title}" width="100%" />`;
+    const content1 = linkUrl ? `<a href="${linkUrl}">${img1}</a>` : img1;
+
     if (card2) {
+      const img2 = `<img src="${card2.url}" alt="${card2.title}" width="100%" />`;
+      const content2 = linkUrl ? `<a href="${linkUrl}">${img2}</a>` : img2;
       rows.push(`  <tr>
     <td valign="top" width="50%">
-      <img src="${card1.url}" alt="${card1.title}" width="100%" />
+      ${content1}
     </td>
     <td valign="top" width="50%">
-      <img src="${card2.url}" alt="${card2.title}" width="100%" />
+      ${content2}
     </td>
   </tr>`);
     } else {
+      const singleImg = `<img src="${card1.url}" alt="${card1.title}" />`;
+      const singleContent = linkUrl ? `<a href="${linkUrl}">${singleImg}</a>` : singleImg;
       rows.push(`  <tr>
     <td valign="top" colspan="2" align="center">
-      <img src="${card1.url}" alt="${card1.title}" />
+      ${singleContent}
     </td>
   </tr>`);
     }
