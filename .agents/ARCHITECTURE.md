@@ -4,20 +4,20 @@
 
 ---
 
-## Estado actual: 2026-10-07 (v1.17.0)
+## Estado actual: 2026-10-26 (v1.19.1)
 
 ### Stack
 
 | Capa | Tecnología | Versión |
 |---|---|---|
 | Runtime | Node.js | 24 |
-| Backend | NestJS + Fastify + TypeScript | 12.1.2 / 5.12.5 / 7.0.2 |
-| Frontend | Astro (SSG estático) | 7.3.7 |
-| Base de datos | PostgreSQL + TypeORM | 8.23.1 / 1.1.1 |
-| Package Manager | pnpm (monorepo) | 12.10.1 |
+| Backend | NestJS + Fastify + TypeScript | 12.2.0 / 5.12.7 / 7.0.2 |
+| Frontend | Astro (SSG estático) | 7.4.2 |
+| Base de datos | PostgreSQL + TypeORM | 8.23.1 / 1.1.2 |
+| Package Manager | pnpm (monorepo) | 12.15.0 |
 | Contenedor | Docker multi-stage, node:24-alpine | — |
 | CSS | Vanilla CSS (global.css) | — |
-| Tests | Vitest | 5.0.0 |
+| Tests | Vitest | 5.0.5 |
 
 ---
 

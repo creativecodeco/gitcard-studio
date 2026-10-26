@@ -2,6 +2,19 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.19.1] - 2026-10-26
+
+### 🔒 Auditoría de Seguridad, Sincronización y Actualización de Dependencias Monorepo
+- **Remediación de Vulnerabilidades (`pnpm audit` — 0 vulnerabilidades)**:
+  - Actualizado `happy-dom` a **`21.0.4`** (y fijado en `overrides` de `pnpm-workspace.yaml`) para corregir la vulnerabilidad High `GHSA-834v-8h66-3h79` (`CVE-2026-33943`).
+  - Actualizado `fastify` a **`5.12.7`** (y fijado en `overrides` de `pnpm-workspace.yaml`) para corregir la vulnerabilidad Low `GHSA-389g-gv7q-r4x8`.
+- **Actualización de Dependencias Exactas**:
+  - **Root (`package.json`)**: `prettier-plugin-astro` (`1.1.2`).
+  - **Backend (`backend/package.json`)**: `@nestjs/common`, `@nestjs/core`, `@nestjs/platform-fastify` y `@nestjs/testing` (`12.2.0`), `@fastify/compress` (`9.2.2`), `@fastify/cors` (`11.3.1`), `@fastify/etag` (`6.2.1`), `@fastify/helmet` (`13.2.0`), `@fastify/rate-limit` (`11.2.1`), `@fastify/static` (`10.1.7`), `fastify` (`5.12.7`), `typeorm` (`1.1.2`), `dotenv` (`18.0.9`), `@types/node` (`26.6.5`), `tsc-alias` (`1.9.9`) y `vitest` (`5.0.5`).
+  - **Frontend (`frontend/package.json`)**: `astro` (`7.4.2`), `@astrojs/check` (`0.9.12`), `@playwright/test` (`1.64.1`), `happy-dom` (`21.0.4`) y `vitest` (`5.0.5`).
+- **Sincronización de Versión Monorepo**:
+  - Actualizada la versión del proyecto a **`v1.19.1`** de forma sincronizada en `root`, `backend`, `frontend`, `sonar-project.properties` y `.agents/ARCHITECTURE.md`.
+
 ## [1.19.0] - 2026-10-13
 
 ### 🚀 Vitrina Visual de Tarjetas y Enlaces Clicables de Adquisición
@@ -749,4 +762,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.19.0
+**Versión actualmente expuesta / en producción:** v1.19.1
