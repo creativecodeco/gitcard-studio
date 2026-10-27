@@ -2,6 +2,23 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.20.0] - 2026-10-27
+
+### ✨ Nuevas Características
+- **Tarjeta SVG de Visitas del Proyecto (`GET /api/repo-views`) y Contador por Proyecto (`GET /api/views?repo=...`)**:
+  - Implementado el presentador SVG [`repoViewsCard.ts`](backend/src/adapters/presenters/repoViewsCard.ts) y el caso de uso [`GetRepoViewsCardUseCase.ts`](backend/src/use-cases/cards/GetRepoViewsCardUseCase.ts) que generan una tarjeta estilizada por repositorio mostrando metadatos del proyecto (propietario, nombre, descripción, lenguaje principal, estrellas y forks) junto con una insignia destacada de visitas en tiempo real.
+  - Extendido el endpoint `GET /api/views` y el caso de uso [`RecordRepoViewUseCase.ts`](backend/src/use-cases/metrics/RecordRepoViewUseCase.ts) para soportar el parámetro opcional `repo`, permitiendo llevar contadores independientes por repositorio sin incrementar ni contaminar las visitas globales del perfil.
+  - Creada la entidad PostgreSQL [`RepoMetric`](backend/src/infrastructure/database/entities/RepoMetric.ts) (`repo_metrics`) con clave primaria compuesta `(username, repo)` y trazabilidad de impactos desde GitHub Camo y Web Directa, integrada en los flujos GDPR de exportación (`ExportUserDataUseCase`) y purga (`PurgeUserDataUseCase`), así como en el verificador de READMEs (`VerifyUserReadmeUseCase`).
+- **Selector de Repositorios Accesibles y Soporte de Organizaciones (`GET /api/users/repos`)**:
+  - Añadido el endpoint `GET /api/users/repos` en [`AuthController`](backend/src/modules/auth/auth.controller.ts) y la propiedad `accessible_repos` en `GET /api/users/me/metrics` para listar automáticamente todos los repositorios a los que el usuario tiene acceso (propios, colaborador y miembro de organizaciones si está autenticado con PAT o GitHub App; o repositorios públicos en modo público).
+  - Actualizada la validación [`GITHUB_REPO_REGEX`](backend/src/domain/entities/Validation.ts) y [`ApiGitHubRepository.getFeaturedRepo`](backend/src/adapters/repositories/ApiGitHubRepository.ts) para admitir tanto el formato `owner/repo` (ej. `creativecodeco/ui`) como solo el nombre corto `repo` (ej. `ui`), resolviendo automáticamente repositorios alojados en organizaciones o de colaborador cuando no existen bajo el namespace personal del usuario.
+  - Incorporado en [`PrivateTokenModal.astro`](frontend/src/components/PrivateTokenModal.astro) un selector desplegable (`#repo-select-auth`), campo de texto sincronizado (`#repo-input-auth`) y autocompletado (`#user-repos-datalist`) disponible tanto en modo público como con cuenta conectada (PAT / GitHub App).
+- **Integración en Estudio Web, Métricas del Usuario y Panel de Administración**:
+  - Añadida la tarjeta **Visitas del Proyecto (Repositorio)** en la galería principal de [`index.astro`](frontend/src/pages/index.astro) bajo las pestañas **Todas (14)** y **Repositorios (4)**.
+  - Actualizado el panel de métricas personales del usuario en [`PrivateTokenModal.astro`](frontend/src/components/PrivateTokenModal.astro) con el contador de **Visitas Proyectos** (`#metric-repo-views`) y el desglose detallado de visitas por cada repositorio (`#metric-repo-breakdown`).
+  - Actualizado el dashboard administrativo [`admin/metrics.astro`](frontend/src/pages/admin/metrics.astro) con tarjetas KPI de **Visitas Proyectos** y **Renders Repo Views**, integración en la gráfica de distribución de tarjetas y columna dedicada **Visitas Proyectos** con tooltip de desglose por repositorio en la tabla de usuarios.
+  - Traducciones completas añadidas en los 7 idiomas soportados (`es`, `en`, `fr`, `de`, `pt`, `ja`, `zh`).
+
 ## [1.19.1] - 2026-10-26
 
 ### 🔒 Auditoría de Seguridad, Sincronización y Actualización de Dependencias Monorepo
@@ -762,4 +779,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.19.1
+**Versión actualmente expuesta / en producción:** v1.20.0

@@ -3,6 +3,7 @@ import { Metrics, HitContext } from '@/domain/entities/Metrics';
 import { AppDataSource } from '@/infrastructure/database/database';
 import { GlobalMetric } from '@/infrastructure/database/entities/GlobalMetric';
 import { UserMetric } from '@/infrastructure/database/entities/UserMetric';
+import { RepoMetric } from '@/infrastructure/database/entities/RepoMetric';
 import { RequestLog } from '@/infrastructure/database/entities/RequestLog';
 import { logger } from '@/infrastructure/logging/logger';
 
@@ -121,7 +122,8 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       rankRenders: 0,
       streakRenders: 0,
       trophiesRenders: 0,
-      viewsRenders: 0
+      viewsRenders: 0,
+      repoViewsRenders: 0
     };
 
     try {
@@ -132,6 +134,14 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
           metrics[row.metric_key as keyof Metrics] = row.metric_value;
         }
       });
+
+      if (!metrics.repoViewsRenders) {
+        const repoMetricRepo = AppDataSource.getRepository(RepoMetric);
+        if (typeof repoMetricRepo?.find === 'function') {
+          const repoRows = await repoMetricRepo.find();
+          metrics.repoViewsRenders = repoRows.reduce((acc, r) => acc + (r.repo_views || 0), 0);
+        }
+      }
     } catch (err) {
       logger.error('Error fetching global metrics:', { error: err });
     }
@@ -153,8 +163,35 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
   async getAllUserMetrics(): Promise<any[]> {
     try {
       const userMetricRepo = AppDataSource.getRepository(UserMetric);
-      return await userMetricRepo.find({
+      const repoMetricRepo = AppDataSource.getRepository(RepoMetric);
+      const users = await userMetricRepo.find({
         order: { last_updated: 'DESC' }
+      });
+
+      const repoRows =
+        typeof repoMetricRepo?.find === 'function'
+          ? await repoMetricRepo.find({ order: { repo_views: 'DESC' } })
+          : [];
+
+      const repoMap = new Map<
+        string,
+        { totalViews: number; repos: Array<{ repo: string; views: number }> }
+      >();
+      for (const r of repoRows) {
+        const uKey = r.username.toLowerCase();
+        const existing = repoMap.get(uKey) || { totalViews: 0, repos: [] };
+        existing.totalViews += r.repo_views || 0;
+        existing.repos.push({ repo: r.repo, views: r.repo_views || 0 });
+        repoMap.set(uKey, existing);
+      }
+
+      return users.map((u) => {
+        const repoInfo = repoMap.get(u.username.toLowerCase());
+        return {
+          ...u,
+          repo_views: repoInfo ? repoInfo.totalViews : 0,
+          repo_metrics: repoInfo ? repoInfo.repos : []
+        };
       });
     } catch (err) {
       logger.error('Error fetching all user metrics:', { error: err });
@@ -219,6 +256,61 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
     } catch (err) {
       logger.error(`Error in getOrIncrementProfileViews for user ${username}`, {
         username,
+        error: err
+      });
+      return 0;
+    }
+  }
+
+  async getOrIncrementRepoViews(
+    username: string,
+    repo: string,
+    increment: boolean,
+    context?: HitContext
+  ): Promise<number> {
+    try {
+      const repoMetricRepo = AppDataSource.getRepository(RepoMetric);
+      const userLower = username.toLowerCase();
+      const repoLower = repo.toLowerCase();
+
+      await AppDataSource.createQueryBuilder()
+        .insert()
+        .into(RepoMetric)
+        .values({ username: userLower, repo: repoLower })
+        .orIgnore()
+        .execute();
+
+      if (increment) {
+        const source = this.determineTrafficSource(
+          context?.userAgent,
+          context?.referer,
+          context?.ref
+        );
+        await this.incrementRepoViewCounters(userLower, repoLower, source);
+
+        if (context) {
+          await this.logProfileViewRequest(userLower, context, 'repo-views');
+        }
+      }
+
+      const row = await repoMetricRepo.findOneBy({ username: userLower, repo: repoLower });
+      const currentViews = row ? row.repo_views : 0;
+
+      if (increment) {
+        logger.info(`Repo views count updated for ${userLower}/${repoLower}`, {
+          username: userLower,
+          repo: repoLower,
+          repoViews: currentViews,
+          userAgent: context?.userAgent,
+          referer: context?.referer
+        });
+      }
+
+      return currentViews;
+    } catch (err) {
+      logger.error(`Error in getOrIncrementRepoViews for ${username}/${repo}`, {
+        username,
+        repo,
         error: err
       });
       return 0;
@@ -346,7 +438,70 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       .execute();
   }
 
-  private async logProfileViewRequest(username: string, context: HitContext): Promise<void> {
+  private async incrementRepoViewCounters(
+    userLower: string,
+    repoLower: string,
+    source: 'github' | 'web' = 'web'
+  ): Promise<void> {
+    await AppDataSource.createQueryBuilder()
+      .update(GlobalMetric)
+      .set({ metric_value: () => 'metric_value + 1' })
+      .where('metric_key = :key', { key: 'totalRenders' })
+      .execute();
+
+    await AppDataSource.createQueryBuilder()
+      .update(GlobalMetric)
+      .set({ metric_value: () => 'metric_value + 1' })
+      .where('metric_key = :key', { key: 'viewsRenders' })
+      .execute();
+
+    await AppDataSource.createQueryBuilder()
+      .update(GlobalMetric)
+      .set({ metric_value: () => 'metric_value + 1' })
+      .where('metric_key = :key', { key: 'repoViewsRenders' })
+      .execute();
+
+    await AppDataSource.createQueryBuilder()
+      .insert()
+      .into(UserMetric)
+      .values({ username: userLower })
+      .orIgnore()
+      .execute();
+
+    const now = new Date();
+    const userUpdateData: Record<string, unknown> = {
+      last_updated: now
+    };
+    const updateData: Record<string, unknown> = {
+      repo_views: () => 'repo_views + 1',
+      last_updated: now
+    };
+    if (source === 'github') {
+      updateData.last_github_hit = now;
+      userUpdateData.last_github_hit = now;
+    } else {
+      updateData.last_web_hit = now;
+      userUpdateData.last_web_hit = now;
+    }
+
+    await AppDataSource.createQueryBuilder()
+      .update(UserMetric)
+      .set(userUpdateData)
+      .where('username = :username', { username: userLower })
+      .execute();
+
+    await AppDataSource.createQueryBuilder()
+      .update(RepoMetric)
+      .set(updateData)
+      .where('username = :username AND repo = :repo', { username: userLower, repo: repoLower })
+      .execute();
+  }
+
+  private async logProfileViewRequest(
+    username: string,
+    context: HitContext,
+    cardType: string = 'views'
+  ): Promise<void> {
     const userAgent = context.userAgent || '';
     const referer = context.referer || '';
     const ip = context.ip || '';
@@ -355,7 +510,7 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
     const requestLogRepo = AppDataSource.getRepository(RequestLog);
     const log = new RequestLog();
     log.username = username.slice(0, 39);
-    log.card_type = 'views';
+    log.card_type = cardType;
     log.source = source;
     log.user_agent = userAgent.slice(0, 500);
     log.referer = referer.slice(0, 500);

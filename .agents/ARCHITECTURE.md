@@ -4,7 +4,7 @@
 
 ---
 
-## Estado actual: 2026-10-26 (v1.19.1)
+## Estado actual: 2026-10-27 (v1.20.0)
 
 ### Stack
 
@@ -54,7 +54,7 @@ gitcard-studio/
 │   │   ├── app.module.ts         # NestJS Root Module
 │   │   ├── main.ts               # NestJS Fastify bootstrap con compresión, ETags y Helmet
 │   │   └── server.ts             # Punto de entrada de inicio de servidor
-│   └── tests/                    # Vitest unit tests backend (33 archivos, 165 tests pasados)
+│   └── tests/                    # Vitest unit tests backend (35 archivos, 187 tests pasados)
 ├── frontend/                     # Astro 7 — cliente web estático interactivo
 │   ├── astro.config.mjs          # outDir: ../public, format: file, compressHTML: true
 │   ├── src/
@@ -81,6 +81,7 @@ gitcard-studio/
 | GET | `/api/stats` | `CardsController.getStats` | Pública, CORS `*`, SVG |
 | GET | `/api/languages` | `CardsController.getLanguages` | Pública, CORS `*`, SVG |
 | GET | `/api/repo` | `CardsController.getRepo` | Pública, CORS `*`, SVG |
+| GET | `/api/repo-views` | `CardsController.getRepoViews` | Pública, `no-cache`, SVG de visitas por proyecto |
 | GET | `/api/rank` | `CardsController.getRank` | Pública, CORS `*`, SVG |
 | GET | `/api/streak` | `CardsController.getStreak` | Pública, SVG |
 | GET | `/api/trophies` | `CardsController.getTrophies` | Pública, SVG |
@@ -94,7 +95,8 @@ gitcard-studio/
 | GET | `/api/v1/user/stats` | `ApiV1Controller.getUserStatsJson` | Pública, JSON agregado |
 | GET | `/api/auth/github` | `AuthController.initiateGitHubAuth` | Redirección OAuth GitHub App |
 | GET | `/api/auth/github/callback` | `AuthController.handleGitHubCallback` | Callback OAuth GitHub App |
-| GET | `/api/users/me/metrics` | `AuthController.getUserMetrics` | Métricas personales del usuario |
+| GET | `/api/users/me/metrics` | `AuthController.getUserMetrics` | Métricas personales del usuario y desglose por repositorio |
+| GET | `/api/users/repos` | `AuthController.getUserRepositories` | Lista de repositorios accesibles por el usuario |
 | DELETE | `/api/users/me` | `AuthController.deleteUserAccount` | Purga autoverificada de datos |
 | POST | `/api/auth/disconnect` | `AuthController.disconnectAccount` | Desconexión de cuenta GitHub |
 | POST | `/api/tokens/register` | `TokensController.register` | Validado via DTO (PAT) |
@@ -149,7 +151,7 @@ gitcard-studio/
 
 - **Validación de inputs**: DTOs y expresiones regulares estrictas en parámetros de entrada (`ValidationPipe`):
   - Username: `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`
-  - Repo: `/^[a-z\d-_.]{1,100}$/i`
+  - Repo: `/^(?:[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}\/)?[a-z\d-_.]{1,100}$/i`
   - Color: componentes Hex, RGB/RGBA y HSL/HSLA reconstruidos numéricamente (`sanitizeColor`)
   - Label: barrera formal de sanitización con clase invertida (`sanitizeBadgeLabel`)
 - **Fastify Helmet**: `@fastify/helmet` con `contentSecurityPolicy: false` para renderizado de SVG inline en etiquetas `<img>`.

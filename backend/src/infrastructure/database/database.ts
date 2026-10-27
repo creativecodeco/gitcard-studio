@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { logger } from '../logging/logger';
 import { GlobalMetric } from './entities/GlobalMetric';
 import { UserMetric } from './entities/UserMetric';
+import { RepoMetric } from './entities/RepoMetric';
 import { RequestLog } from './entities/RequestLog';
 import { UserTokenEntity } from './entities/UserTokenEntity';
 import { UserStatsHistory } from './entities/UserStatsHistory';
@@ -16,7 +17,7 @@ const commonDbOptions = {
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 3000
   },
-  entities: [GlobalMetric, UserMetric, RequestLog, UserTokenEntity, UserStatsHistory],
+  entities: [GlobalMetric, UserMetric, RepoMetric, RequestLog, UserTokenEntity, UserStatsHistory],
   migrations: [],
   subscribers: []
 };
@@ -72,6 +73,17 @@ export async function initDatabase(): Promise<void> {
             ADD COLUMN IF NOT EXISTS last_web_hit timestamp with time zone;`
         );
       }
+      await AppDataSource.query(
+        `CREATE TABLE IF NOT EXISTS repo_metrics (
+          username varchar(100) NOT NULL,
+          repo varchar(100) NOT NULL,
+          repo_views integer DEFAULT 0 NOT NULL,
+          last_github_hit timestamp with time zone,
+          last_web_hit timestamp with time zone,
+          last_updated timestamp with time zone,
+          PRIMARY KEY (username, repo)
+        );`
+      );
     } catch (schemaErr) {
       logger.warn('Schema migration check for user_metrics completed with note:', {
         error: schemaErr
@@ -89,6 +101,7 @@ export async function initDatabase(): Promise<void> {
       'streakRenders',
       'trophiesRenders',
       'viewsRenders',
+      'repoViewsRenders',
       'sponsorsRenders'
     ];
 

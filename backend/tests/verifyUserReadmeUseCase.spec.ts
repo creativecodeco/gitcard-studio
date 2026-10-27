@@ -58,6 +58,7 @@ describe('VerifyUserReadmeUseCase', () => {
       ![GitHub Stats](https://gitcard-studio.creativecode.com.co/api/stats?username=octocat&theme=dark)
       ![Streak](https://gitcard-studio.creativecode.com.co/api/streak?username=octocat&theme=dark)
       ![Profile views](https://gitcard-studio.creativecode.com.co/api/views?username=octocat)
+      ![Project views](https://gitcard-studio.creativecode.com.co/api/repo-views?username=octocat&repo=hello-world)
     `;
     vi.mocked(mockGitHubRepo.getProfileReadme).mockResolvedValue(sampleReadme);
 
@@ -68,12 +69,14 @@ describe('VerifyUserReadmeUseCase', () => {
     expect(result.detectedCards).toContain('stats');
     expect(result.detectedCards).toContain('streak');
     expect(result.detectedCards).toContain('views');
+    expect(result.detectedCards).toContain('repo-views');
     expect(result.cacheRefreshed).toBe(true);
     expect(result.cacheValidated).toBe(true);
     expect(mockMetricsRepo.updateUserReadmeVerification).toHaveBeenCalledWith('octocat', true, [
       'stats',
       'streak',
-      'views'
+      'views',
+      'repo-views'
     ]);
   });
 

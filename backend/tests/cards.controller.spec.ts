@@ -176,4 +176,47 @@ describe('CardsController', () => {
     );
     expect(result).toContain('svg');
   });
+
+  it('should render repo views counter badge when repo param is provided in getProfileViews', async () => {
+    const mockRecordRepoView = { execute: vi.fn().mockResolvedValue(128) };
+    const mockRepoViewsCard = { execute: vi.fn().mockResolvedValue('<svg>repo-views</svg>') };
+    const customController = new CardsController(
+      mockStatsUseCase,
+      mockLanguagesUseCase,
+      mockRepoUseCase,
+      mockRankUseCase,
+      mockStreakUseCase,
+      mockTrophiesUseCase,
+      mockRecordProfileViewUseCase,
+      mockTopReposUseCase,
+      mockSponsorsUseCase,
+      mockCommitActivityUseCase,
+      mockTechStackUseCase,
+      mockGithubRepo,
+      mockRepoViewsCard as never,
+      mockRecordRepoView as never
+    );
+
+    const badgeSvg = await customController.getProfileViews(
+      { username: 'octocat', repo: 'hello-world' },
+      'GitHub-Camo',
+      'https://github.com',
+      '127.0.0.1',
+      mockRes as FastifyReply
+    );
+
+    expect(mockRecordRepoView.execute).toHaveBeenCalled();
+    expect(badgeSvg).toContain('Project views');
+    expect(badgeSvg).toContain('128');
+
+    const cardSvg = await customController.getRepoViews(
+      { username: 'octocat', repo: 'hello-world', theme: 'dark' },
+      'GitHub-Camo',
+      'https://github.com',
+      '127.0.0.1',
+      mockRes as FastifyReply
+    );
+    expect(mockRepoViewsCard.execute).toHaveBeenCalled();
+    expect(cardSvg).toBe('<svg>repo-views</svg>');
+  });
 });

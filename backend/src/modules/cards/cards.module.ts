@@ -15,7 +15,9 @@ import { GetUserTopReposCardUseCase } from '@/use-cases/cards/GetUserTopReposCar
 import { GetUserSponsorsCardUseCase } from '@/use-cases/cards/GetUserSponsorsCardUseCase';
 import { GetUserCommitActivityCardUseCase } from '@/use-cases/cards/GetUserCommitActivityCardUseCase';
 import { GetTechStackCardUseCase } from '@/use-cases/cards/GetTechStackCardUseCase';
+import { GetRepoViewsCardUseCase } from '@/use-cases/cards/GetRepoViewsCardUseCase';
 import { RecordProfileViewUseCase } from '@/use-cases/metrics/RecordProfileViewUseCase';
+import { RecordRepoViewUseCase } from '@/use-cases/metrics/RecordRepoViewUseCase';
 
 @Module({
   controllers: [CardsController, ApiV1Controller],
@@ -86,6 +88,16 @@ import { RecordProfileViewUseCase } from '@/use-cases/metrics/RecordProfileViewU
       provide: RecordProfileViewUseCase,
       useFactory: (metrics) => new RecordProfileViewUseCase(metrics),
       inject: ['IMetricsRepository']
+    },
+    {
+      provide: RecordRepoViewUseCase,
+      useFactory: (metrics) => new RecordRepoViewUseCase(metrics),
+      inject: ['IMetricsRepository']
+    },
+    {
+      provide: GetRepoViewsCardUseCase,
+      useFactory: (gh, token, metrics) => new GetRepoViewsCardUseCase(gh, token, metrics),
+      inject: ['IGitHubRepository', 'ITokenRepository', 'IMetricsRepository']
     }
   ]
 })

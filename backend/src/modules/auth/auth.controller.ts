@@ -21,6 +21,8 @@ import { ITokenRepository } from '@/domain/repositories/ITokenRepository';
 import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
 import { AppDataSource } from '@/infrastructure/database/database';
 import { UserMetric } from '@/infrastructure/database/entities/UserMetric';
+import { RepoMetric } from '@/infrastructure/database/entities/RepoMetric';
+import { getDecryptedToken } from '@/infrastructure/security/security';
 import { logger } from '@/infrastructure/logging/logger';
 import { escapeXml } from '@/utils/escape';
 import { getMessages, resolveLocale } from '@/infrastructure/i18n/backendI18n';
@@ -161,8 +163,40 @@ export class AuthController {
 
     try {
       const userMetricRepo = AppDataSource.getRepository(UserMetric);
+      const repoMetricRepo = AppDataSource.getRepository(RepoMetric);
       const metricEntity = await userMetricRepo.findOneBy({ username });
+      const repoEntities =
+        typeof repoMetricRepo?.find === 'function'
+          ? await repoMetricRepo.find({
+              where: { username },
+              order: { repo_views: 'DESC' }
+            })
+          : [];
+      const totalRepoViews = repoEntities.reduce((sum, r) => sum + (r.repo_views || 0), 0);
       const tokenInfo = await this.tokenRepo.getToken(username);
+
+      let accessibleRepos: Array<{
+        name: string;
+        owner: string;
+        fullName: string;
+        stars: number;
+      }> = [];
+      if (tokenInfo && typeof this.githubRepo?.getUserTopRepos === 'function') {
+        try {
+          const decryptedToken = await getDecryptedToken(username, this.tokenRepo);
+          const repos = await this.githubRepo.getUserTopRepos(username, 100, decryptedToken);
+          accessibleRepos = repos.map((r) => ({
+            name: r.name,
+            owner: r.owner,
+            fullName: `${r.owner}/${r.name}`,
+            stars: r.stars || 0
+          }));
+        } catch (repoErr) {
+          logger.warn(`Could not fetch accessible repos for ${username} in getUserMetrics`, {
+            error: repoErr
+          });
+        }
+      }
 
       return {
         username: query.username,
@@ -171,8 +205,15 @@ export class AuthController {
         expiresAt: tokenInfo?.expires_at ?? null,
         scopes: tokenInfo?.scopes ?? null,
         updatedAt: tokenInfo?.updated_at ?? null,
+        accessible_repos: accessibleRepos,
         metrics: {
           profile_views: metricEntity?.profile_views ?? 0,
+          repo_views: totalRepoViews,
+          repos_views_breakdown: repoEntities.map((r) => ({
+            repo: r.repo,
+            views: r.repo_views,
+            last_updated: r.last_updated ?? null
+          })),
           stats_renders: (metricEntity?.stats_web ?? 0) + (metricEntity?.stats_github ?? 0),
           languages_renders:
             (metricEntity?.languages_web ?? 0) + (metricEntity?.languages_github ?? 0),
@@ -194,6 +235,36 @@ export class AuthController {
         error
       });
       throw new InternalServerErrorException(m.userMetricsFetchError);
+    }
+  }
+
+  @Get('users/repos')
+  async getUserAccessibleRepos(@Query() query: GetUserMetricsQueryDto): Promise<{
+    username: string;
+    repos: Array<{ name: string; owner: string; fullName: string; stars: number }>;
+  }> {
+    const username = query.username.toLowerCase();
+    try {
+      const decryptedToken = await getDecryptedToken(username, this.tokenRepo);
+      const repos =
+        typeof this.githubRepo?.getUserTopRepos === 'function'
+          ? await this.githubRepo.getUserTopRepos(username, 100, decryptedToken)
+          : [];
+      return {
+        username: query.username,
+        repos: repos.map((r) => ({
+          name: r.name,
+          owner: r.owner,
+          fullName: `${r.owner}/${r.name}`,
+          stars: r.stars || 0
+        }))
+      };
+    } catch (error: unknown) {
+      logger.warn(`Error fetching accessible repos for user ${query.username}`, {
+        username: query.username,
+        error
+      });
+      return { username: query.username, repos: [] };
     }
   }
 

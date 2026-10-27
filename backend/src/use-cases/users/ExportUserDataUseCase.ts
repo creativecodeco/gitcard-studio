@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '@/infrastructure/database/database';
 import { UserTokenEntity } from '@/infrastructure/database/entities/UserTokenEntity';
 import { UserMetric } from '@/infrastructure/database/entities/UserMetric';
+import { RepoMetric } from '@/infrastructure/database/entities/RepoMetric';
 import { UserStatsHistory } from '@/infrastructure/database/entities/UserStatsHistory';
 import { RequestLog } from '@/infrastructure/database/entities/RequestLog';
 
@@ -19,6 +20,7 @@ export interface UserDataExportResult {
     updatedAt?: Date | string;
   };
   metrics: UserMetric | null;
+  repoMetrics?: RepoMetric[];
   statsHistory: Array<{
     snapshotDate: Date | string;
     stars: number;
@@ -47,11 +49,16 @@ export class ExportUserDataUseCase {
   async execute(username: string): Promise<UserDataExportResult> {
     const tokenRepo = this.tokenRepo ?? AppDataSource.getRepository(UserTokenEntity);
     const metricRepo = this.metricRepo ?? AppDataSource.getRepository(UserMetric);
+    const repoMetricRepo = AppDataSource.getRepository(RepoMetric);
     const historyRepo = this.historyRepo ?? AppDataSource.getRepository(UserStatsHistory);
     const logRepo = this.logRepo ?? AppDataSource.getRepository(RequestLog);
 
     const tokenRecord = await tokenRepo.findOne({ where: { username } });
     const metrics = await metricRepo.findOne({ where: { username } });
+    const repoMetrics =
+      typeof repoMetricRepo?.find === 'function'
+        ? await repoMetricRepo.find({ where: { username }, order: { repo_views: 'DESC' } })
+        : [];
     const history = await historyRepo.find({
       where: { username },
       order: { recorded_at: 'DESC' },
@@ -76,6 +83,7 @@ export class ExportUserDataUseCase {
         updatedAt: tokenRecord?.updated_at
       },
       metrics: metrics || null,
+      repoMetrics,
       statsHistory: history.map((h) => ({
         snapshotDate: h.recorded_at,
         stars: h.stars,

@@ -308,10 +308,11 @@ Las tarjetas se pueden incrustar en cualquier archivo Markdown usando la siguien
 | `/api/trophies` | Trofeos e hitos alcanzados en GitHub | `[![Trophies](https://gitcard-studio.creativecode.com.co/api/trophies?username=tu-usuario&theme=dark)](https://gitcard-studio.creativecode.com.co/)` |
 | `/api/top-repos` | Tarjeta con los repositorios más destacados | `[![Top Repos](https://gitcard-studio.creativecode.com.co/api/top-repos?username=tu-usuario&theme=solarized)](https://gitcard-studio.creativecode.com.co/)` |
 | `/api/repo` | Tarjeta de un repositorio destacado individual | `[![Featured Repo](https://gitcard-studio.creativecode.com.co/api/repo?username=tu-usuario&repo=tu-repo&theme=dark)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/repo-views` | Tarjeta SVG estilizada con contador de visitas por proyecto/repositorio | `[![Project Views](https://gitcard-studio.creativecode.com.co/api/repo-views?username=tu-usuario&repo=tu-repo&theme=dark)](https://gitcard-studio.creativecode.com.co/)` |
 | `/api/sponsors` | Tarjeta del perfil de GitHub Sponsors | `[![Sponsors](https://gitcard-studio.creativecode.com.co/api/sponsors?username=tu-usuario&theme=neon)](https://gitcard-studio.creativecode.com.co/)` |
 | `/api/today-status` | Insignia con el estado de commits del día actual | `[![Today Status](https://gitcard-studio.creativecode.com.co/api/today-status?username=tu-usuario&theme=dark)](https://gitcard-studio.creativecode.com.co/)` |
 | `/api/timeline-matrix` | Matriz horaria de distribución de commits por período | `[![Timeline Matrix](https://gitcard-studio.creativecode.com.co/api/timeline-matrix?username=tu-usuario&theme=neon)](https://gitcard-studio.creativecode.com.co/)` |
-| `/api/views` | Insignia SVG con contador de visitas al perfil de GitHub | `[![Profile Views](https://gitcard-studio.creativecode.com.co/api/views?username=tu-usuario&color=38bdf8)](https://gitcard-studio.creativecode.com.co/)` |
+| `/api/views` | Insignia SVG con contador de visitas al perfil o proyecto (`&repo=`) | `[![Profile Views](https://gitcard-studio.creativecode.com.co/api/views?username=tu-usuario&repo=tu-repo&color=38bdf8)](https://gitcard-studio.creativecode.com.co/)` |
 | `/api/badge` | Insignia SVG estilo Shields.io personalizada | `[![Badge](https://gitcard-studio.creativecode.com.co/api/badge?username=tu-usuario&type=views&color=38bdf8)](https://gitcard-studio.creativecode.com.co/)` |
 
 #### **Parámetros Comunes:**
@@ -345,7 +346,7 @@ Este microservicio implementa las siguientes medidas de seguridad para entornos 
 - **Validación de Parámetros por Expresión Regular**:
   - Validado a nivel de Controller (DTOs con class-validator) y en la capa de negocio de Use Cases.
   - Username: `/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`
-  - Repo: `/^[a-z\d-_.]{1,100}$/i`
+  - Repo: `/^(?:[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}\/)?[a-z\d-_.]{1,100}$/i`
   - Color: componentes Hex, RGB/RGBA y HSL/HSLA reconstruidos con parseo numérico (`sanitizeColor`).
   - Label: sanitización formal con clase de caracteres invertida (`sanitizeBadgeLabel`).
 - **Secure by Default**: Los endpoints de métricas se bloquean por defecto con error `403` si no se configura la variable `METRICS_KEY`.

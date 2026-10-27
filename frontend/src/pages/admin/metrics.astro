@@ -183,6 +183,20 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           </div>
           <p style="font-size: 0.75rem; color: #a855f7;">Impresiones Views Badge</p>
         </div>
+
+        <!-- KPI 6: Repo Views -->
+        <div
+          class="glass-card"
+          style="padding: 20px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden;"
+        >
+          <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase;">
+            Vistas de Proyectos
+          </div>
+          <div id="kpi-repo-views" style="font-size: 2rem; font-weight: 800; color: #ec4899;">
+            0
+          </div>
+          <p style="font-size: 0.75rem; color: #ec4899;">Visitas por repositorio</p>
+        </div>
       </div>
 
       <!-- Charts Row -->
@@ -349,7 +363,15 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
                   style="padding: 12px 16px; text-align: right; cursor: pointer; user-select: none; transition: color 0.2s;"
                   title="Ordenar por Vistas de Perfil"
                 >
-                  Vistas <span id="sort-icon-profile_views" class="sort-icon"></span>
+                  Vistas Perfil <span id="sort-icon-profile_views" class="sort-icon"></span>
+                </th>
+                <th
+                  class="sortable-th"
+                  data-col="repo_views"
+                  style="padding: 12px 16px; text-align: right; cursor: pointer; user-select: none; transition: color 0.2s;"
+                  title="Ordenar por Vistas de Proyectos (Repositorios)"
+                >
+                  Vistas Proyectos <span id="sort-icon-repo_views" class="sort-icon"></span>
                 </th>
                 <th
                   class="sortable-th"
@@ -419,6 +441,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   const kpiVerified = document.getElementById('kpi-verified');
   const kpiUsers = document.getElementById('kpi-users');
   const kpiViews = document.getElementById('kpi-views');
+  const kpiRepoViews = document.getElementById('kpi-repo-views');
   const usersTableBody = document.getElementById('users-table-body');
 
   // Interactive controls
@@ -457,6 +480,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     | 'webRenders'
     | 'totalRenders'
     | 'profile_views'
+    | 'repo_views'
     | 'last_updated' = 'githubRenders';
   let sortDirection: 'asc' | 'desc' = 'desc';
   let currentPage = 1;
@@ -594,6 +618,15 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       if (kpiVerified) kpiVerified.textContent = totalVerified.toLocaleString();
       if (kpiUsers) kpiUsers.textContent = Number(rawUsersData.length || 0).toLocaleString();
       if (kpiViews) kpiViews.textContent = Number(globalData.viewsRenders || 0).toLocaleString();
+      if (kpiRepoViews) {
+        const totalRepoViewsFromUsers = usersList.reduce(
+          (sum: number, u: any) => sum + Number(u.repo_views || 0),
+          0
+        );
+        kpiRepoViews.textContent = Number(
+          globalData.repoViewsRenders || totalRepoViewsFromUsers || 0
+        ).toLocaleString();
+      }
 
       applyFiltersAndResetPage();
 
@@ -690,6 +723,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           'Racha',
           'Trofeos',
           'Vistas de Perfil',
+          'Vistas de Proyecto',
           'Estado de Hoy',
           'Línea de Tiempo'
         ],
@@ -703,6 +737,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
               globalData.streakRenders || 0,
               globalData.trophiesRenders || 0,
               globalData.viewsRenders || 0,
+              globalData.repoViewsRenders || 0,
               globalData.todayStatusRenders || 0,
               globalData.timelineMatrixRenders || 0
             ],
@@ -714,6 +749,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
               '#f85149', // streak
               '#a855f7', // trophies
               '#e2e8f0', // views
+              '#ec4899', // repo-views
               '#ff7edb', // today-status
               '#06b6d4' // timeline-matrix
             ],
@@ -949,6 +985,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       'githubRenders',
       'webRenders',
       'profile_views',
+      'repo_views',
       'last_updated'
     ];
     cols.forEach((col) => {
@@ -1133,7 +1170,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     if (filteredUsers.length === 0) {
       usersTableBody.innerHTML = `
         <tr>
-          <td colspan="7" style="padding: 30px; text-align: center; color: var(--text-secondary);">No se encontraron perfiles.</td>
+          <td colspan="8" style="padding: 30px; text-align: center; color: var(--text-secondary);">No se encontraron perfiles.</td>
         </tr>
       `;
       if (paginationInfo) paginationInfo.textContent = 'Mostrando 0 de 0 perfiles';
@@ -1153,6 +1190,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           : 'N/A';
         const safeUser = escapeHtml(user.username);
         const encodedUser = encodeURIComponent(user.username);
+        const repoMetricsTooltip =
+          Array.isArray(user.repo_metrics) && user.repo_metrics.length > 0
+            ? escapeHtml(
+                user.repo_metrics
+                  .map((rm: { repo: string; views: number }) => `${rm.repo}: ${rm.views}`)
+                  .join(' • ')
+              )
+            : 'Sin visitas de proyectos registradas';
 
         let statusBadge: string;
         if (user.readme_verified) {
@@ -1211,6 +1256,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
             </td>
             <td style="padding: 14px 16px; text-align: right; color: var(--text-secondary);">
               ${Number(user.profile_views || 0).toLocaleString()}
+            </td>
+            <td style="padding: 14px 16px; text-align: right; font-weight: 600; color: #ec4899;" title="${repoMetricsTooltip}">
+              ${Number(user.repo_views || 0).toLocaleString()}
             </td>
             <td style="padding: 14px 16px; text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
               ${lastAct}
@@ -1344,6 +1392,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         | 'webRenders'
         | 'totalRenders'
         | 'profile_views'
+        | 'repo_views'
         | 'last_updated';
 
       if (!targetCol) return;

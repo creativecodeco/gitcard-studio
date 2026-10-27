@@ -35,6 +35,7 @@ const CARD_PATTERNS: Array<{ name: string; regex: RegExp }> = [
   { name: 'streak', regex: /\/api\/streak(?:\?|["'\s)])/i },
   { name: 'trophies', regex: /\/api\/trophies(?:\?|["'\s)])/i },
   { name: 'views', regex: /\/api\/views(?:\?|["'\s)])/i },
+  { name: 'repo-views', regex: /\/api\/repo-views(?:\?|["'\s)])/i },
   { name: 'sponsors', regex: /\/api\/sponsors(?:\?|["'\s)])/i },
   { name: 'commit-activity', regex: /\/api\/commit-activity(?:\?|["'\s)])/i },
   { name: 'today-status', regex: /\/api\/today-status(?:\?|["'\s)])/i },
