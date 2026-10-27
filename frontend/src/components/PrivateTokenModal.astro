@@ -66,39 +66,119 @@
       <div
         style="
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 8px;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 6px;
         "
       >
-        <div class="glass-card" style="padding: 8px 10px; text-align: center; border-radius: 6px;">
+        <div class="glass-card" style="padding: 8px 6px; text-align: center; border-radius: 6px;">
           <div
-            style="font-size: 0.68rem; color: var(--text-secondary);"
+            style="font-size: 0.65rem; color: var(--text-secondary);"
             data-i18n="user_views_label"
           >
             Visitas Perfil
           </div>
           <div
-            style="font-size: 1.1rem; font-weight: 700; color: var(--accent-color); margin-top: 2px;"
+            style="font-size: 1.05rem; font-weight: 700; color: var(--accent-color); margin-top: 2px;"
             id="metric-profile-views"
           >
             0
           </div>
         </div>
-        <div class="glass-card" style="padding: 8px 10px; text-align: center; border-radius: 6px;">
+        <div class="glass-card" style="padding: 8px 6px; text-align: center; border-radius: 6px;">
           <div
-            style="font-size: 0.68rem; color: var(--text-secondary);"
+            style="font-size: 0.65rem; color: var(--text-secondary);"
+            data-i18n="repo_views_label"
+          >
+            Visitas Proyectos
+          </div>
+          <div
+            style="font-size: 1.05rem; font-weight: 700; color: #38bdf8; margin-top: 2px;"
+            id="metric-repo-views"
+          >
+            0
+          </div>
+        </div>
+        <div class="glass-card" style="padding: 8px 6px; text-align: center; border-radius: 6px;">
+          <div
+            style="font-size: 0.65rem; color: var(--text-secondary);"
             data-i18n="card_renders_label"
           >
             Renders Cards
           </div>
           <div
-            style="font-size: 1.1rem; font-weight: 700; color: #4ade80; margin-top: 2px;"
+            style="font-size: 1.05rem; font-weight: 700; color: #4ade80; margin-top: 2px;"
             id="metric-card-renders"
           >
             0
           </div>
         </div>
       </div>
+      <!-- Per-Repository Views Breakdown (shown when user has tracked repos) -->
+      <div
+        id="metric-repo-breakdown"
+        class="hidden"
+        style="margin-top: 8px; padding: 6px 8px; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.18); border-radius: 6px; display: flex; flex-direction: column; gap: 4px; max-height: 92px; overflow-y: auto;"
+      ></div>
+    </div>
+
+    <!-- Specific Repository Selector for Authenticated Users (GitHub App / PAT) -->
+    <div class="input-group" style="margin-bottom: 10px;">
+      <label
+        for="repo-input-auth"
+        class="input-label"
+        style="font-size: 0.78rem;"
+        data-i18n="repo_label"
+      >
+        Repositorio Específico (Opcional)
+      </label>
+      <select
+        id="repo-select-auth"
+        class="hidden"
+        style="
+          width: 100%;
+          height: 36px;
+          margin-bottom: 6px;
+          padding: 0 10px;
+          border-radius: 8px;
+          border: 1px solid var(--glass-border);
+          background: rgba(15, 23, 42, 0.75);
+          color: var(--text-primary);
+          font-size: 0.82rem;
+          font-family: inherit;
+          cursor: pointer;
+          outline: none;
+        "
+      >
+        <option value="">⭐ Automático (Repositorio más popular)</option>
+      </select>
+      <div class="input-wrapper" style="height: 36px;">
+        <span class="input-prefix">
+          <svg
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="margin-right: 4px"
+            aria-hidden="true"
+          >
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </span>
+        <input
+          type="text"
+          id="repo-input-auth"
+          list="user-repos-datalist"
+          placeholder="ej. ui o creativecodeco/ui"
+          data-i18n-placeholder="repo_placeholder"
+          style="font-size: 0.85rem;"
+          autocomplete="off"
+        />
+      </div>
+      <datalist id="user-repos-datalist"></datalist>
     </div>
 
     <!-- Refresh / Generate Cards Action Button for Authenticated Users -->
@@ -226,6 +306,7 @@
         <input
           type="text"
           id="repo-input"
+          list="user-repos-datalist"
           placeholder="ej. gitcard-studio (o el más popular)"
           data-i18n-placeholder="repo_placeholder"
           autocomplete="off"
@@ -545,6 +626,8 @@
     const connectedUsernameDisplay = document.getElementById('connected-username-display');
     const userAvatarInitial = document.getElementById('user-avatar-initial');
     const metricProfileViews = document.getElementById('metric-profile-views');
+    const metricRepoViews = document.getElementById('metric-repo-views');
+    const metricRepoBreakdown = document.getElementById('metric-repo-breakdown');
     const metricCardRenders = document.getElementById('metric-card-renders');
     const btnDisconnectAccount = document.getElementById('btn-disconnect-account');
     const btnOpenPurgeModal = document.getElementById('btn-open-purge-modal');
@@ -645,10 +728,59 @@
             usernameInput.value = data.username;
           }
           if (connectedUsernameDisplay) connectedUsernameDisplay.textContent = `@${data.username}`;
+          const connectedTokenType = document.getElementById('connected-token-type');
+          if (connectedTokenType) {
+            connectedTokenType.textContent =
+              data.tokenType === 'pat' ? 'Token PAT Activo' : 'GitHub App Activa';
+          }
           if (userAvatarInitial)
             userAvatarInitial.textContent = data.username.charAt(0).toUpperCase();
           if (metricProfileViews)
             metricProfileViews.textContent = String(data.metrics.profile_views || 0);
+          if (metricRepoViews) metricRepoViews.textContent = String(data.metrics.repo_views || 0);
+          if (metricRepoBreakdown) {
+            metricRepoBreakdown.textContent = '';
+            const breakdown = Array.isArray(data.metrics.repos_views_breakdown)
+              ? data.metrics.repos_views_breakdown
+              : [];
+            if (breakdown.length > 0) {
+              metricRepoBreakdown.classList.remove('hidden');
+              breakdown.forEach((item: { repo: string; views: number }) => {
+                const row = document.createElement('div');
+                row.style.cssText =
+                  'display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: var(--text-secondary); cursor: pointer; padding: 2px 4px; border-radius: 4px; transition: background 0.15s;';
+                row.title = `Haz clic para previsualizar ${item.repo}`;
+                row.addEventListener('mouseenter', () => {
+                  row.style.background = 'rgba(56, 189, 248, 0.12)';
+                });
+                row.addEventListener('mouseleave', () => {
+                  row.style.background = 'transparent';
+                });
+                row.addEventListener('click', () => {
+                  const rAuth = document.getElementById(
+                    'repo-input-auth'
+                  ) as HTMLInputElement | null;
+                  const rPub = document.getElementById('repo-input') as HTMLInputElement | null;
+                  if (rAuth) rAuth.value = item.repo;
+                  if (rPub) rPub.value = item.repo;
+                  const btnGenAuth = document.getElementById('btn-generate-auth');
+                  btnGenAuth?.click();
+                });
+                const repoName = document.createElement('span');
+                repoName.style.cssText =
+                  'font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;';
+                repoName.textContent = `📦 ${item.repo}`;
+                const repoCount = document.createElement('span');
+                repoCount.style.cssText = 'font-weight: 700; color: #38bdf8;';
+                repoCount.textContent = Number(item.views || 0).toLocaleString();
+                row.appendChild(repoName);
+                row.appendChild(repoCount);
+                metricRepoBreakdown.appendChild(row);
+              });
+            } else {
+              metricRepoBreakdown.classList.add('hidden');
+            }
+          }
           if (metricCardRenders) {
             const totalRenders =
               (data.metrics.stats_renders || 0) +
@@ -660,6 +792,51 @@
               (data.metrics.sponsors_renders || 0) +
               (data.metrics.commit_activity_renders || 0);
             metricCardRenders.textContent = String(totalRenders);
+          }
+
+          const repoSelectAuth = document.getElementById(
+            'repo-select-auth'
+          ) as HTMLSelectElement | null;
+          const userReposDatalist = document.getElementById('user-repos-datalist');
+          const accessibleRepos = Array.isArray(data.accessible_repos) ? data.accessible_repos : [];
+          if (repoSelectAuth) {
+            repoSelectAuth.textContent = '';
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.textContent = '⭐ Automático (Repositorio más popular)';
+            repoSelectAuth.appendChild(defaultOpt);
+
+            if (accessibleRepos.length > 0) {
+              repoSelectAuth.classList.remove('hidden');
+              accessibleRepos.forEach(
+                (r: { name: string; owner: string; fullName: string; stars: number }) => {
+                  const opt = document.createElement('option');
+                  const isOwn = r.owner.toLowerCase() === data.username.toLowerCase();
+                  opt.value = isOwn ? r.name : r.fullName;
+                  opt.textContent = `📦 ${r.fullName}${r.stars > 0 ? ` (★ ${r.stars})` : ''}`;
+                  repoSelectAuth.appendChild(opt);
+                }
+              );
+            } else {
+              repoSelectAuth.classList.add('hidden');
+            }
+          }
+          if (userReposDatalist && accessibleRepos.length > 0) {
+            userReposDatalist.textContent = '';
+            accessibleRepos.forEach(
+              (r: { name: string; owner: string; fullName: string; stars: number }) => {
+                const optShort = document.createElement('option');
+                optShort.value = r.name;
+                optShort.label = `${r.fullName}${r.stars > 0 ? ` ★ ${r.stars}` : ''}`;
+                userReposDatalist.appendChild(optShort);
+                if (r.owner.toLowerCase() !== data.username.toLowerCase()) {
+                  const optFull = document.createElement('option');
+                  optFull.value = r.fullName;
+                  optFull.label = `${r.fullName}${r.stars > 0 ? ` ★ ${r.stars}` : ''}`;
+                  userReposDatalist.appendChild(optFull);
+                }
+              }
+            );
           }
 
           window.dispatchEvent(
@@ -681,6 +858,25 @@
     if (activeUser) {
       loadUserMetrics(activeUser);
     }
+
+    window.addEventListener('app:pat-registered', ((e: CustomEvent) => {
+      const user = e.detail?.username;
+      if (user) {
+        loadUserMetrics(user);
+      }
+    }) as EventListener);
+
+    const repoSelectAuthEl = document.getElementById(
+      'repo-select-auth'
+    ) as HTMLSelectElement | null;
+    repoSelectAuthEl?.addEventListener('change', () => {
+      const rAuth = document.getElementById('repo-input-auth') as HTMLInputElement | null;
+      const rPub = document.getElementById('repo-input') as HTMLInputElement | null;
+      if (rAuth) rAuth.value = repoSelectAuthEl.value;
+      if (rPub) rPub.value = repoSelectAuthEl.value;
+      const btnGenAuth = document.getElementById('btn-generate-auth');
+      btnGenAuth?.click();
+    });
 
     btnDisconnectAccount?.addEventListener('click', async (e) => {
       e.preventDefault();

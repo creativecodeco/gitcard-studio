@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AppDataSource } from '@/infrastructure/database/database';
 import { UserTokenEntity } from '@/infrastructure/database/entities/UserTokenEntity';
 import { UserMetric } from '@/infrastructure/database/entities/UserMetric';
+import { RepoMetric } from '@/infrastructure/database/entities/RepoMetric';
 import { UserStatsHistory } from '@/infrastructure/database/entities/UserStatsHistory';
 import { RequestLog } from '@/infrastructure/database/entities/RequestLog';
 
@@ -14,6 +15,7 @@ export class PurgeUserDataUseCase {
 
       // 2. Delete user metrics (hits cache)
       await transactionalEntityManager.delete(UserMetric, { username });
+      await transactionalEntityManager.delete(RepoMetric, { username });
 
       // 3. Delete user stats history snapshots
       await transactionalEntityManager.delete(UserStatsHistory, { username });

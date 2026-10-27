@@ -1,5 +1,5 @@
 export const GITHUB_USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
-export const GITHUB_REPO_REGEX = /^[a-z\d-_.]{1,100}$/i;
+export const GITHUB_REPO_REGEX = /^(?:[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}\/)?[a-z\d-_.]{1,100}$/i;
 export const BADGE_LABEL_REGEX = /^[a-z\d\s\-_.:/]{1,50}$/i;
 
 export function validateUsername(username: string): void {
@@ -10,6 +10,10 @@ export function validateUsername(username: string): void {
 
 export function validateRepo(repo: string): void {
   if (!repo || typeof repo !== 'string' || !GITHUB_REPO_REGEX.test(repo)) {
+    throw new Error('Repositorio de GitHub inválido');
+  }
+  const repoPart = repo.includes('/') ? repo.split('/')[1] : repo;
+  if (repoPart === '.' || repoPart === '..') {
     throw new Error('Repositorio de GitHub inválido');
   }
 }

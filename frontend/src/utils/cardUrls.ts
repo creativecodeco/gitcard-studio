@@ -25,12 +25,13 @@ export interface CardUrls {
   todayStatusUrl: string;
   timelineMatrixUrl: string;
   repoUrl: string;
+  repoViewsUrl: string;
   viewsUrl: string;
   techStackUrl: string;
 }
 
 /**
- * Builds API endpoint URLs for all 13 SVG cards.
+ * Builds API endpoint URLs for all 14 SVG cards.
  */
 export function buildCardUrls(options: CardUrlOptions): CardUrls {
   const {
@@ -66,8 +67,10 @@ export function buildCardUrls(options: CardUrlOptions): CardUrls {
   const techStackUrl = `${origin}/api/tech-stack?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
 
   let repoUrl = `${origin}/api/repo?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  let repoViewsUrl = `${origin}/api/repo-views?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
   if (repo) {
     repoUrl += `&repo=${encodeURIComponent(repo)}`;
+    repoViewsUrl += `&repo=${encodeURIComponent(repo)}`;
   }
 
   const labelVal = viewsLabel ? viewsLabel.trim() : '';
@@ -75,6 +78,7 @@ export function buildCardUrls(options: CardUrlOptions): CardUrls {
   const styleVal = viewsStyle || '';
 
   let viewsUrl = `${origin}/api/views?username=${username}&theme=${theme}${tagParam}`;
+  if (repo) viewsUrl += `&repo=${encodeURIComponent(repo)}`;
   if (labelVal) viewsUrl += `&label=${encodeURIComponent(labelVal)}`;
   if (colorVal) viewsUrl += `&color=${encodeURIComponent(colorVal)}`;
   if (styleVal) viewsUrl += `&style=${encodeURIComponent(styleVal)}`;
@@ -91,6 +95,7 @@ export function buildCardUrls(options: CardUrlOptions): CardUrls {
     todayStatusUrl,
     timelineMatrixUrl,
     repoUrl,
+    repoViewsUrl,
     viewsUrl,
     techStackUrl
   };

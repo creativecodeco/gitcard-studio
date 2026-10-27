@@ -716,15 +716,74 @@ export class ApiGitHubRepository implements IGitHubRepository {
     return bestRepo;
   }
 
+  private async findRepoByNameInAccessibleRepos(
+    username: string,
+    shortRepoName: string,
+    userToken?: string
+  ): Promise<RepoStats | null> {
+    const targetLower = shortRepoName.toLowerCase();
+    try {
+      const topRepos = await this.getUserTopRepos(username, 100, userToken);
+      const matched = topRepos.find((r) => r.name.toLowerCase() === targetLower);
+      if (matched) {
+        return matched;
+      }
+    } catch (err) {
+      logger.warn(`Could not search getUserTopRepos for ${username}/${shortRepoName}`, {
+        error: err
+      });
+    }
+
+    if (!userToken) {
+      return null;
+    }
+
+    try {
+      const repos = await this.fetchGitHub(
+        'https://api.github.com/user/repos?per_page=100&visibility=all&affiliation=owner,collaborator,organization_member',
+        userToken
+      );
+      if (Array.isArray(repos)) {
+        const found = repos.find(
+          (r: any) => typeof r.name === 'string' && r.name.toLowerCase() === targetLower
+        );
+        if (found) {
+          const language = found.language || 'Markdown';
+          return {
+            name: found.name,
+            owner: found.owner?.login || username,
+            description: found.description || 'Sin descripción disponible.',
+            stars: found.stargazers_count || 0,
+            forks: found.forks_count || 0,
+            language,
+            languageColor: LANGUAGE_COLORS[language] || DEFAULT_COLOR,
+            license: found.license ? found.license.spdx_id || found.license.name : 'No License'
+          };
+        }
+      }
+    } catch (err) {
+      logger.warn(`Could not search /user/repos for ${username}/${shortRepoName}`, { error: err });
+    }
+
+    return null;
+  }
+
   async getFeaturedRepo(
     username: string,
     repoName?: string,
     userToken?: string
   ): Promise<RepoStats> {
     let repoData: any;
+    const hasExplicitOwner = Boolean(repoName && repoName.includes('/'));
+    const [explicitOwner, explicitRepo] =
+      hasExplicitOwner && repoName ? repoName.split('/') : [username, repoName];
+
     try {
       repoData = repoName
-        ? await this.fetchGitHub(`https://api.github.com/repos/${username}/${repoName}`, userToken)
+        ? await this.fetchGitHub(
+            `https://api.github.com/repos/${explicitOwner}/${explicitRepo}`,
+            userToken
+          )
         : await this.findBestRepo(username, userToken);
     } catch (err: any) {
       if (userToken && (err.message?.includes('401') || err.message?.includes('Bad credentials'))) {
@@ -732,8 +791,18 @@ export class ApiGitHubRepository implements IGitHubRepository {
           `User token for ${username} returned 401 in getFeaturedRepo. Retrying without userToken.`
         );
         repoData = repoName
-          ? await this.fetchGitHub(`https://api.github.com/repos/${username}/${repoName}`)
+          ? await this.fetchGitHub(`https://api.github.com/repos/${explicitOwner}/${explicitRepo}`)
           : await this.findBestRepo(username);
+      } else if (repoName && !hasExplicitOwner && err.message?.includes('404')) {
+        const accessibleMatch = await this.findRepoByNameInAccessibleRepos(
+          username,
+          repoName,
+          userToken
+        );
+        if (accessibleMatch) {
+          return accessibleMatch;
+        }
+        throw err;
       } else {
         throw err;
       }

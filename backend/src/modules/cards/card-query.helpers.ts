@@ -117,8 +117,17 @@ export function extractCardWidth(query: Record<string, unknown>): string | undef
   const widthVal = query.card_width ?? query.width;
   if (typeof widthVal === 'string' && widthVal.trim() !== '') {
     const trimmed = widthVal.trim();
-    if (/^\d+(?:px|%)?$/i.test(trimmed)) {
-      return trimmed;
+    const match = /^(\d+)(px|%)?$/i.exec(trimmed);
+    if (match) {
+      const num = Number.parseInt(match[1], 10);
+      const unitRaw = match[2] ? match[2].toLowerCase() : '';
+      let unit = '';
+      if (unitRaw === '%') {
+        unit = '%';
+      } else if (unitRaw === 'px') {
+        unit = 'px';
+      }
+      return `${num}${unit}`;
     }
   }
 

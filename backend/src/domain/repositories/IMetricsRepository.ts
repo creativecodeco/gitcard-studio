@@ -24,6 +24,12 @@ export interface IMetricsRepository {
     increment: boolean,
     context?: HitContext
   ): Promise<number>;
+  getOrIncrementRepoViews?(
+    username: string,
+    repo: string,
+    increment: boolean,
+    context?: HitContext
+  ): Promise<number>;
   getRendersHistory(days: number): Promise<any[]>;
   updateUserReadmeVerification(
     username: string,

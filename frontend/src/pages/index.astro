@@ -257,6 +257,30 @@ import Footer from '@/components/Footer.astro';
             </svg>
           </CardPreview>
 
+          <!-- Project Views Card Preview -->
+          <CardPreview
+            id="repo-views"
+            title="Visitas del Proyecto (Repositorio)"
+            codeLabel="Visitas del Proyecto"
+            category="repos"
+          >
+            <svg
+              slot="placeholder-icon"
+              class="placeholder-svg"
+              viewBox="0 0 24 24"
+              width="48"
+              height="48"
+              fill="none"
+              stroke="#38bdf8"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </CardPreview>
+
           <!-- Rank Card Preview -->
           <CardPreview
             id="rank"
@@ -500,7 +524,19 @@ import Footer from '@/components/Footer.astro';
   // Elements
   const usernameInput = document.getElementById('username-input') as HTMLInputElement | null;
   const repoInput = document.getElementById('repo-input') as HTMLInputElement | null;
+  const repoInputAuth = document.getElementById('repo-input-auth') as HTMLInputElement | null;
   const themesContainer = document.getElementById('themes-container');
+
+  repoInput?.addEventListener('input', () => {
+    if (repoInputAuth && repoInputAuth.value !== repoInput.value) {
+      repoInputAuth.value = repoInput.value;
+    }
+  });
+  repoInputAuth?.addEventListener('input', () => {
+    if (repoInput && repoInput.value !== repoInputAuth.value) {
+      repoInput.value = repoInputAuth.value;
+    }
+  });
   const themeOptions = document.querySelectorAll('.theme-option') as NodeListOf<HTMLButtonElement>;
 
   const statsImg = document.getElementById('stats-img') as HTMLImageElement | null;
@@ -511,6 +547,9 @@ import Footer from '@/components/Footer.astro';
 
   const repoImg = document.getElementById('repo-img') as HTMLImageElement | null;
   const repoPlaceholder = document.getElementById('repo-placeholder');
+
+  const repoViewsImg = document.getElementById('repo-views-img') as HTMLImageElement | null;
+  const repoViewsPlaceholder = document.getElementById('repo-views-placeholder');
 
   const rankImg = document.getElementById('rank-img') as HTMLImageElement | null;
   const rankPlaceholder = document.getElementById('rank-placeholder');
@@ -550,6 +589,7 @@ import Footer from '@/components/Footer.astro';
   const markdownStatsCode = document.getElementById('markdown-stats-code');
   const markdownLanguagesCode = document.getElementById('markdown-languages-code');
   const markdownRepoCode = document.getElementById('markdown-repo-code');
+  const markdownRepoViewsCode = document.getElementById('markdown-repo-views-code');
   const markdownRankCode = document.getElementById('markdown-rank-code');
   const markdownStreakCode = document.getElementById('markdown-streak-code');
   const markdownTrophiesCode = document.getElementById('markdown-trophies-code');
@@ -564,6 +604,7 @@ import Footer from '@/components/Footer.astro';
   const btnCopyStats = document.getElementById('btn-copy-stats');
   const btnCopyLanguages = document.getElementById('btn-copy-languages');
   const btnCopyRepo = document.getElementById('btn-copy-repo');
+  const btnCopyRepoViews = document.getElementById('btn-copy-repo-views');
   const btnCopyRank = document.getElementById('btn-copy-rank');
   const btnCopyStreak = document.getElementById('btn-copy-streak');
   const btnCopyTrophies = document.getElementById('btn-copy-trophies');
@@ -597,7 +638,7 @@ import Footer from '@/components/Footer.astro';
   let currentLinkStyle: 'linked' | 'raw' = 'linked';
 
   let completedImagesCount = 0;
-  const totalImagesToLoad = 13; // stats, languages, repo, rank, streak, trophies, top-repos, sponsors, commit-activity, today-status, timeline-matrix, views, tech-stack
+  const totalImagesToLoad = 14; // stats, languages, repo, repo-views, rank, streak, trophies, top-repos, sponsors, commit-activity, today-status, timeline-matrix, views, tech-stack
   let isGeneratingAllCards = false;
   let isUsingCustomTheme = false;
   let activeCardFetchController: AbortController | null = null;
@@ -848,7 +889,12 @@ import Footer from '@/components/Footer.astro';
   document.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
       const target = e.target as HTMLElement;
-      if (target && (target.id === 'username-input' || target.id === 'repo-input')) {
+      if (
+        target &&
+        (target.id === 'username-input' ||
+          target.id === 'repo-input' ||
+          target.id === 'repo-input-auth')
+      ) {
         e.preventDefault();
         submitUsername(true);
       }
@@ -859,6 +905,8 @@ import Footer from '@/components/Footer.astro';
     const uInput =
       (document.getElementById('username-input') as HTMLInputElement | null) || usernameInput;
     const rInput = (document.getElementById('repo-input') as HTMLInputElement | null) || repoInput;
+    const rInputAuth =
+      (document.getElementById('repo-input-auth') as HTMLInputElement | null) || repoInputAuth;
 
     const usernameVal = uInput?.value.trim() || currentUsername;
     if (!usernameVal) {
@@ -867,7 +915,16 @@ import Footer from '@/components/Footer.astro';
     }
 
     currentUsername = usernameVal;
-    currentRepo = rInput ? rInput.value.trim() : '';
+    const authPaneVisible = !document
+      .getElementById('token-registered')
+      ?.classList.contains('hidden');
+    currentRepo = authPaneVisible
+      ? (rInputAuth ? rInputAuth.value.trim() : '') || (rInput ? rInput.value.trim() : '')
+      : rInput
+        ? rInput.value.trim()
+        : '';
+    if (rInput && rInput.value !== currentRepo) rInput.value = currentRepo;
+    if (rInputAuth && rInputAuth.value !== currentRepo) rInputAuth.value = currentRepo;
 
     const newUrl = new URL(window.location.origin + window.location.pathname);
     newUrl.searchParams.set('user', currentUsername);
@@ -881,6 +938,33 @@ import Footer from '@/components/Footer.astro';
 
     updateThemeSelectorsState();
     updateCards(forceRefresh);
+
+    // Populate user repositories datalist in the background for autocomplete
+    fetch(`/api/users/repos?username=${encodeURIComponent(currentUsername)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const datalist = document.getElementById('user-repos-datalist');
+        if (datalist && data && Array.isArray(data.repos) && data.repos.length > 0) {
+          datalist.textContent = '';
+          data.repos.forEach(
+            (r: { name: string; owner: string; fullName: string; stars: number }) => {
+              const optShort = document.createElement('option');
+              optShort.value = r.name;
+              optShort.label = `${r.fullName}${r.stars > 0 ? ` ★ ${r.stars}` : ''}`;
+              datalist.appendChild(optShort);
+              if (r.owner.toLowerCase() !== currentUsername.toLowerCase()) {
+                const optFull = document.createElement('option');
+                optFull.value = r.fullName;
+                optFull.label = `${r.fullName}${r.stars > 0 ? ` ★ ${r.stars}` : ''}`;
+                datalist.appendChild(optFull);
+              }
+            }
+          );
+        }
+      })
+      .catch(() => {
+        // Non-blocking autocomplete helper
+      });
   }
 
   // --- Direct Download Handlers (SVG & PNG) ---
@@ -1128,6 +1212,12 @@ import Footer from '@/components/Footer.astro';
         getPreviewUrl: () => repoImg?.src
       },
       {
+        id: 'repo-views',
+        title: t('code_label_repo_views', currentLocale),
+        cleanUrl: cardUrls.repoViewsUrl,
+        getPreviewUrl: () => repoViewsImg?.src
+      },
+      {
         id: 'tech-stack',
         title: t('code_label_tech_stack', currentLocale),
         cleanUrl: cardUrls.techStackUrl,
@@ -1204,6 +1294,7 @@ import Footer from '@/components/Footer.astro';
       statsImg,
       languagesImg,
       repoImg,
+      repoViewsImg,
       rankImg,
       streakImg,
       trophiesImg,
@@ -1226,6 +1317,7 @@ import Footer from '@/components/Footer.astro';
       statsPlaceholder,
       languagesPlaceholder,
       repoPlaceholder,
+      repoViewsPlaceholder,
       rankPlaceholder,
       streakPlaceholder,
       trophiesPlaceholder,
@@ -1334,6 +1426,7 @@ import Footer from '@/components/Footer.astro';
       todayStatusUrl,
       timelineMatrixUrl,
       repoUrl,
+      repoViewsUrl,
       viewsUrl,
       techStackUrl
     } = cardUrls;
@@ -1342,6 +1435,7 @@ import Footer from '@/components/Footer.astro';
     showImageLoading(statsImg, statsPlaceholder);
     showImageLoading(languagesImg, languagesPlaceholder);
     showImageLoading(repoImg, repoPlaceholder);
+    showImageLoading(repoViewsImg, repoViewsPlaceholder);
     showImageLoading(rankImg, rankPlaceholder);
     showImageLoading(streakImg, streakPlaceholder);
     showImageLoading(trophiesImg, trophiesPlaceholder);
@@ -1379,6 +1473,10 @@ import Footer from '@/components/Footer.astro';
     if (repoImg) {
       repoImg.src = repoUrl + cacheBuster;
       repoImg.alt = `Tarjeta de repositorio destacado de GitHub para el usuario @${currentUsername}${currentRepo ? ` (repo: ${currentRepo})` : ''}`;
+    }
+    if (repoViewsImg) {
+      repoViewsImg.src = repoViewsUrl + cacheBuster;
+      repoViewsImg.alt = `Tarjeta de visitas del proyecto de GitHub para el usuario @${currentUsername}${currentRepo ? ` (repo: ${currentRepo})` : ''}`;
     }
     if (rankImg) {
       rankImg.src = rankUrl + cacheBuster;
@@ -1440,6 +1538,10 @@ import Footer from '@/components/Footer.astro';
       languagesUrl
     );
     const markdownRepo = formatCardMarkdown(t('title_repo', currentLocale), repoUrl);
+    const markdownRepoViews = formatCardMarkdown(
+      t('code_label_repo_views', currentLocale),
+      repoViewsUrl
+    );
     const markdownRank = formatCardMarkdown(t('title_rank', currentLocale), rankUrl);
     const markdownStreak = formatCardMarkdown(t('code_label_streak', currentLocale), streakUrl);
     const markdownTrophies = formatCardMarkdown(
@@ -1475,6 +1577,7 @@ import Footer from '@/components/Footer.astro';
     if (markdownStatsCode) markdownStatsCode.textContent = markdownStats;
     if (markdownLanguagesCode) markdownLanguagesCode.textContent = markdownLanguages;
     if (markdownRepoCode) markdownRepoCode.textContent = markdownRepo;
+    if (markdownRepoViewsCode) markdownRepoViewsCode.textContent = markdownRepoViews;
     if (markdownRankCode) markdownRankCode.textContent = markdownRank;
     if (markdownStreakCode) markdownStreakCode.textContent = markdownStreak;
     if (markdownTrophiesCode) markdownTrophiesCode.textContent = markdownTrophies;
@@ -1509,6 +1612,7 @@ import Footer from '@/components/Footer.astro';
     const styleVal = viewsStyle ? viewsStyle.value : '';
 
     let viewsUrl = `${origin}/api/views?username=${currentUsername}&theme=${currentTheme}`;
+    if (currentRepo) viewsUrl += `&repo=${encodeURIComponent(currentRepo)}`;
     if (labelVal) viewsUrl += `&label=${encodeURIComponent(labelVal)}`;
     if (colorVal) viewsUrl += `&color=${encodeURIComponent(colorVal)}`;
     if (styleVal) viewsUrl += `&style=${encodeURIComponent(styleVal)}`;
@@ -1655,6 +1759,7 @@ import Footer from '@/components/Footer.astro';
   setupImageEvents(statsImg, statsPlaceholder, 'Error al cargar tarjeta. Verifica el usuario.');
   setupImageEvents(languagesImg, languagesPlaceholder, 'Error al cargar lenguajes.');
   setupImageEvents(repoImg, repoPlaceholder, 'Error al cargar repositorio.');
+  setupImageEvents(repoViewsImg, repoViewsPlaceholder, 'Error al cargar visitas del proyecto.');
   setupImageEvents(rankImg, rankPlaceholder, 'Error al cargar rango.');
   setupImageEvents(streakImg, streakPlaceholder, 'Error al cargar racha de contribuciones.');
   setupImageEvents(trophiesImg, trophiesPlaceholder, 'Error al cargar trofeos.');
@@ -1682,6 +1787,7 @@ import Footer from '@/components/Footer.astro';
   setupCopyButton(btnCopyStats, markdownStatsCode);
   setupCopyButton(btnCopyLanguages, markdownLanguagesCode);
   setupCopyButton(btnCopyRepo, markdownRepoCode);
+  setupCopyButton(btnCopyRepoViews, markdownRepoViewsCode);
   setupCopyButton(btnCopyRank, markdownRankCode);
   setupCopyButton(btnCopyStreak, markdownStreakCode);
   setupCopyButton(btnCopyTrophies, markdownTrophiesCode);
@@ -1839,6 +1945,7 @@ import Footer from '@/components/Footer.astro';
   function resetAppUI() {
     if (usernameInput) usernameInput.value = '';
     if (repoInput) repoInput.value = '';
+    if (repoInputAuth) repoInputAuth.value = '';
     currentUsername = '';
     currentRepo = '';
 
@@ -1856,6 +1963,7 @@ import Footer from '@/components/Footer.astro';
       statsImg,
       languagesImg,
       repoImg,
+      repoViewsImg,
       rankImg,
       streakImg,
       trophiesImg,
@@ -1878,6 +1986,7 @@ import Footer from '@/components/Footer.astro';
       statsPlaceholder,
       languagesPlaceholder,
       repoPlaceholder,
+      repoViewsPlaceholder,
       rankPlaceholder,
       streakPlaceholder,
       trophiesPlaceholder,
@@ -1908,6 +2017,7 @@ import Footer from '@/components/Footer.astro';
       markdownStatsCode,
       markdownLanguagesCode,
       markdownRepoCode,
+      markdownRepoViewsCode,
       markdownRankCode,
       markdownStreakCode,
       markdownTrophiesCode,
@@ -1973,8 +2083,10 @@ import Footer from '@/components/Footer.astro';
       const data = await response.json();
       if (response.ok) {
         localStorage.setItem('registered-github-username', username);
+        localStorage.setItem('gh_active_user', username);
         showRegisteredState();
         showStatus(data.message, 'success');
+        window.dispatchEvent(new CustomEvent('app:pat-registered', { detail: { username } }));
 
         if (usernameInput) {
           usernameInput.value = username;

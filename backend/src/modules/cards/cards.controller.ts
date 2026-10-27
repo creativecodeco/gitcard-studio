@@ -1,4 +1,4 @@
-import { Controller, Get, Headers, Inject, Ip, Query, Res } from '@nestjs/common';
+import { Controller, Get, Headers, Inject, Ip, Optional, Query, Res } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { GetUserStatsCardUseCase } from '@/use-cases/cards/GetUserStatsCardUseCase';
 import { GetUserLanguagesCardUseCase } from '@/use-cases/cards/GetUserLanguagesCardUseCase';
@@ -10,7 +10,9 @@ import { GetUserTopReposCardUseCase } from '@/use-cases/cards/GetUserTopReposCar
 import { GetUserSponsorsCardUseCase } from '@/use-cases/cards/GetUserSponsorsCardUseCase';
 import { GetUserCommitActivityCardUseCase } from '@/use-cases/cards/GetUserCommitActivityCardUseCase';
 import { GetTechStackCardUseCase } from '@/use-cases/cards/GetTechStackCardUseCase';
+import { GetRepoViewsCardUseCase } from '@/use-cases/cards/GetRepoViewsCardUseCase';
 import { RecordProfileViewUseCase } from '@/use-cases/metrics/RecordProfileViewUseCase';
+import { RecordRepoViewUseCase } from '@/use-cases/metrics/RecordRepoViewUseCase';
 import { renderViewsBadge } from '@/adapters/presenters/viewsBadge';
 import { renderErrorCard } from '@/adapters/presenters/errorCard';
 import { renderBadgeSVG } from '@/adapters/presenters/badge.presenter';
@@ -52,7 +54,13 @@ export class CardsController {
     @Inject(GetTechStackCardUseCase)
     private readonly techStackCardUseCase: GetTechStackCardUseCase,
     @Inject('IGitHubRepository')
-    private readonly githubRepo: IGitHubRepository
+    private readonly githubRepo: IGitHubRepository,
+    @Optional()
+    @Inject(GetRepoViewsCardUseCase)
+    private readonly repoViewsCardUseCase?: GetRepoViewsCardUseCase,
+    @Optional()
+    @Inject(RecordRepoViewUseCase)
+    private readonly recordRepoViewUseCase?: RecordRepoViewUseCase
   ) {}
 
   private async handleCardRequest(
@@ -67,7 +75,8 @@ export class CardsController {
       theme: string,
       overrides: Record<string, string>,
       hitContext?: HitContext
-    ) => Promise<string>
+    ) => Promise<string>,
+    noCache: boolean = false
   ): Promise<string> {
     res.header('Content-Type', 'image/svg+xml; charset=utf-8');
     res.header('X-Content-Type-Options', 'nosniff');
@@ -75,7 +84,10 @@ export class CardsController {
     const theme = query.theme;
 
     if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
-      res.header('Cache-Control', 'no-cache, no-store, must-revalidate').status(400);
+      const invalidCacheHeader = noCache
+        ? 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate'
+        : 'no-cache, no-store, must-revalidate';
+      res.header('Cache-Control', invalidCacheHeader).status(400);
       const safeUser = typeof username === 'string' ? username : undefined;
       return renderErrorCard(
         'Usuario de GitHub inválido',
@@ -124,6 +136,17 @@ export class CardsController {
 
       const svg = await executeUseCase(username, theme as string, overrides, hitContext);
 
+      if (noCache) {
+        res
+          .header('Content-Type', 'image/svg+xml; charset=utf-8')
+          .header('X-Content-Type-Options', 'nosniff')
+          .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
+          .header('Pragma', 'no-cache')
+          .header('Expires', '0')
+          .status(200);
+        return svg;
+      }
+
       const cacheHeader = isCacheBypass
         ? 'no-cache, no-store, must-revalidate'
         : 'public, max-age=7200';
@@ -144,7 +167,12 @@ export class CardsController {
       res
         .header('Content-Type', 'image/svg+xml; charset=utf-8')
         .header('X-Content-Type-Options', 'nosniff')
-        .header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        .header(
+          'Cache-Control',
+          noCache
+            ? 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate'
+            : 'no-cache, no-store, must-revalidate'
+        )
         .status(500);
       return renderErrorCard(message, typeof theme === 'string' ? theme : undefined, { username });
     }
@@ -247,7 +275,7 @@ export class CardsController {
   ): Promise<string> {
     res.header('Content-Type', 'image/svg+xml; charset=utf-8');
     res.header('X-Content-Type-Options', 'nosniff');
-    const { username, theme, color, label, style, preview } = query;
+    const { username, repo, theme, color, label, style, preview } = query;
 
     if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
       res
@@ -256,20 +284,43 @@ export class CardsController {
       return renderErrorCard('Usuario de GitHub inválido');
     }
 
+    if (
+      repo !== undefined &&
+      repo !== '' &&
+      (typeof repo !== 'string' || !GITHUB_REPO_REGEX.test(repo))
+    ) {
+      res
+        .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
+        .status(400);
+      return renderErrorCard('Repositorio de GitHub inválido');
+    }
+
     try {
       const isPreview = preview === 'true' || preview === '1';
       const ref = typeof query.ref === 'string' ? query.ref : undefined;
       const hitContext: HitContext = { username, userAgent, referer, ip, isPreview, ref };
 
-      const viewsCount = await this.recordProfileViewUseCase.execute(
-        username,
-        userAgent,
-        referer,
-        isPreview,
-        hitContext
-      );
+      const hasRepo = typeof repo === 'string' && repo.trim() !== '';
+      const viewsCount =
+        hasRepo && this.recordRepoViewUseCase
+          ? await this.recordRepoViewUseCase.execute(
+              username,
+              repo,
+              userAgent,
+              referer,
+              isPreview,
+              hitContext
+            )
+          : await this.recordProfileViewUseCase.execute(
+              username,
+              userAgent,
+              referer,
+              isPreview,
+              hitContext
+            );
 
-      const cleanLabel = sanitizeBadgeLabel(label, 'Profile views');
+      const defaultBadgeLabel = hasRepo ? 'Project views' : 'Profile views';
+      const cleanLabel = sanitizeBadgeLabel(label, defaultBadgeLabel);
       const cleanColor = typeof color === 'string' ? color : undefined;
       const cleanTheme = typeof theme === 'string' ? theme : undefined;
       const cleanStyle = typeof style === 'string' ? style : undefined;
@@ -295,6 +346,55 @@ export class CardsController {
         .status(500);
       return renderErrorCard(message);
     }
+  }
+
+  @Get('repo-views')
+  async getRepoViews(
+    @Query() query: Record<string, unknown>,
+    @Headers('user-agent') userAgent: string | undefined,
+    @Headers('referer') referer: string | undefined,
+    @Ip() ip: string,
+    @Res({ passthrough: true }) res: FastifyReply
+  ): Promise<string> {
+    res.header('Content-Type', 'image/svg+xml; charset=utf-8');
+    res.header('X-Content-Type-Options', 'nosniff');
+    const repo = query.repo;
+
+    if (
+      repo !== undefined &&
+      repo !== '' &&
+      (typeof repo !== 'string' || !GITHUB_REPO_REGEX.test(repo))
+    ) {
+      res
+        .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
+        .status(400);
+      return renderErrorCard(
+        'Repositorio de GitHub inválido',
+        typeof query.theme === 'string' ? query.theme : undefined
+      );
+    }
+
+    if (!this.repoViewsCardUseCase) {
+      res
+        .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
+        .status(500);
+      return renderErrorCard('Servicio de visitas de repositorio no disponible');
+    }
+
+    const cleanRepo = typeof repo === 'string' && repo.trim() !== '' ? repo.trim() : undefined;
+    const rawLabel = typeof query.label === 'string' ? query.label : undefined;
+    const cleanLabel = rawLabel ? escapeXml(sanitizeBadgeLabel(rawLabel, '')) : undefined;
+
+    return this.handleCardRequest(
+      query,
+      userAgent,
+      referer,
+      ip,
+      res,
+      'RepoViews',
+      (u, t, o, h) => this.repoViewsCardUseCase!.execute(u, cleanRepo, t, o, h, cleanLabel),
+      true
+    );
   }
 
   @Get('top-repos')
