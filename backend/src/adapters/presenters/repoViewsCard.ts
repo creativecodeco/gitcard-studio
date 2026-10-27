@@ -79,7 +79,7 @@ export function renderRepoViewsCard(
   const theme = getTheme(themeName, overrides);
   const cardWidth = 495;
   const cardHeight = 155;
-  const widthAttr = overrides?.cardWidth || `${cardWidth}`;
+  const widthAttr = escapeXml(overrides?.cardWidth || `${cardWidth}`);
 
   const langKey = locale.toLowerCase() in REPO_VIEWS_I18N ? locale.toLowerCase() : 'es';
   const i18nText = REPO_VIEWS_I18N[langKey];
@@ -87,14 +87,22 @@ export function renderRepoViewsCard(
   const safeName = escapeXml(repo.name);
   const safeOwner = escapeXml(repo.owner);
   const safeLanguage = escapeXml(repo.language || '');
+  const safeLanguageColor = escapeXml(repo.languageColor || '#858585');
+  const safeStars = escapeXml(String(Number(repo.stars) || 0));
+  const safeForks = escapeXml(String(Number(repo.forks) || 0));
   const safeDescription = escapeXml(truncateText(repo.description || i18nText.liveTracking, 42));
-  const safeViews = escapeXml(viewsCount.toLocaleString());
+  const safeViews = escapeXml(Number(viewsCount || 0).toLocaleString());
   const safeViewsLabel = escapeXml(
     customLabel && customLabel.trim() !== '' ? customLabel.trim() : i18nText.viewsLabel
   );
   const safeLiveText = escapeXml(i18nText.liveTracking);
   const safeStarsLabel = escapeXml(i18nText.starsLabel);
   const safeForksLabel = escapeXml(i18nText.forksLabel);
+  const safeTitleColor = escapeXml(theme.title);
+  const safeSecondaryColor = escapeXml(theme.secondary);
+  const safeTextColor = escapeXml(theme.text);
+  const safeAccentColor = escapeXml(theme.accent);
+  const safeBorderColor = escapeXml(theme.border);
 
   const backgroundDef = getBackgroundDef(theme, 'bg');
 
@@ -105,20 +113,20 @@ export function renderRepoViewsCard(
       <defs>
         ${backgroundDef}
         <style>
-          .title { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 700; font-size: 16px; fill: ${theme.title}; }
-          .owner { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 500; font-size: 12px; fill: ${theme.secondary}; }
-          .desc { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 400; font-size: 12px; fill: ${theme.text}; }
-          .sub { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 500; font-size: 11px; fill: ${theme.secondary}; }
-          .views-num { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 800; font-size: 24px; fill: ${theme.accent}; }
-          .views-lbl { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 600; font-size: 11px; fill: ${theme.text}; text-transform: uppercase; letter-spacing: 0.4px; }
-          .label { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 600; font-size: 12px; fill: ${theme.text}; }
-          .value { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 700; font-size: 12px; fill: ${theme.accent}; }
-          .icon { fill: ${theme.accent}; }
+          .title { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 700; font-size: 16px; fill: ${safeTitleColor}; }
+          .owner { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 500; font-size: 12px; fill: ${safeSecondaryColor}; }
+          .desc { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 400; font-size: 12px; fill: ${safeTextColor}; }
+          .sub { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 500; font-size: 11px; fill: ${safeSecondaryColor}; }
+          .views-num { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 800; font-size: 24px; fill: ${safeAccentColor}; }
+          .views-lbl { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 600; font-size: 11px; fill: ${safeTextColor}; text-transform: uppercase; letter-spacing: 0.4px; }
+          .label { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 600; font-size: 12px; fill: ${safeTextColor}; }
+          .value { font-family: 'Segoe UI', Ubuntu, sans-serif; font-weight: 700; font-size: 12px; fill: ${safeAccentColor}; }
+          .icon { fill: ${safeAccentColor}; }
         </style>
       </defs>
 
       <!-- Card Background -->
-      <rect width="${cardWidth}" height="${cardHeight}" rx="12" fill="url(#bg)" stroke="${theme.border}" stroke-width="1.5" />
+      <rect width="${cardWidth}" height="${cardHeight}" rx="12" fill="url(#bg)" stroke="${safeBorderColor}" stroke-width="1.5" />
 
       <!-- Repository Header -->
       <g transform="translate(25, 28)">
@@ -132,13 +140,13 @@ export function renderRepoViewsCard(
       <!-- Left Info Section -->
       <g transform="translate(25, 76)">
         <text x="0" y="0" class="desc">${safeDescription}</text>
-        <circle cx="5" cy="18" r="3.5" fill="${theme.accent}" />
+        <circle cx="5" cy="18" r="3.5" fill="${safeAccentColor}" />
         <text x="14" y="22" class="sub">${safeLiveText}</text>
       </g>
 
       <!-- Project Views Counter Highlight Box -->
       <g transform="translate(315, 48)">
-        <rect width="155" height="54" rx="10" fill="${theme.accent}" fill-opacity="0.1" stroke="${theme.border}" stroke-width="1" />
+        <rect width="155" height="54" rx="10" fill="${safeAccentColor}" fill-opacity="0.1" stroke="${safeBorderColor}" stroke-width="1" />
         <svg class="icon" viewBox="0 0 24 24" width="18" height="18" x="14" y="10">
           ${ICONS.eye}
         </svg>
@@ -147,12 +155,12 @@ export function renderRepoViewsCard(
       </g>
 
       <!-- Decorative Divider -->
-      <line x1="25" y1="115" x2="470" y2="115" stroke="${theme.border}" stroke-dasharray="2, 2" stroke-width="1" />
+      <line x1="25" y1="115" x2="470" y2="115" stroke="${safeBorderColor}" stroke-dasharray="2, 2" stroke-width="1" />
 
       <!-- Footer Metrics -->
       <g transform="translate(25, 128)">
         <g transform="translate(0, 0)">
-          <circle cx="6" cy="6" r="5" fill="${repo.languageColor}" />
+          <circle cx="6" cy="6" r="5" fill="${safeLanguageColor}" />
           <text x="16" y="10" class="label">${safeLanguage}</text>
         </g>
 
@@ -161,7 +169,7 @@ export function renderRepoViewsCard(
             ${ICONS.star}
           </svg>
           <text x="18" y="10" class="label">${safeStarsLabel}</text>
-          <text x="80" y="10" class="value">${repo.stars}</text>
+          <text x="80" y="10" class="value">${safeStars}</text>
         </g>
 
         <g transform="translate(270, 0)">
@@ -169,12 +177,12 @@ export function renderRepoViewsCard(
             ${ICONS.fork}
           </svg>
           <text x="18" y="10" class="label">${safeForksLabel}</text>
-          <text x="60" y="10" class="value">${repo.forks}</text>
+          <text x="60" y="10" class="value">${safeForks}</text>
         </g>
       </g>
 
       <!-- Brand Logo / Subtitle -->
-      ${renderBrandHeader(`${repo.owner}/${repo.name}`, theme)}
+      ${renderBrandHeader(`${safeOwner}/${safeName}`, theme)}
     </svg>
   `);
 }

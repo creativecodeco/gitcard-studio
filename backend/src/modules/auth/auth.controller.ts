@@ -244,6 +244,7 @@ export class AuthController {
     repos: Array<{ name: string; owner: string; fullName: string; stars: number }>;
   }> {
     const username = query.username.toLowerCase();
+    const safeUsername = escapeXml(query.username);
     try {
       const decryptedToken = await getDecryptedToken(username, this.tokenRepo);
       const repos =
@@ -251,7 +252,7 @@ export class AuthController {
           ? await this.githubRepo.getUserTopRepos(username, 100, decryptedToken)
           : [];
       return {
-        username: query.username,
+        username: safeUsername,
         repos: repos.map((r) => ({
           name: r.name,
           owner: r.owner,
@@ -260,11 +261,11 @@ export class AuthController {
         }))
       };
     } catch (error: unknown) {
-      logger.warn(`Error fetching accessible repos for user ${query.username}`, {
-        username: query.username,
+      logger.warn(`Error fetching accessible repos for user ${safeUsername}`, {
+        username: safeUsername,
         error
       });
-      return { username: query.username, repos: [] };
+      return { username: safeUsername, repos: [] };
     }
   }
 
