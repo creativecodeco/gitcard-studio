@@ -5,9 +5,11 @@ import {
   renderBrandHeader,
   getFontFamily,
   renderGlowFilter,
-  renderCardFrame
+  renderCardFrame,
+  sanitizeColor
 } from './theme';
 import { getTranslations } from './i18n';
+import { escapeXml } from '@/utils/escape';
 
 export function renderLanguagesCard(
   languages: LanguageStat[],
@@ -22,7 +24,7 @@ export function renderLanguagesCard(
   const isCompact = overrides?.layout === 'compact';
   const cardWidth = 495;
   const cardHeight = isCompact ? 130 : 195;
-  const widthAttr = overrides?.cardWidth || `${cardWidth}`;
+  const widthAttr = escapeXml(overrides?.cardWidth || `${cardWidth}`);
 
   const borderRadius = overrides?.borderRadius ? Number.parseInt(overrides.borderRadius, 10) : 12;
   const showBorder = overrides?.showBorder !== 'false';
@@ -61,8 +63,9 @@ export function renderLanguagesCard(
 
   filteredLanguages.forEach((lang) => {
     const segmentWidth = (lang.percentage / 100) * barWidth;
+    const safeColor = sanitizeColor(lang.color) || theme.accent;
     barSegments.push(
-      `<rect x="${currentX}" y="${isCompact ? '55' : '65'}" width="${segmentWidth}" height="${isCompact ? '10' : '12'}" fill="${lang.color}" />`
+      `<rect x="${currentX}" y="${isCompact ? '55' : '65'}" width="${segmentWidth}" height="${isCompact ? '10' : '12'}" fill="${safeColor}" />`
     );
     currentX += segmentWidth;
   });
@@ -73,11 +76,13 @@ export function renderLanguagesCard(
     const isCol2 = index % 2 !== 0;
     const colX = isCol2 ? 260 : 25;
     const rowY = (isCompact ? 80 : 105) + Math.floor(index / 2) * (isCompact ? 18 : 23);
+    const safeColor = sanitizeColor(lang.color) || theme.accent;
+    const safeName = escapeXml(lang.name);
 
     legendItems.push(`
       <g transform="translate(${colX}, ${rowY})">
-        <circle cx="6" cy="6" r="5" fill="${lang.color}" />
-        <text x="18" y="9" class="legend-name">${lang.name}</text>
+        <circle cx="6" cy="6" r="5" fill="${safeColor}" />
+        <text x="18" y="9" class="legend-name">${safeName}</text>
         <text x="140" y="9" class="legend-percent">${lang.percentage}%</text>
       </g>
     `);

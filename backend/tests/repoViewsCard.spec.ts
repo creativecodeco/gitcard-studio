@@ -15,8 +15,7 @@ describe('RepoViewsCard Presenter & Use Cases', () => {
     forks: 24,
     language: 'TypeScript',
     languageColor: '#3178c6',
-    license: 'MIT',
-    url: 'https://github.com/creativecodeco/gitcard-studio'
+    license: 'MIT'
   };
 
   it('should render valid SVG for repoViewsCard with localized text', () => {

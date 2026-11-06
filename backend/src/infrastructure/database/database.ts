@@ -66,6 +66,8 @@ export async function initDatabase(): Promise<void> {
       if (Array.isArray(tableExists) && tableExists.length > 0) {
         await AppDataSource.query(
           `ALTER TABLE user_metrics 
+            ADD COLUMN IF NOT EXISTS tech_stack_web integer DEFAULT 0 NOT NULL,
+            ADD COLUMN IF NOT EXISTS tech_stack_github integer DEFAULT 0 NOT NULL,
             ADD COLUMN IF NOT EXISTS readme_verified boolean DEFAULT false,
             ADD COLUMN IF NOT EXISTS readme_verified_at timestamp with time zone,
             ADD COLUMN IF NOT EXISTS detected_cards varchar(255),
@@ -102,7 +104,9 @@ export async function initDatabase(): Promise<void> {
       'trophiesRenders',
       'viewsRenders',
       'repoViewsRenders',
-      'sponsorsRenders'
+      'sponsorsRenders',
+      'commitActivityRenders',
+      'techStackRenders'
     ];
 
     for (const key of keys) {

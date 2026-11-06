@@ -1,6 +1,7 @@
 import { RepoStats } from '@/domain/entities/RepoStats';
-import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
+import { getTheme, getBackgroundDef, renderBrandHeader, sanitizeColor } from './theme';
 import { getTranslations } from './i18n';
+import { escapeXml } from '@/utils/escape';
 
 export function renderTopReposCard(
   repos: RepoStats[],
@@ -12,7 +13,7 @@ export function renderTopReposCard(
   const t = getTranslations(overrides?.locale);
   const cardWidth = 495;
   const cardHeight = 300;
-  const widthAttr = overrides?.cardWidth || `${cardWidth}`;
+  const widthAttr = escapeXml(overrides?.cardWidth || `${cardWidth}`);
 
   const backgroundDef = getBackgroundDef(theme, 'bg-top');
 
@@ -26,6 +27,7 @@ export function renderTopReposCard(
       const y = HEADER_HEIGHT + i * ROW_HEIGHT;
       const desc =
         repo.description.length > 55 ? `${repo.description.slice(0, 52)}…` : repo.description;
+      const safeLangColor = sanitizeColor(repo.languageColor) || theme.accent;
 
       return `
       <g transform="translate(0, ${y})">
@@ -34,11 +36,11 @@ export function renderTopReposCard(
 
         <!-- Repo Name -->
         <text x="32" y="24" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="700"
-          font-size="13.5" fill="${theme.title}">${escXml(repo.name)}</text>
+          font-size="13.5" fill="${theme.title}">${escapeXml(repo.name)}</text>
 
         <!-- Description -->
         <text x="32" y="40" font-family="'Segoe UI', Ubuntu, sans-serif" font-weight="400"
-          font-size="11" fill="${theme.text}">${escXml(desc)}</text>
+          font-size="11" fill="${theme.text}">${escapeXml(desc)}</text>
 
         <!-- Stars -->
         <g transform="translate(330, 13)">
@@ -58,7 +60,7 @@ export function renderTopReposCard(
 
         <!-- Language Dot & Name -->
         <g transform="translate(440, 13)">
-          <circle cx="4" cy="5" r="4" fill="${repo.languageColor}" />
+          <circle cx="4" cy="5" r="4" fill="${safeLangColor}" />
         </g>
       </g>
     `;
@@ -96,15 +98,6 @@ export function renderTopReposCard(
       ${repoRows}
     </svg>
   `.trim();
-}
-
-function escXml(str: string): string {
-  return str
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&apos;');
 }
 
 function formatCount(n: number): string {

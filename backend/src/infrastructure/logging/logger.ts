@@ -8,9 +8,12 @@ interface LogPayload {
 }
 
 /**
- * Sanitizes potentially sensitive keys (tokens, secrets, authorizations) from metadata objects.
+ * Sanitizes potentially sensitive keys (tokens, secrets, authorizations) recursively from metadata objects.
  */
-function sanitizeMetadata(meta?: Record<string, unknown>): Record<string, unknown> | undefined {
+function sanitizeMetadata(
+  meta?: Record<string, unknown>,
+  depth = 0
+): Record<string, unknown> | undefined {
   if (!meta) return undefined;
   const sanitized: Record<string, unknown> = {};
 
@@ -20,7 +23,11 @@ function sanitizeMetadata(meta?: Record<string, unknown>): Record<string, unknow
       lowerKey.includes('token') ||
       lowerKey.includes('secret') ||
       lowerKey.includes('authorization') ||
-      lowerKey.includes('password')
+      lowerKey.includes('password') ||
+      lowerKey.includes('cookie') ||
+      lowerKey === 'key' ||
+      lowerKey === 'api_key' ||
+      lowerKey === 'apikey'
     ) {
       sanitized[key] = '[REDACTED]';
     } else if (value instanceof Error) {
@@ -29,6 +36,8 @@ function sanitizeMetadata(meta?: Record<string, unknown>): Record<string, unknow
         message: value.message,
         stack: value.stack
       };
+    } else if (value && typeof value === 'object' && !Array.isArray(value) && depth < 4) {
+      sanitized[key] = sanitizeMetadata(value as Record<string, unknown>, depth + 1);
     } else {
       sanitized[key] = value;
     }

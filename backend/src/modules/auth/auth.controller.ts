@@ -12,9 +12,11 @@ import {
   Post,
   Query,
   Redirect,
+  Res,
   UnauthorizedException
 } from '@nestjs/common';
 import crypto from 'node:crypto';
+import { FastifyReply } from 'fastify';
 import { RegisterOAuthTokenUseCase } from '@/use-cases/tokens/RegisterOAuthTokenUseCase';
 import { PurgeUserDataUseCase } from '@/use-cases/users/PurgeUserDataUseCase';
 import { ITokenRepository } from '@/domain/repositories/ITokenRepository';
@@ -22,7 +24,15 @@ import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
 import { AppDataSource } from '@/infrastructure/database/database';
 import { UserMetric } from '@/infrastructure/database/entities/UserMetric';
 import { RepoMetric } from '@/infrastructure/database/entities/RepoMetric';
-import { getDecryptedToken } from '@/infrastructure/security/security';
+import {
+  buildClearSessionCookieHeader,
+  buildSessionCookieHeader,
+  decryptOAuthSessionToken,
+  generateOAuthSessionToken,
+  getDecryptedToken,
+  safeTimingEqual,
+  verifyOAuthSessionToken
+} from '@/infrastructure/security/security';
 import { logger } from '@/infrastructure/logging/logger';
 import { escapeXml } from '@/utils/escape';
 import { getMessages, resolveLocale } from '@/infrastructure/i18n/backendI18n';
@@ -31,6 +41,8 @@ import { DisconnectAccountDto, GetUserMetricsQueryDto, PurgeSelfAccountDto } fro
 
 @Controller('api')
 export class AuthController {
+  private readonly pendingOAuthStates = new Map<string, number>();
+
   constructor(
     @Inject(RegisterOAuthTokenUseCase)
     private readonly registerOAuthUseCase: RegisterOAuthTokenUseCase,
@@ -49,7 +61,14 @@ export class AuthController {
       );
     }
 
+    const now = Date.now();
+    for (const [key, exp] of this.pendingOAuthStates.entries()) {
+      if (exp <= now) this.pendingOAuthStates.delete(key);
+    }
+
     const state = crypto.randomBytes(16).toString('hex');
+    this.pendingOAuthStates.set(state, now + 10 * 60 * 1000);
+
     const redirectUri =
       process.env.GITHUB_CALLBACK_URL || 'http://localhost:3000/api/auth/github/callback';
     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=read:user,repo&redirect_uri=${encodeURIComponent(
@@ -65,11 +84,24 @@ export class AuthController {
     @Query('code') code?: string,
     @Query('error') error?: string,
     @Ip() clientIp?: string,
-    @Headers('user-agent') userAgent?: string
+    @Headers('user-agent') userAgent?: string,
+    @Query('state') state?: string,
+    @Res({ passthrough: true }) reply?: FastifyReply
   ): Promise<{ url: string; statusCode: number }> {
     if (error || !code) {
       logger.warn('GitHub OAuth callback error or missing code', { error });
       return { url: '/?auth_error=denied', statusCode: 302 };
+    }
+
+    if (this.pendingOAuthStates.size > 0) {
+      const stateExpiry = state ? this.pendingOAuthStates.get(state) : undefined;
+      if (state) {
+        this.pendingOAuthStates.delete(state);
+      }
+      if (!stateExpiry || stateExpiry <= Date.now()) {
+        logger.warn('GitHub OAuth callback rejected due to invalid or expired CSRF state');
+        return { url: '/?auth_error=invalid_state', statusCode: 302 };
+      }
     }
 
     const clientId = process.env.GITHUB_CLIENT_ID;
@@ -92,7 +124,8 @@ export class AuthController {
           client_id: clientId,
           client_secret: clientSecret,
           code
-        })
+        }),
+        signal: AbortSignal.timeout(8000)
       });
 
       if (!tokenRes.ok) {
@@ -109,7 +142,7 @@ export class AuthController {
       };
 
       if (!tokenData.access_token || tokenData.error) {
-        logger.error('GitHub token exchange response error', { tokenData });
+        logger.error('GitHub token exchange response error', { error: tokenData.error });
         return { url: '/?auth_error=token_missing', statusCode: 302 };
       }
 
@@ -119,7 +152,8 @@ export class AuthController {
           'User-Agent': 'gitcard-studio-app',
           Accept: 'application/vnd.github.v3+json',
           Authorization: `Bearer ${tokenData.access_token}`
-        }
+        },
+        signal: AbortSignal.timeout(8000)
       });
 
       if (!userRes.ok) {
@@ -148,8 +182,13 @@ export class AuthController {
         userAgent: agent
       });
 
+      const sessionToken = generateOAuthSessionToken(username);
+      reply?.header('Set-Cookie', buildSessionCookieHeader(sessionToken));
       logger.info(`GitHub App OAuth login successful for user ${username}`, { username });
-      return { url: `/?auth_success=1&username=${encodeURIComponent(username)}`, statusCode: 302 };
+      return {
+        url: `/?auth_success=1&username=${encodeURIComponent(username)}&session_token=${encodeURIComponent(sessionToken)}`,
+        statusCode: 302
+      };
     } catch (err: unknown) {
       logger.error('Error during GitHub OAuth callback processing', { error: err });
       return { url: '/?auth_error=server_error', statusCode: 302 };
@@ -157,7 +196,11 @@ export class AuthController {
   }
 
   @Get('users/me/metrics')
-  async getUserMetrics(@Query() query: GetUserMetricsQueryDto): Promise<Record<string, unknown>> {
+  async getUserMetrics(
+    @Query() query: GetUserMetricsQueryDto,
+    @Headers('authorization') authHeader?: string,
+    @Headers('cookie') cookieHeader?: string
+  ): Promise<Record<string, unknown>> {
     const m = getMessages(resolveLocale(query.locale));
     const username = query.username.toLowerCase();
 
@@ -174,23 +217,37 @@ export class AuthController {
           : [];
       const totalRepoViews = repoEntities.reduce((sum, r) => sum + (r.repo_views || 0), 0);
       const tokenInfo = await this.tokenRepo.getToken(username);
+      const providedToken = extractBearerToken(authHeader, undefined, cookieHeader);
+      const sessionInfo = providedToken ? decryptOAuthSessionToken(providedToken) : null;
 
+      let isAuthorizedOwner = false;
       let accessibleRepos: Array<{
         name: string;
         owner: string;
         fullName: string;
         stars: number;
       }> = [];
-      if (tokenInfo && typeof this.githubRepo?.getUserTopRepos === 'function') {
+      if (tokenInfo) {
         try {
           const decryptedToken = await getDecryptedToken(username, this.tokenRepo);
-          const repos = await this.githubRepo.getUserTopRepos(username, 100, decryptedToken);
-          accessibleRepos = repos.map((r) => ({
-            name: r.name,
-            owner: r.owner,
-            fullName: `${r.owner}/${r.name}`,
-            stars: r.stars || 0
-          }));
+          isAuthorizedOwner = Boolean(
+            providedToken &&
+            (verifyOAuthSessionToken(providedToken, username) ||
+              (decryptedToken && safeTimingEqual(providedToken, decryptedToken)))
+          );
+          if (typeof this.githubRepo?.getUserTopRepos === 'function') {
+            const repos = await this.githubRepo.getUserTopRepos(
+              username,
+              100,
+              isAuthorizedOwner ? decryptedToken : undefined
+            );
+            accessibleRepos = repos.map((r) => ({
+              name: r.name,
+              owner: r.owner,
+              fullName: `${r.owner}/${r.name}`,
+              stars: r.stars || 0
+            }));
+          }
         } catch (repoErr) {
           logger.warn(`Could not fetch accessible repos for ${username} in getUserMetrics`, {
             error: repoErr
@@ -200,11 +257,12 @@ export class AuthController {
 
       return {
         username: query.username,
-        connected: Boolean(tokenInfo),
-        tokenType: tokenInfo?.token_type ?? 'none',
-        expiresAt: tokenInfo?.expires_at ?? null,
-        scopes: tokenInfo?.scopes ?? null,
-        updatedAt: tokenInfo?.updated_at ?? null,
+        connected: isAuthorizedOwner,
+        authenticatedUsername: sessionInfo?.username ?? null,
+        tokenType: isAuthorizedOwner ? (tokenInfo?.token_type ?? 'none') : 'none',
+        expiresAt: isAuthorizedOwner ? (tokenInfo?.expires_at ?? null) : null,
+        scopes: isAuthorizedOwner ? (tokenInfo?.scopes ?? null) : null,
+        updatedAt: isAuthorizedOwner ? (tokenInfo?.updated_at ?? null) : null,
         accessible_repos: accessibleRepos,
         metrics: {
           profile_views: metricEntity?.profile_views ?? 0,
@@ -239,17 +297,31 @@ export class AuthController {
   }
 
   @Get('users/repos')
-  async getUserAccessibleRepos(@Query() query: GetUserMetricsQueryDto): Promise<{
+  async getUserAccessibleRepos(
+    @Query() query: GetUserMetricsQueryDto,
+    @Headers('authorization') authHeader?: string,
+    @Headers('cookie') cookieHeader?: string
+  ): Promise<{
     username: string;
     repos: Array<{ name: string; owner: string; fullName: string; stars: number }>;
   }> {
     const username = query.username.toLowerCase();
     const safeUsername = escapeXml(query.username);
     try {
-      const decryptedToken = await getDecryptedToken(username, this.tokenRepo);
+      const providedToken = extractBearerToken(authHeader, undefined, cookieHeader);
+      let effectiveToken: string | undefined;
+      if (providedToken) {
+        const decryptedToken = await getDecryptedToken(username, this.tokenRepo);
+        if (
+          verifyOAuthSessionToken(providedToken, username) ||
+          (decryptedToken && safeTimingEqual(providedToken, decryptedToken))
+        ) {
+          effectiveToken = decryptedToken;
+        }
+      }
       const repos =
         typeof this.githubRepo?.getUserTopRepos === 'function'
-          ? await this.githubRepo.getUserTopRepos(username, 100, decryptedToken)
+          ? await this.githubRepo.getUserTopRepos(username, 100, effectiveToken)
           : [];
       return {
         username: safeUsername,
@@ -273,13 +345,21 @@ export class AuthController {
     username: string,
     authHeader?: string,
     bodyToken?: string,
-    locale?: 'es' | 'en'
+    locale?: 'es' | 'en',
+    cookieHeader?: string
   ): Promise<void> {
     const m = getMessages(resolveLocale(locale));
-    const providedToken = extractBearerToken(authHeader, bodyToken);
+    const providedToken = extractBearerToken(authHeader, bodyToken, cookieHeader);
 
     if (!providedToken || providedToken.trim() === '') {
       throw new UnauthorizedException(m.purgeTokenRequired);
+    }
+
+    if (providedToken.startsWith('gcss_')) {
+      if (!verifyOAuthSessionToken(providedToken, username)) {
+        throw new UnauthorizedException(m.tokenExpiredOrInvalid);
+      }
+      return;
     }
 
     const profileRes = await fetch('https://api.github.com/user', {
@@ -287,7 +367,8 @@ export class AuthController {
         'User-Agent': 'gitcard-studio-security',
         Accept: 'application/vnd.github.v3+json',
         Authorization: `token ${providedToken}`
-      }
+      },
+      signal: AbortSignal.timeout(8000)
     });
 
     if (!profileRes.ok) {
@@ -305,20 +386,33 @@ export class AuthController {
   @Delete('users/me')
   async deleteUserAccount(
     @Query() query: PurgeSelfAccountDto,
-    @Headers('authorization') authHeader?: string
+    @Headers('authorization') authHeader?: string,
+    @Headers('cookie') cookieHeader?: string,
+    @Res({ passthrough: true }) reply?: FastifyReply
   ): Promise<{ message: string }> {
     const m = getMessages(resolveLocale(query.locale));
     const username = query.username.toLowerCase();
 
     const existingToken = await this.tokenRepo.getToken(username);
-    const providedToken = extractBearerToken(authHeader, query.token);
-    if (providedToken || existingToken?.token_type !== 'app_user') {
-      await this.verifyTokenOwnership(username, authHeader, query.token, query.locale);
+    const providedToken = extractBearerToken(authHeader, query.token, cookieHeader);
+    if (
+      providedToken ||
+      existingToken?.token_type !== 'app_user' ||
+      process.env.NODE_ENV === 'production'
+    ) {
+      await this.verifyTokenOwnership(
+        username,
+        authHeader,
+        query.token,
+        query.locale,
+        cookieHeader
+      );
     }
 
     try {
       await this.purgeUseCase.execute(username);
       await this.githubRepo.clearCache(username);
+      reply?.header('Set-Cookie', buildClearSessionCookieHeader());
       logger.info(`User account ${query.username} purged self successfully via UI`, {
         username: query.username
       });
@@ -338,24 +432,32 @@ export class AuthController {
   @Post('auth/disconnect')
   async disconnectAccount(
     @Body() dto: DisconnectAccountDto,
-    @Headers('authorization') authHeader?: string
+    @Headers('authorization') authHeader?: string,
+    @Headers('cookie') cookieHeader?: string,
+    @Res({ passthrough: true }) reply?: FastifyReply
   ): Promise<{ message: string }> {
     const m = getMessages(resolveLocale(dto.locale));
     const username = dto.username.toLowerCase();
 
     const existingToken = await this.tokenRepo.getToken(username);
     if (!existingToken) {
+      reply?.header('Set-Cookie', buildClearSessionCookieHeader());
       return { message: m.accountDisconnectSuccess };
     }
 
-    const providedToken = extractBearerToken(authHeader, dto.token);
-    if (providedToken || existingToken.token_type !== 'app_user') {
-      await this.verifyTokenOwnership(username, authHeader, dto.token, dto.locale);
+    const providedToken = extractBearerToken(authHeader, dto.token, cookieHeader);
+    if (
+      providedToken ||
+      existingToken.token_type !== 'app_user' ||
+      process.env.NODE_ENV === 'production'
+    ) {
+      await this.verifyTokenOwnership(username, authHeader, dto.token, dto.locale, cookieHeader);
     }
 
     try {
       await this.tokenRepo.deleteToken(username);
       await this.githubRepo.clearCache(username);
+      reply?.header('Set-Cookie', buildClearSessionCookieHeader());
       logger.info(`Disconnected GitHub account for user ${dto.username}`, {
         username: dto.username
       });

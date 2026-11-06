@@ -54,6 +54,12 @@ export class UserMetric {
   commit_activity_github!: number;
 
   @Column({ type: 'integer', default: 0 })
+  tech_stack_web!: number;
+
+  @Column({ type: 'integer', default: 0 })
+  tech_stack_github!: number;
+
+  @Column({ type: 'integer', default: 0 })
   profile_views!: number;
 
   @Column({ type: 'boolean', default: false })

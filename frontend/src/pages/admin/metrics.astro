@@ -426,6 +426,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <script>
   import { escapeHtml } from '@/utils/escape';
+  import { secureStorage } from '@/utils/secureStorage';
 
   const authPanel = document.getElementById('auth-panel');
   const analyticsPanel = document.getElementById('analytics-panel');
@@ -500,9 +501,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     if (authError) authError.classList.add('hidden');
 
     try {
-      const response = await fetch(`/api/metrics?key=${encodeURIComponent(key)}`);
+      const response = await fetch('/api/metrics', {
+        headers: { 'x-api-key': key }
+      });
       if (response.ok) {
-        sessionStorage.setItem('gitcard-studio-metrics-key', key);
+        secureStorage.setSession('gitcard-studio-metrics-key', key);
         await initDashboard(key);
       } else {
         showError('Acceso no autorizado. Clave incorrecta.');
@@ -524,7 +527,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
   function handleLogout() {
     stopPolling();
-    sessionStorage.removeItem('gitcard-studio-metrics-key');
+    secureStorage.removeSession('gitcard-studio-metrics-key');
     window.location.reload();
   }
 
@@ -545,14 +548,15 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     }
 
     try {
+      const authHeaders = { 'x-api-key': key };
       // Fetch global metrics
-      const globalRes = await fetch(`/api/metrics?key=${encodeURIComponent(key)}`);
+      const globalRes = await fetch('/api/metrics', { headers: authHeaders });
       // Fetch user metrics
-      const usersRes = await fetch(`/api/metrics/users?key=${encodeURIComponent(key)}`);
+      const usersRes = await fetch('/api/metrics/users', { headers: authHeaders });
       // Fetch renders history (last 7 days)
-      const historyRes = await fetch(`/api/metrics/history?days=7&key=${encodeURIComponent(key)}`);
+      const historyRes = await fetch('/api/metrics/history?days=7', { headers: authHeaders });
       // Fetch breakdown metrics (formats, themes, locales)
-      const breakdownRes = await fetch(`/api/metrics/breakdown?key=${encodeURIComponent(key)}`);
+      const breakdownRes = await fetch('/api/metrics/breakdown', { headers: authHeaders });
 
       if (!globalRes.ok || !usersRes.ok) {
         handleLogout();
@@ -1004,7 +1008,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   }
 
   async function verifyReadme(username: string, buttonEl: HTMLButtonElement) {
-    const key = sessionStorage.getItem('gitcard-studio-metrics-key') || '';
+    const key = secureStorage.getSession('gitcard-studio-metrics-key') || '';
     if (!key) return;
 
     buttonEl.disabled = true;
@@ -1026,7 +1030,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           'Content-Type': 'application/json',
           'x-api-key': key
         },
-        body: JSON.stringify({ username, key, forceRefresh })
+        body: JSON.stringify({ username, forceRefresh })
       });
 
       if (!response.ok) {
@@ -1056,7 +1060,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   }
 
   async function auditAllUsers() {
-    const key = sessionStorage.getItem('gitcard-studio-metrics-key') || '';
+    const key = secureStorage.getSession('gitcard-studio-metrics-key') || '';
     if (!key || !btnAuditAll) return;
 
     const forceRefresh = checkboxForceRefresh ? checkboxForceRefresh.checked : true;
@@ -1087,7 +1091,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           'Content-Type': 'application/json',
           'x-api-key': key
         },
-        body: JSON.stringify({ forceRefresh, key })
+        body: JSON.stringify({ forceRefresh })
       });
 
       if (!response.ok) {
@@ -1316,7 +1320,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   function setupAutoRefresh() {
     stopPolling();
     if (checkboxAutoRefresh && checkboxAutoRefresh.checked) {
-      const key = sessionStorage.getItem('gitcard-studio-metrics-key') || '';
+      const key = secureStorage.getSession('gitcard-studio-metrics-key') || '';
       pollingInterval = setInterval(() => {
         if (key) loadDashboardData(key);
       }, 30000); // 30 seconds
@@ -1331,7 +1335,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   }
 
   // Init
-  const storedKey = sessionStorage.getItem('gitcard-studio-metrics-key');
+  const storedKey = secureStorage.getSession('gitcard-studio-metrics-key');
   if (storedKey) {
     initDashboard(storedKey);
   } else {
@@ -1349,7 +1353,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   btnLogout?.addEventListener('click', handleLogout);
 
   btnRefresh?.addEventListener('click', () => {
-    const key = sessionStorage.getItem('gitcard-studio-metrics-key') || '';
+    const key = secureStorage.getSession('gitcard-studio-metrics-key') || '';
     if (key) loadDashboardData(key);
   });
 

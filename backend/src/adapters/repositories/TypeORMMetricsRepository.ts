@@ -39,19 +39,13 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
         .where('metric_key = :key', { key: 'totalRenders' })
         .execute();
 
-      const normalizedType =
-        type === 'commit-activity'
-          ? 'commit_activity'
-          : type === 'tech-stack'
-            ? 'tech_stack'
-            : type;
-      const metricKey =
-        type === 'commit-activity'
-          ? 'commitActivityRenders'
-          : type === 'tech-stack'
-            ? 'techStackRenders'
-            : `${type}Renders`;
-      const column = `${normalizedType}_${source}`;
+      const normalizedType = type.replace(/-/g, '_');
+      const metricKeyMap: Record<string, string> = {
+        'commit-activity': 'commitActivityRenders',
+        'tech-stack': 'techStackRenders'
+      };
+      const metricKey = metricKeyMap[type] ?? `${type}Renders`;
+      const column = type === 'views' ? 'profile_views' : `${normalizedType}_${source}`;
 
       // 2. Increment specific card type renders
       await transactionalEntityManager

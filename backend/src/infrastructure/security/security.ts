@@ -21,10 +21,14 @@ export function safeTimingEqual(a: string, b: string): boolean {
 // Derive a secure 32-byte key from the environment variable
 function getEncryptionKey(): Buffer {
   const rawKey = process.env.ENCRYPTION_KEY;
-  if (!rawKey || rawKey === 'default-fallback-key-change-me-in-production-creativecode') {
+  if (
+    !rawKey ||
+    rawKey === 'default-fallback-key-change-me-in-production-creativecode' ||
+    rawKey.trim().length < 32
+  ) {
     if (process.env.NODE_ENV === 'production') {
       throw new Error(
-        'CRITICAL SECURITY ERROR: ENCRYPTION_KEY environment variable is not defined or is using default fallback in production mode.'
+        'CRITICAL SECURITY ERROR: ENCRYPTION_KEY environment variable is not defined, uses default fallback, or is shorter than 32 characters in production mode.'
       );
     }
   }
@@ -32,8 +36,159 @@ function getEncryptionKey(): Buffer {
   return crypto.createHash('sha256').update(keyToUse).digest();
 }
 
+export const SESSION_COOKIE_NAME = 'gcs_session';
+
 /**
- * Encrypt a GitHub Personal Access Token using AES-256-GCM
+ * Generate a stateless AES-256-GCM encrypted and authenticated session token for an authenticated user
+ */
+export function generateOAuthSessionToken(
+  username: string,
+  ttlMs: number = 30 * 24 * 60 * 60 * 1000
+): string {
+  const normalizedUser = username.trim().toLowerCase();
+  const expiresAt = Date.now() + ttlMs;
+  const payload = JSON.stringify({
+    u: normalizedUser,
+    exp: expiresAt,
+    n: crypto.randomBytes(8).toString('hex')
+  });
+
+  const iv = crypto.randomBytes(12);
+  const key = getEncryptionKey();
+  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+  cipher.setAAD(Buffer.from('gcs-oauth-session-v2', 'utf8'));
+
+  let encrypted = cipher.update(payload, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  const authTag = cipher.getAuthTag().toString('hex');
+
+  return `gcss_v2.${iv.toString('hex')}.${encrypted}.${authTag}`;
+}
+
+/**
+ * Decrypt and authenticate an AES-256-GCM session token, returning its payload if valid and unexpired
+ */
+export function decryptOAuthSessionToken(
+  token: string
+): { username: string; expiresAt: number } | null {
+  if (!token || typeof token !== 'string' || !token.startsWith('gcss_')) {
+    return null;
+  }
+
+  if (!token.startsWith('gcss_v2.')) {
+    return null;
+  }
+
+  const parts = token.split('.');
+  if (parts.length !== 4) {
+    return null;
+  }
+
+  const [, ivHex, encryptedHex, authTagHex] = parts;
+  if (!ivHex || !encryptedHex || !authTagHex || ivHex.length !== 24 || authTagHex.length !== 32) {
+    return null;
+  }
+
+  try {
+    const iv = Buffer.from(ivHex, 'hex');
+    const authTag = Buffer.from(authTagHex, 'hex');
+    const key = getEncryptionKey();
+
+    const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+    decipher.setAAD(Buffer.from('gcs-oauth-session-v2', 'utf8'));
+    decipher.setAuthTag(authTag);
+
+    let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+
+    const parsed = JSON.parse(decrypted) as { u?: string; exp?: number };
+    if (
+      !parsed ||
+      typeof parsed.u !== 'string' ||
+      !parsed.u.trim() ||
+      typeof parsed.exp !== 'number' ||
+      !Number.isFinite(parsed.exp) ||
+      parsed.exp <= Date.now()
+    ) {
+      return null;
+    }
+
+    return {
+      username: parsed.u.trim().toLowerCase(),
+      expiresAt: parsed.exp
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Verify a stateless AES-256-GCM session token for a target username
+ */
+export function verifyOAuthSessionToken(token: string, expectedUsername: string): boolean {
+  if (!expectedUsername || typeof expectedUsername !== 'string') {
+    return false;
+  }
+
+  const session = decryptOAuthSessionToken(token);
+  if (!session) {
+    return false;
+  }
+
+  const normalizedExpected = expectedUsername.trim().toLowerCase();
+  return safeTimingEqual(session.username, normalizedExpected);
+}
+
+/**
+ * Build an HttpOnly, SameSite=Lax, Secure (in prod) Set-Cookie header value for the session token
+ */
+export function buildSessionCookieHeader(
+  sessionToken: string,
+  maxAgeSeconds: number = 30 * 24 * 60 * 60
+): string {
+  const isProd = process.env.NODE_ENV === 'production';
+  const secureFlag = isProd ? '; Secure' : '';
+  return `${SESSION_COOKIE_NAME}=${encodeURIComponent(sessionToken)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSeconds}${secureFlag}`;
+}
+
+/**
+ * Build a Set-Cookie header that immediately expires and clears the session cookie
+ */
+export function buildClearSessionCookieHeader(): string {
+  const isProd = process.env.NODE_ENV === 'production';
+  const secureFlag = isProd ? '; Secure' : '';
+  return `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secureFlag}`;
+}
+
+/**
+ * Extract the encrypted session token from a raw Cookie HTTP header
+ */
+export function extractSessionTokenFromCookie(cookieHeader?: string): string | undefined {
+  if (!cookieHeader || typeof cookieHeader !== 'string') {
+    return undefined;
+  }
+
+  const cookies = cookieHeader.split(';');
+  for (const part of cookies) {
+    const eqIdx = part.indexOf('=');
+    if (eqIdx <= 0) continue;
+    const name = part.slice(0, eqIdx).trim();
+    if (name === SESSION_COOKIE_NAME) {
+      const rawVal = part.slice(eqIdx + 1).trim();
+      if (!rawVal) return undefined;
+      try {
+        return decodeURIComponent(rawVal);
+      } catch {
+        return rawVal;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Encrypt a GitHub Personal Access Token using AES-256-GCM (versioned v1 format)
  */
 export function encryptToken(token: string): { encryptedToken: string; iv: string } {
   const iv = crypto.randomBytes(12);
@@ -46,16 +201,18 @@ export function encryptToken(token: string): { encryptedToken: string; iv: strin
   const authTag = cipher.getAuthTag().toString('hex');
 
   return {
-    encryptedToken: `${encrypted}:${authTag}`,
+    encryptedToken: `v1:${encrypted}:${authTag}`,
     iv: iv.toString('hex')
   };
 }
 
 /**
- * Decrypt a GitHub Personal Access Token using AES-256-GCM
+ * Decrypt a GitHub Personal Access Token using AES-256-GCM (supports v1 and legacy formats)
  */
 export function decryptToken(encryptedText: string, ivHex: string): string {
-  const [encrypted, authTagHex] = encryptedText.split(':');
+  const parts = encryptedText.split(':');
+  const encrypted = parts.length === 3 && parts[0] === 'v1' ? parts[1] : parts[0];
+  const authTagHex = parts.length === 3 && parts[0] === 'v1' ? parts[2] : parts[1];
   if (!encrypted || !authTagHex) {
     throw new Error('Formato de token cifrado inválido.');
   }
@@ -87,10 +244,12 @@ export function generateConsentFingerprint(
 }
 
 /**
- * Validate that the provided token is valid and does not have dangerous write/admin permissions
+ * Validate that the provided token is valid, belongs to the expected user (if specified),
+ * and does not have dangerous write/admin permissions
  */
 export async function validateTokenScopes(
-  token: string
+  token: string,
+  expectedUsername?: string
 ): Promise<{ valid: boolean; reason?: string }> {
   try {
     // 1. Verify token validity by requesting user profile info
@@ -99,7 +258,8 @@ export async function validateTokenScopes(
         'User-Agent': 'gitcard-studio-security',
         Accept: 'application/vnd.github.v3+json',
         Authorization: `token ${token}`
-      }
+      },
+      signal: AbortSignal.timeout(8000)
     });
 
     if (!profileRes.ok) {
@@ -109,6 +269,18 @@ export async function validateTokenScopes(
       return {
         valid: false,
         reason: `GitHub API error (${profileRes.status}): ${profileRes.statusText}`
+      };
+    }
+
+    const profileData = (await profileRes.json().catch(() => null)) as { login?: string } | null;
+    if (
+      expectedUsername &&
+      profileData?.login &&
+      profileData.login.toLowerCase() !== expectedUsername.trim().toLowerCase()
+    ) {
+      return {
+        valid: false,
+        reason: `El token proporcionado pertenece a @${profileData.login} y no coincide con el usuario @${expectedUsername}.`
       };
     }
 
@@ -157,7 +329,8 @@ export async function validateTokenScopes(
         Accept: 'application/vnd.github.v3+json',
         Authorization: `token ${token}`
       },
-      body: JSON.stringify({})
+      body: JSON.stringify({}),
+      signal: AbortSignal.timeout(8000)
     });
 
     // If it responds with 422, it means the token had authorization to write, which we want to reject
@@ -194,94 +367,113 @@ export async function getDecryptedRefreshToken(tokenInfo: {
   }
 }
 
+const inFlightTokenRefreshes = new Map<string, Promise<string | undefined>>();
+
 export async function refreshGitHubAppToken(
   username: string,
   refreshToken: string,
   tokenRepo: ITokenRepository
 ): Promise<string | undefined> {
-  const clientId = process.env.GITHUB_CLIENT_ID;
-  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
-
-  if (!clientId || !clientSecret) {
-    logger.warn('Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET for refreshing token');
-    return undefined;
+  const userKey = username.trim().toLowerCase();
+  const existingRefresh = inFlightTokenRefreshes.get(userKey);
+  if (existingRefresh) {
+    return existingRefresh;
   }
 
-  try {
-    const res = await fetch('https://github.com/login/oauth/access_token', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        client_id: clientId,
-        client_secret: clientSecret,
-        grant_type: 'refresh_token',
-        refresh_token: refreshToken
-      })
-    });
+  const refreshPromise = (async (): Promise<string | undefined> => {
+    const clientId = process.env.GITHUB_CLIENT_ID;
+    const clientSecret = process.env.GITHUB_CLIENT_SECRET;
 
-    if (!res.ok) {
-      logger.error('Failed to refresh GitHub App token', { status: res.status });
+    if (!clientId || !clientSecret) {
+      logger.warn('Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET for refreshing token');
       return undefined;
     }
 
-    const data = (await res.json()) as {
-      access_token?: string;
-      expires_in?: number;
-      refresh_token?: string;
-      scope?: string;
-      error?: string;
-      error_description?: string;
-    };
+    try {
+      const res = await fetch('https://github.com/login/oauth/access_token', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          client_id: clientId,
+          client_secret: clientSecret,
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken
+        }),
+        signal: AbortSignal.timeout(10000)
+      });
 
-    if (data.error || !data.access_token) {
-      logger.warn('GitHub App token refresh response did not contain access_token', { data });
-      if (
-        data.error === 'bad_refresh_token' ||
-        data.error === 'bad_verification_code' ||
-        data.error === 'incorrect_client_credentials'
-      ) {
-        logger.warn(`Purging unrefreshable token for user ${username} due to ${data.error}`);
-        await tokenRepo.deleteToken(username).catch((err) => {
-          logger.error(`Error deleting unrefreshable token for ${username}`, { error: err });
-        });
+      if (!res.ok) {
+        logger.error('Failed to refresh GitHub App token', { status: res.status });
+        return undefined;
       }
+
+      const data = (await res.json()) as {
+        access_token?: string;
+        expires_in?: number;
+        refresh_token?: string;
+        scope?: string;
+        error?: string;
+        error_description?: string;
+      };
+
+      if (data.error || !data.access_token) {
+        logger.warn('GitHub App token refresh response did not contain access_token', {
+          error: data.error,
+          error_description: data.error_description
+        });
+        if (
+          data.error === 'bad_refresh_token' ||
+          data.error === 'bad_verification_code' ||
+          data.error === 'incorrect_client_credentials'
+        ) {
+          logger.warn(`Purging unrefreshable token for user ${username} due to ${data.error}`);
+          await tokenRepo.deleteToken(username).catch((err) => {
+            logger.error(`Error deleting unrefreshable token for ${username}`, { error: err });
+          });
+        }
+        return undefined;
+      }
+
+      const encToken = encryptToken(data.access_token);
+      let encRefresh: { encryptedToken: string; iv: string } | undefined;
+      if (data.refresh_token) {
+        encRefresh = encryptToken(data.refresh_token);
+      }
+
+      const expiresAt = data.expires_in
+        ? new Date(Date.now() + data.expires_in * 1000).toISOString()
+        : undefined;
+
+      const existingInfo = await tokenRepo.getToken(username);
+      await tokenRepo.saveToken({
+        username,
+        encryptedToken: encToken.encryptedToken,
+        iv: encToken.iv,
+        consentAccepted: existingInfo ? existingInfo.consent_accepted === 1 : true,
+        consentDate: existingInfo?.consent_date ?? new Date().toISOString(),
+        consentFingerprint: existingInfo?.consent_fingerprint ?? 'system-refresh',
+        tokenType: 'app_user',
+        encryptedRefreshToken: encRefresh?.encryptedToken,
+        refreshTokenIv: encRefresh?.iv,
+        expiresAt,
+        scopes: data.scope ?? existingInfo?.scopes
+      });
+
+      logger.info(`Refreshed GitHub App token for user ${username}`);
+      return data.access_token;
+    } catch (error) {
+      logger.error(`Error refreshing GitHub App token for user ${username}`, { error });
       return undefined;
     }
+  })().finally(() => {
+    inFlightTokenRefreshes.delete(userKey);
+  });
 
-    const encToken = encryptToken(data.access_token);
-    let encRefresh: { encryptedToken: string; iv: string } | undefined;
-    if (data.refresh_token) {
-      encRefresh = encryptToken(data.refresh_token);
-    }
-
-    const expiresAt = data.expires_in
-      ? new Date(Date.now() + data.expires_in * 1000).toISOString()
-      : undefined;
-
-    const existingInfo = await tokenRepo.getToken(username);
-    await tokenRepo.saveToken({
-      username,
-      encryptedToken: encToken.encryptedToken,
-      iv: encToken.iv,
-      consentAccepted: existingInfo ? existingInfo.consent_accepted === 1 : true,
-      consentDate: existingInfo?.consent_date ?? new Date().toISOString(),
-      consentFingerprint: existingInfo?.consent_fingerprint ?? 'system-refresh',
-      tokenType: 'app_user',
-      encryptedRefreshToken: encRefresh?.encryptedToken,
-      refreshTokenIv: encRefresh?.iv,
-      expiresAt,
-      scopes: data.scope ?? existingInfo?.scopes
-    });
-
-    logger.info(`Refreshed GitHub App token for user ${username}`);
-    return data.access_token;
-  } catch (error) {
-    logger.error(`Error refreshing GitHub App token for user ${username}`, { error });
-    return undefined;
-  }
+  inFlightTokenRefreshes.set(userKey, refreshPromise);
+  return refreshPromise;
 }
 
 export async function getDecryptedToken(

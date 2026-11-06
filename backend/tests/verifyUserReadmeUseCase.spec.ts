@@ -30,7 +30,8 @@ describe('VerifyUserReadmeUseCase', () => {
       getUniqueUsersCount: vi.fn(),
       getOrIncrementProfileViews: vi.fn(),
       getRendersHistory: vi.fn(),
-      updateUserReadmeVerification: vi.fn()
+      updateUserReadmeVerification: vi.fn(),
+      getBreakdownMetrics: vi.fn()
     };
 
     useCase = new VerifyUserReadmeUseCase(mockGitHubRepo, mockMetricsRepo);

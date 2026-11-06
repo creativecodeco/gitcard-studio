@@ -5,78 +5,68 @@
   aria-pressed="false"
   data-i18n-aria-label="theme_toggle_btn"
 >
-  <!-- Sun Icon -->
-  <svg
-    class="sun-icon"
-    viewBox="0 0 24 24"
-    width="20"
-    height="20"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    aria-hidden="true"
-  >
-    <circle cx="12" cy="12" r="5"></circle>
-    <line x1="12" y1="1" x2="12" y2="3"></line>
-    <line x1="12" y1="21" x2="12" y2="23"></line>
-    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-    <line x1="1" y1="12" x2="3" y2="12"></line>
-    <line x1="21" y1="12" x2="23" y2="12"></line>
-    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-  </svg>
-  <!-- Moon Icon -->
-  <svg
-    class="hidden moon-icon"
-    viewBox="0 0 24 24"
-    width="20"
-    height="20"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    aria-hidden="true"
-  >
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-  </svg>
+  <span class="icon-swap-slot" aria-hidden="true">
+    <!-- Sun Icon (Default in dark mode) -->
+    <svg
+      class="sun-icon icon-default"
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <!-- Moon Icon (Active in light mode) -->
+    <svg
+      class="moon-icon icon-active"
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </span>
 </button>
 
 <script>
+  import { secureStorage } from '../utils/secureStorage';
+
   const btnThemeToggle = document.getElementById('btn-theme-toggle');
-  const sunIcon = document.querySelector('.sun-icon');
-  const moonIcon = document.querySelector('.moon-icon');
 
   function initTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
+    const savedTheme = secureStorage.getLocal('theme') || 'dark';
     const isLight = savedTheme === 'light';
     btnThemeToggle?.setAttribute('aria-pressed', isLight ? 'true' : 'false');
     if (isLight) {
       document.body.classList.add('light-mode');
-      sunIcon?.classList.add('hidden');
-      moonIcon?.classList.remove('hidden');
     } else {
       document.body.classList.remove('light-mode');
-      sunIcon?.classList.remove('hidden');
-      moonIcon?.classList.add('hidden');
     }
   }
 
   btnThemeToggle?.addEventListener('click', () => {
     const isLight = document.body.classList.toggle('light-mode');
     btnThemeToggle.setAttribute('aria-pressed', isLight ? 'true' : 'false');
-    localStorage.setItem('theme', isLight ? 'light' : 'dark');
-
-    if (isLight) {
-      sunIcon?.classList.add('hidden');
-      moonIcon?.classList.remove('hidden');
-    } else {
-      sunIcon?.classList.remove('hidden');
-      moonIcon?.classList.add('hidden');
-    }
+    secureStorage.setLocal('theme', isLight ? 'light' : 'dark');
   });
 
   // Run on load

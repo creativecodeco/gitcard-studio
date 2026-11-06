@@ -2,6 +2,7 @@ import { UserStats } from '@/domain/entities/UserStats';
 import { LanguageStat } from '@/domain/entities/LanguageStat';
 import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 import { getTranslations } from './i18n';
+import { escapeXml } from '@/utils/escape';
 
 type TrophyRank = 'S' | 'A' | 'B' | 'C';
 
@@ -135,7 +136,8 @@ export function renderTrophiesCard(
 
   const cardWidth = 495;
   const cardHeight = 210;
-  const widthAttr = overrides?.cardWidth || `${cardWidth}`;
+  const widthAttr = escapeXml(overrides?.cardWidth || `${cardWidth}`);
+  const safeName = escapeXml(stats.name || stats.username);
 
   const backgroundDef = getBackgroundDef(theme, 'bg');
 
@@ -179,8 +181,8 @@ export function renderTrophiesCard(
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
-      <title>GitHub Trophies - ${stats.name}</title>
-      <desc>GitHub Trophies and achievements card for ${stats.name}</desc>
+      <title>GitHub Trophies - ${safeName}</title>
+      <desc>GitHub Trophies and achievements card for ${safeName}</desc>
       <defs>
         ${backgroundDef}
         <style>

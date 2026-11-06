@@ -4,7 +4,7 @@
 
 ---
 
-## Estado actual: 2026-10-27 (v1.20.0)
+## Estado actual: 2026-11-05 (v1.21.0)
 
 ### Stack
 
@@ -158,5 +158,5 @@ gitcard-studio/
 - **Rendimiento HTTP**: `@fastify/compress` (Brotli/Gzip) y `@fastify/etag` (304 Not Modified).
 - **Control de Tasa**: Configurado en la capa de infraestructura HTTP (`@fastify/rate-limit`).
 - **METRICS_KEY**: obligatoria — retorna `403` si no está configurada o `401` si no coincide.
-- **Tokens**: AES-256-GCM cifrados en reposo con IVs únicos por token, fingerprint de consentimiento con SHA-256.
-- **Error responses en tarjetas**: siempre `Content-Type: image/svg+xml` (SVG `renderErrorCard`) con `Cache-Control: no-cache, no-store, must-revalidate`.
+- **Tokens y Sesiones**: Tokens PAT/OAuth cifrados en reposo con AES-256-GCM versionado (`v1:encrypted:authTag`), mutex por usuario en la renovación de tokens OAuth (`inFlightTokenRefreshes`), tokens de sesión cifrados y autenticados con AES-256-GCM (`gcss_v2.<iv>.<cipher>.<authTag>`), cookie `gcs_session` (`HttpOnly; SameSite=Lax; Secure`) y almacenamiento cliente cifrado AEAD (`secureStorage.ts`) inmune a modificaciones manuales en DevTools.
+- **Error responses en tarjetas**: siempre `Content-Type: image/svg+xml` (SVG `renderErrorCard`) con `Cache-Control: no-cache, no-store, must-revalidate` y cabeceras de aislamiento CSP (`default-src 'none'; img-src data:; style-src 'unsafe-inline'`) + `X-Content-Type-Options: nosniff`.

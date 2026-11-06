@@ -28,8 +28,10 @@ const {
     <div class="skeleton-shimmer hidden" id={`${id}-shimmer`}></div>
     <img
       id={`${id}-img`}
+      src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E"
       alt={`Vista previa de ${title.toLowerCase()}`}
       class="hidden preview-img"
+      decoding="async"
       style={imgStyle}
     />
     <div class="placeholder-card" id={`${id}-placeholder`}>
@@ -49,35 +51,37 @@ const {
         id={`btn-copy-${id}`}
         aria-label={`Copiar markdown de ${codeLabel.toLowerCase()}`}
       >
-        <svg
-          class="icon-copy"
-          viewBox="0 0 24 24"
-          width="15"
-          height="15"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
-        </svg>
-        <svg
-          class="hidden icon-check"
-          viewBox="0 0 24 24"
-          width="15"
-          height="15"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
+        <span class="icon-swap-slot" aria-hidden="true">
+          <svg
+            class="icon-copy icon-default"
+            viewBox="0 0 24 24"
+            width="15"
+            height="15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+          </svg>
+          <svg
+            class="icon-check icon-active"
+            viewBox="0 0 24 24"
+            width="15"
+            height="15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </span>
         <span class="copy-text" data-i18n="copy_btn">
           Copiar
         </span>
@@ -91,7 +95,7 @@ const {
         id={`btn-download-svg-${id}`}
         title="Descargar imagen SVG vectorial"
         data-i18n-title="btn_download_svg_title"
-        style="flex: 1; height: 34px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(56,189,248,0.08); color: var(--text-primary); cursor: pointer; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;"
+        style="flex: 1; height: 34px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(56,189,248,0.08); color: var(--text-primary); cursor: pointer; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px;"
       >
         <svg
           viewBox="0 0 24 24"
@@ -114,7 +118,7 @@ const {
         id={`btn-download-png-${id}`}
         title="Descargar imagen PNG de alta resolución"
         data-i18n-title="btn_download_png_title"
-        style="flex: 1; height: 34px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(168,85,247,0.08); color: var(--text-primary); cursor: pointer; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;"
+        style="flex: 1; height: 34px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(168,85,247,0.08); color: var(--text-primary); cursor: pointer; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px;"
       >
         <svg
           viewBox="0 0 24 24"
@@ -140,6 +144,11 @@ const {
   .download-btn {
     cursor: pointer !important;
     user-select: none;
+    transition:
+      transform 150ms ease-out,
+      scale 150ms ease-out,
+      filter 150ms ease-out,
+      border-color 150ms ease-out;
   }
   .download-btn * {
     cursor: pointer !important;
@@ -150,8 +159,8 @@ const {
     transform: translateY(-1px);
     border-color: rgba(255, 255, 255, 0.25) !important;
   }
-  .download-btn:active {
-    transform: translateY(0);
+  .download-btn:active:not(:disabled) {
+    scale: 0.96;
     filter: brightness(0.95);
   }
 </style>

@@ -15,7 +15,9 @@ describe('RecordProfileViewUseCase', () => {
       getAllUserMetrics: vi.fn(),
       getUniqueUsersCount: vi.fn(),
       getOrIncrementProfileViews: vi.fn().mockResolvedValue(10),
-      getRendersHistory: vi.fn()
+      getRendersHistory: vi.fn(),
+      updateUserReadmeVerification: vi.fn(),
+      getBreakdownMetrics: vi.fn()
     };
     useCase = new RecordProfileViewUseCase(mockMetricsRepo);
   });

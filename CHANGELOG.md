@@ -2,6 +2,31 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.21.0] - 2026-11-05
+
+### 🔒 Blindaje Criptográfico Integral, Cifrado de Almacenamiento Local/Cookies y Remediación OWASP Top 10
+- **Almacenamiento Cifrado e Inmune a Modificación Manual (`Cookies`, `localStorage` y `sessionStorage`)**:
+  - Implementado [`secureStorage.ts`](frontend/src/utils/secureStorage.ts) en el frontend con **Cifrado Autenticado con Datos Asociados (AEAD: flujo CTR SHA-256 + IV aleatorio de 96 bits vía `crypto.getRandomValues` + etiqueta HMAC-SHA256 de 128 bits en tiempo constante)** (`gcs_enc_v1.<ivHex>.<cipherHex>.<macHex>`).
+  - Ninguna preferencia, usuario o clave de administración (`gh_active_user`, `registered-github-username`, `gh_session_token`, `gitcard-studio-metrics-key`, `theme`, `gitcard_privacy_accepted`, `app_locale`) se almacena en texto plano en `localStorage` ni `sessionStorage`.
+  - Guardián de integridad en tiempo real (`secureStorage.installIntegrityGuard`) que detecta y purga automáticamente cualquier valor modificado manualmente desde DevTools o copiado entre claves (`AAD` vinculado a ámbito, origen y nombre de clave), así como sesiones huérfanas.
+  - Actualizado [`generateOAuthSessionToken`](backend/src/infrastructure/security/security.ts) y [`decryptOAuthSessionToken`](backend/src/infrastructure/security/security.ts) para emitir tokens de sesión cifrados y autenticados en el servidor con **AES-256-GCM** (`gcss_v2.<iv>.<cipher>.<authTag>`) junto con una cookie de sesión **`gcs_session` (`HttpOnly; SameSite=Lax; Secure`)** en los flujos de GitHub App OAuth y registro PAT.
+- **Control de Acceso Estricto (OWASP A01 — Prevención de IDOR, CSRF y Suplantación de Cuenta)**:
+  - Remediada vulnerabilidad IDOR en `POST /api/users/export` (`TokensController.exportData`) exigiendo verificación criptográfica de propiedad de la cuenta.
+  - Verificación de coincidencia de propietario (`profileData.login === expectedUsername`) en `validateTokenScopes` para impedir envenenamiento de cuentas ajenas al registrar un PAT.
+  - Protección CSRF con parámetro `state` criptográfico en el flujo OAuth de GitHub App (`GET /api/auth/github` y `/api/auth/github/callback`).
+  - Restringidos `GET /api/users/repos` y `GET /api/users/me/metrics` para que `connected: true`, metadatos de token y repositorios privados/de organización solo se devuelvan cuando el solicitante presenta una sesión cifrada o PAT válido perteneciente al propietario (`isAuthorizedOwner`).
+  - Eliminado el envío de `METRICS_KEY` por query string (`?key=...`) en el panel `/admin/metrics`, transmitiéndose exclusivamente mediante la cabecera HTTP `x-api-key`.
+- **Seguridad Criptográfica, Sanitización XSS/SVG y Prevención de SSRF/DoS (OWASP A02, A03, A05, A10)**:
+  - Cifrado AES-256-GCM versionado (`v1:encrypted:authTag`) con retrocompatibilidad y validación obligatoria de `ENCRYPTION_KEY` (mínimo 32 caracteres) y `GITHUB_WEBHOOK_SECRET` en producción, más verificación HMAC de webhooks sobre `req.rawBody` en tiempo constante.
+  - Sanitización estricta de fuentes (`getFontFamily` whitelist), colores (`sanitizeColor`), atributos `width` y etiquetas `<title>`/`<desc>` en `rankCard.ts`, `trophiesCard.ts`, `repoCard.ts`, `languagesCard.ts` y `topReposCard.ts`.
+  - Añadidas cabeceras de seguridad `Content-Security-Policy: default-src 'none'; img-src data:; style-src 'unsafe-inline'` y `X-Content-Type-Options: nosniff` en todas las respuestas SVG de `CardsController`.
+  - Validación anti-SSRF (`validateAvatarUrl`), bloqueo de redirecciones (`redirect: 'error'`), validación de MIME `image/*` y límite de 5 MB en `avatar.ts`.
+  - Límite de entrada SVG (512 KB) y caché LRU acotada por SHA-256 en el conversor PNG (`imageConverter.ts`), además de *rate-limiting* escalonado en `main.ts` (`30 req/min` en rutas sensibles y `300 req/min` en tarjetas).
+- **Resiliencia en Renovación de Tokens OAuth, Persistencia de Métricas y Calidad de Código**:
+  - Implementado mutex por usuario (`inFlightTokenRefreshes`) en `refreshGitHubAppToken` (`security.ts`) para evitar condiciones de carrera cuando múltiples tarjetas solicitan simultáneamente la renovación de un `refresh_token` de un solo uso.
+  - Añadidas las columnas `tech_stack_web` y `tech_stack_github` en `UserMetric.ts` y migración automática en `database.ts`, eliminando los ternarios anidados en `TypeORMMetricsRepository.ts` y `webhooks.controller.ts`.
+  - Optimizada la carga inicial de tarjetas en `CardPreview.astro` e `index.astro` para evitar bloqueos del overlay `#global-loading` en imágenes con `display: none`.
+
 ## [1.20.0] - 2026-10-27
 
 ### ✨ Nuevas Características
@@ -779,4 +804,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.20.0
+**Versión actualmente expuesta / en producción:** v1.21.0

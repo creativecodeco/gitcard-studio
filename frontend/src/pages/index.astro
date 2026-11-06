@@ -249,7 +249,7 @@ import Footer from '@/components/Footer.astro';
               height="48"
               fill="none"
               stroke="currentColor"
-              stroke-width="2.5"
+              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
             >
@@ -271,10 +271,11 @@ import Footer from '@/components/Footer.astro';
               width="48"
               height="48"
               fill="none"
-              stroke="#38bdf8"
+              stroke="currentColor"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              style="color: #38bdf8;"
             >
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
               <circle cx="12" cy="12" r="3"></circle>
@@ -392,10 +393,11 @@ import Footer from '@/components/Footer.astro';
               width="48"
               height="48"
               fill="none"
-              stroke="#ea4aaa"
+              stroke="currentColor"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              style="color: #ea4aaa;"
             >
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
@@ -415,10 +417,11 @@ import Footer from '@/components/Footer.astro';
               width="48"
               height="48"
               fill="none"
-              stroke="#4ade80"
+              stroke="currentColor"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              style="color: #4ade80;"
             >
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="3" y1="9" x2="21" y2="9"></line>
@@ -442,10 +445,11 @@ import Footer from '@/components/Footer.astro';
               width="48"
               height="48"
               fill="none"
-              stroke="#ff7edb"
+              stroke="currentColor"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              style="color: #ff7edb;"
             >
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
@@ -466,10 +470,11 @@ import Footer from '@/components/Footer.astro';
               width="48"
               height="48"
               fill="none"
-              stroke="#38bdf8"
+              stroke="currentColor"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              style="color: #38bdf8;"
             >
               <line x1="12" y1="20" x2="12" y2="10"></line>
               <line x1="18" y1="20" x2="18" y2="4"></line>
@@ -491,10 +496,11 @@ import Footer from '@/components/Footer.astro';
               width="48"
               height="48"
               fill="none"
-              stroke="#a855f7"
+              stroke="currentColor"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              style="color: #a855f7;"
             >
               <polyline points="16 18 22 12 16 6"></polyline>
               <polyline points="8 6 2 12 8 18"></polyline>
@@ -520,12 +526,16 @@ import Footer from '@/components/Footer.astro';
   } from '@/utils/readmeGenerator';
   import { buildCardUrls } from '@/utils/cardUrls';
   import { t, updateDomTranslations } from '@/utils/i18n';
+  import { secureStorage } from '@/utils/secureStorage';
+
+  const EMPTY_IMG_SRC =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 
   // Elements
   const usernameInput = document.getElementById('username-input') as HTMLInputElement | null;
   const repoInput = document.getElementById('repo-input') as HTMLInputElement | null;
   const repoInputAuth = document.getElementById('repo-input-auth') as HTMLInputElement | null;
-  const themesContainer = document.getElementById('themes-container');
+  const themesGroup = document.querySelector('.themes-group');
 
   repoInput?.addEventListener('input', () => {
     if (repoInputAuth && repoInputAuth.value !== repoInput.value) {
@@ -796,33 +806,33 @@ import Footer from '@/components/Footer.astro';
   // --- Toggle Expand / Collapse Themes ---
   const btnToggleThemes = document.getElementById('btn-toggle-themes');
   const btnToggleThemesText = document.getElementById('btn-toggle-themes-text');
-  const btnToggleThemesIcon = document.getElementById('btn-toggle-themes-icon');
+  const themesExtraAccordion = document.getElementById('themes-extra-accordion');
   let isThemesExpanded = false;
 
-  btnToggleThemes?.addEventListener('click', () => {
-    isThemesExpanded = !isThemesExpanded;
+  function setThemesExpanded(expanded: boolean) {
+    isThemesExpanded = expanded;
     const extraThemes = document.querySelectorAll('.theme-extra');
 
-    extraThemes.forEach((el) => {
-      if (isThemesExpanded) {
-        el.classList.remove('hidden');
-      } else {
-        el.classList.add('hidden');
-      }
-    });
-
+    if (themesExtraAccordion) {
+      themesExtraAccordion.classList.toggle('is-open', isThemesExpanded);
+      themesExtraAccordion.setAttribute('aria-hidden', String(!isThemesExpanded));
+    }
+    if (btnToggleThemes) {
+      btnToggleThemes.setAttribute('aria-expanded', String(isThemesExpanded));
+    }
     if (btnToggleThemesText) {
       btnToggleThemesText.textContent = isThemesExpanded
         ? t('btn_show_less', currentLocale)
         : t('btn_show_more', currentLocale, { count: String(extraThemes.length) });
     }
-    if (btnToggleThemesIcon) {
-      btnToggleThemesIcon.style.transform = isThemesExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
+  }
+
+  btnToggleThemes?.addEventListener('click', () => {
+    setThemesExpanded(!isThemesExpanded);
   });
 
   // --- SVG Themes Selection logic ---
-  themesContainer?.addEventListener('click', (e) => {
+  themesGroup?.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
     const option = target.closest('.theme-option') as HTMLButtonElement | null;
     if (!option) return;
@@ -901,6 +911,23 @@ import Footer from '@/components/Footer.astro';
     }
   });
 
+  function triggerInputShake(inputEl: HTMLElement | null) {
+    if (!inputEl) return;
+    const wrapper = inputEl.closest('.input-wrapper') as HTMLElement | null;
+    if (!wrapper) return;
+    wrapper.classList.remove('is-shaking');
+    void wrapper.offsetWidth;
+    wrapper.classList.add('is-error', 'is-shaking');
+    const clearError = () => {
+      wrapper.classList.remove('is-error', 'is-shaking');
+      inputEl.removeEventListener('input', clearError);
+    };
+    inputEl.addEventListener('input', clearError);
+    setTimeout(() => {
+      wrapper.classList.remove('is-shaking');
+    }, 450);
+  }
+
   function submitUsername(forceRefresh = false) {
     const uInput =
       (document.getElementById('username-input') as HTMLInputElement | null) || usernameInput;
@@ -910,6 +937,7 @@ import Footer from '@/components/Footer.astro';
 
     const usernameVal = uInput?.value.trim() || currentUsername;
     if (!usernameVal) {
+      triggerInputShake(uInput);
       if (uInput) uInput.focus();
       return;
     }
@@ -940,7 +968,18 @@ import Footer from '@/components/Footer.astro';
     updateCards(forceRefresh);
 
     // Populate user repositories datalist in the background for autocomplete
-    fetch(`/api/users/repos?username=${encodeURIComponent(currentUsername)}`)
+    const repoAuthToken =
+      secureStorage.getSession('gh_session_token') ||
+      secureStorage.getLocal('gh_session_token') ||
+      secureStorage.getLocal('registered-github-token') ||
+      secureStorage.getLocal('gh_token');
+    const repoHeaders: Record<string, string> = {};
+    if (repoAuthToken) {
+      repoHeaders['Authorization'] = `Bearer ${repoAuthToken}`;
+    }
+    fetch(`/api/users/repos?username=${encodeURIComponent(currentUsername)}`, {
+      headers: repoHeaders
+    })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         const datalist = document.getElementById('user-repos-datalist');
@@ -1265,10 +1304,12 @@ import Footer from '@/components/Footer.astro';
     if (!isGeneratingAllCards) return;
 
     completedImagesCount++;
+    if (completedImagesCount >= 1 && globalLoading) {
+      globalLoading.classList.add('hidden');
+    }
+    updateSampleReadmeText();
+
     if (completedImagesCount >= totalImagesToLoad) {
-      if (globalLoading) {
-        globalLoading.classList.add('hidden');
-      }
       sortCardsByStatus();
       updateSampleReadmeText();
       isGeneratingAllCards = false;
@@ -1309,7 +1350,7 @@ import Footer from '@/components/Footer.astro';
     imgs.forEach((img) => {
       if (img) {
         img.classList.add('hidden');
-        img.removeAttribute('src');
+        img.src = EMPTY_IMG_SRC;
       }
     });
 
@@ -1331,7 +1372,7 @@ import Footer from '@/components/Footer.astro';
     ];
     placeholders.forEach((ph) => {
       if (ph) {
-        ph.classList.remove('hidden');
+        ph.classList.remove('hidden', 'is-loading');
         const shimmer = ph.closest('.card-preview-wrapper')?.querySelector('.skeleton-shimmer');
         if (shimmer) shimmer.classList.add('hidden');
 
@@ -1393,10 +1434,15 @@ import Footer from '@/components/Footer.astro';
           text.includes('especificado no existe')
         ) {
           handleUserNotFound(checkUsername);
+        } else if (globalLoading) {
+          globalLoading.classList.add('hidden');
         }
       })
       .catch((err) => {
         if (err.name === 'AbortError') return;
+        if (globalLoading) {
+          globalLoading.classList.add('hidden');
+        }
       });
 
     const cardUrls = buildCardUrls({
@@ -1643,6 +1689,7 @@ import Footer from '@/components/Footer.astro';
 
     imgElement.classList.add('hidden');
     placeholderElement.classList.remove('hidden');
+    placeholderElement.classList.add('is-loading');
 
     const wrapper = imgElement.closest('.card-preview-wrapper');
     const shimmer = wrapper?.querySelector('.skeleton-shimmer');
@@ -1709,6 +1756,8 @@ import Footer from '@/components/Footer.astro';
     if (!imgElement || !placeholderElement) return;
 
     imgElement.addEventListener('load', () => {
+      if (imgElement.src === EMPTY_IMG_SRC) return;
+      placeholderElement.classList.remove('is-loading');
       placeholderElement.classList.add('hidden');
       imgElement.classList.remove('hidden');
 
@@ -1724,6 +1773,7 @@ import Footer from '@/components/Footer.astro';
     });
 
     imgElement.addEventListener('error', () => {
+      placeholderElement.classList.remove('is-loading');
       if (imgElement === statsImg && !userNotFoundHandled && currentUsername) {
         handleUserNotFound(currentUsername);
         return;
@@ -1783,6 +1833,7 @@ import Footer from '@/components/Footer.astro';
   const btnCopyCommitActivity = document.getElementById('btn-copy-commit-activity');
   const btnCopyTodayStatus = document.getElementById('btn-copy-today-status');
   const btnCopyTimelineMatrix = document.getElementById('btn-copy-timeline-matrix');
+  const btnCopyTechStack = document.getElementById('btn-copy-tech-stack');
 
   setupCopyButton(btnCopyStats, markdownStatsCode);
   setupCopyButton(btnCopyLanguages, markdownLanguagesCode);
@@ -1797,6 +1848,7 @@ import Footer from '@/components/Footer.astro';
   setupCopyButton(btnCopyTodayStatus, markdownTodayStatusCode);
   setupCopyButton(btnCopyTimelineMatrix, markdownTimelineMatrixCode);
   setupCopyButton(btnCopyViews, markdownViewsCode);
+  setupCopyButton(btnCopyTechStack, markdownTechStackCode);
 
   // Setup Sample README.md copy button
   const btnCopySampleReadme = document.getElementById('btn-copy-sample-readme');
@@ -1914,7 +1966,7 @@ import Footer from '@/components/Footer.astro';
   }
 
   // Load and show initial token state
-  const storedRegUser = localStorage.getItem('registered-github-username');
+  const storedRegUser = secureStorage.getLocal('registered-github-username');
   if (storedRegUser) {
     showRegisteredState();
     if (usernameInput) {
@@ -1972,12 +2024,13 @@ import Footer from '@/components/Footer.astro';
       commitActivityImg,
       todayStatusImg,
       timelineMatrixImg,
-      viewsImg
+      viewsImg,
+      techStackImg
     ];
     imgs.forEach((img) => {
       if (img) {
         img.classList.add('hidden');
-        img.removeAttribute('src');
+        img.src = EMPTY_IMG_SRC;
         img.alt = '';
       }
     });
@@ -1995,11 +2048,12 @@ import Footer from '@/components/Footer.astro';
       commitActivityPlaceholder,
       todayStatusPlaceholder,
       timelineMatrixPlaceholder,
-      viewsPlaceholder
+      viewsPlaceholder,
+      techStackPlaceholder
     ];
     placeholders.forEach((ph) => {
       if (ph) {
-        ph.classList.remove('hidden');
+        ph.classList.remove('hidden', 'is-loading');
         const pulseIcon = ph.querySelector('.pulse-icon');
         const pText = ph.querySelector('p');
         if (pulseIcon) {
@@ -2026,7 +2080,8 @@ import Footer from '@/components/Footer.astro';
       markdownCommitActivityCode,
       markdownTodayStatusCode,
       markdownTimelineMatrixCode,
-      markdownViewsCode
+      markdownViewsCode,
+      markdownTechStackCode
     ];
     markdownCodes.forEach((mc) => {
       if (mc) mc.textContent = '';
@@ -2060,10 +2115,12 @@ import Footer from '@/components/Footer.astro';
     const consentAccepted = tokenConsent.checked;
 
     if (!username) {
+      triggerInputShake(tokenUsername);
       showStatus(t('msg_enter_username', currentLocale), 'error');
       return;
     }
     if (!token) {
+      triggerInputShake(tokenInput);
       showStatus(t('msg_enter_token', currentLocale), 'error');
       return;
     }
@@ -2082,8 +2139,12 @@ import Footer from '@/components/Footer.astro';
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('registered-github-username', username);
-        localStorage.setItem('gh_active_user', username);
+        if (data && typeof data.sessionToken === 'string') {
+          secureStorage.setLocal('gh_session_token', data.sessionToken);
+          secureStorage.setSession('gh_session_token', data.sessionToken);
+        }
+        secureStorage.setLocal('registered-github-username', username);
+        secureStorage.setLocal('gh_active_user', username);
         showRegisteredState();
         showStatus(data.message, 'success');
         window.dispatchEvent(new CustomEvent('app:pat-registered', { detail: { username } }));
@@ -2108,14 +2169,16 @@ import Footer from '@/components/Footer.astro';
     if (!tokenUsername || !tokenRevokeInput || !globalLoading) return;
     hideStatus();
     const username =
-      localStorage.getItem('registered-github-username') || tokenUsername.value.trim();
+      secureStorage.getLocal('registered-github-username') || tokenUsername.value.trim();
     const token = tokenRevokeInput.value.trim();
 
     if (!username) {
+      triggerInputShake(tokenUsername);
       showStatus(t('msg_no_registered_user', currentLocale), 'error');
       return;
     }
     if (!token) {
+      triggerInputShake(tokenRevokeInput);
       showStatus(t('msg_token_required_revoke', currentLocale), 'error');
       return;
     }
@@ -2133,7 +2196,10 @@ import Footer from '@/components/Footer.astro';
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.removeItem('registered-github-username');
+        secureStorage.removeLocal('registered-github-username');
+        secureStorage.removeLocal('gh_active_user');
+        secureStorage.removeLocal('gh_session_token');
+        secureStorage.removeSession('gh_session_token');
         showUnregisteredState();
         showStatus(data.message, 'success');
         resetAppUI();
@@ -2159,6 +2225,8 @@ import Footer from '@/components/Footer.astro';
   btnOpenPurgeModal?.addEventListener('click', () => {
     if (purgeModal) {
       purgeModal.classList.remove('hidden');
+      purgeModal.classList.add('is-open');
+      purgeModal.setAttribute('aria-hidden', 'false');
     }
     if (purgeUsername) purgeUsername.value = '';
     if (purgeToken) purgeToken.value = '';
@@ -2167,7 +2235,8 @@ import Footer from '@/components/Footer.astro';
 
   btnClosePurge?.addEventListener('click', () => {
     if (purgeModal) {
-      purgeModal.classList.add('hidden');
+      purgeModal.classList.remove('is-open');
+      purgeModal.setAttribute('aria-hidden', 'true');
     }
   });
 
@@ -2208,9 +2277,13 @@ import Footer from '@/components/Footer.astro';
       const data = await response.json();
       if (response.ok) {
         if (purgeModal) {
-          purgeModal.classList.add('hidden');
+          purgeModal.classList.remove('is-open');
+          purgeModal.setAttribute('aria-hidden', 'true');
         }
-        localStorage.removeItem('registered-github-username');
+        secureStorage.removeLocal('registered-github-username');
+        secureStorage.removeLocal('gh_active_user');
+        secureStorage.removeLocal('gh_session_token');
+        secureStorage.removeSession('gh_session_token');
         showUnregisteredState();
         showStatus(data.message, 'success');
         resetAppUI();
@@ -2299,18 +2372,12 @@ import Footer from '@/components/Footer.astro';
       try {
         await navigator.clipboard.writeText(codeText);
         button.classList.add('copied');
-        const iconCopy = button.querySelector('.icon-copy');
-        const iconCheck = button.querySelector('.icon-check');
         const copyTextSpan = button.querySelector('.copy-text');
 
-        if (iconCopy) iconCopy.classList.add('hidden');
-        if (iconCheck) iconCheck.classList.remove('hidden');
         if (copyTextSpan) copyTextSpan.textContent = '¡Copiado!';
 
         setTimeout(() => {
           button.classList.remove('copied');
-          if (iconCopy) iconCopy.classList.remove('hidden');
-          if (iconCheck) iconCheck.classList.add('hidden');
           if (copyTextSpan) copyTextSpan.textContent = t('copy_btn', currentLocale) || 'Copiar';
         }, 2000);
 
@@ -2387,8 +2454,8 @@ import Footer from '@/components/Footer.astro';
 
     const userParam =
       urlParams.get('user') ||
-      localStorage.getItem('gh_active_user') ||
-      localStorage.getItem('registered-github-username');
+      secureStorage.getLocal('gh_active_user') ||
+      secureStorage.getLocal('registered-github-username');
     const themeParam = urlParams.get('theme');
 
     if (themeParam) {
@@ -2397,6 +2464,9 @@ import Footer from '@/components/Footer.astro';
       if (option) {
         themeOptions.forEach((opt) => opt.classList.remove('active'));
         option.classList.add('active');
+        if (option.classList.contains('theme-extra')) {
+          setThemesExpanded(true);
+        }
       }
     }
 

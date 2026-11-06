@@ -1,6 +1,6 @@
 import { RepoStats } from '@/domain/entities/RepoStats';
 import { escapeXml, minifySvg } from '@/utils/escape';
-import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
+import { getTheme, getBackgroundDef, renderBrandHeader, sanitizeColor } from './theme';
 
 const ICONS = {
   repo: `<path d="M3 2.75A2.75 2.75 0 0 1 5.75 0h14.5a.75.75 0 0 1 .75.75v20.5a.75.75 0 0 1-.75.75h-6a.75.75 0 0 1 0-1.5h5.25v-4H5.75A2.75 2.75 0 0 1 3 14.25v-11.5zm1.5 0v11.5c0 .69.56 1.25 1.25 1.25H20v-9.5H5.75a2.75 2.75 0 0 1-2.75-2.75c0-.69.56-1.25 1.25-1.25h12.75a.75.75 0 0 1 0 1.5H4.5z"/>`,
@@ -36,12 +36,13 @@ export function renderRepoCard(
   const theme = getTheme(themeName, overrides);
   const cardWidth = 495;
   const cardHeight = 195;
-  const widthAttr = overrides?.cardWidth || `${cardWidth}`;
+  const widthAttr = escapeXml(overrides?.cardWidth || `${cardWidth}`);
 
   // Escape dynamic text properties
   const safeName = escapeXml(repo.name);
   const safeOwner = escapeXml(repo.owner);
   const safeLanguage = escapeXml(repo.language || '');
+  const safeLanguageColor = sanitizeColor(repo.languageColor) || theme.accent;
   const safeLicense = escapeXml(repo.license || '');
   const safeDescription = escapeXml(repo.description || '');
 
@@ -56,8 +57,8 @@ export function renderRepoCard(
 
   return minifySvg(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${widthAttr}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
-      <title>${repo.name} - GitHub Repository</title>
-      <desc>Featured repository card for ${repo.name}</desc>
+      <title>${safeName} - GitHub Repository</title>
+      <desc>Featured repository card for ${safeName}</desc>
       <defs>
         ${backgroundDef}
         <style>
@@ -94,7 +95,7 @@ export function renderRepoCard(
       <g transform="translate(25, 158)">
         <!-- Language -->
         <g transform="translate(0, 0)">
-          <circle cx="6" cy="6" r="5" fill="${repo.languageColor}" />
+          <circle cx="6" cy="6" r="5" fill="${safeLanguageColor}" />
           <text x="16" y="10" class="label">${safeLanguage}</text>
         </g>
 

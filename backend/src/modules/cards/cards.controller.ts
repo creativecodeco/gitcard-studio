@@ -31,8 +31,17 @@ import { escapeXml } from '@/utils/escape';
 
 import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
 
+const SVG_CSP_HEADER = "default-src 'none'; img-src data:; style-src 'unsafe-inline'";
+
 @Controller('api')
 export class CardsController {
+  private applySvgSecurityHeaders(res: FastifyReply): FastifyReply {
+    return res
+      .header('Content-Type', 'image/svg+xml; charset=utf-8')
+      .header('X-Content-Type-Options', 'nosniff')
+      .header('Content-Security-Policy', SVG_CSP_HEADER);
+  }
+
   constructor(
     @Inject(GetUserStatsCardUseCase) private readonly statsCardUseCase: GetUserStatsCardUseCase,
     @Inject(GetUserLanguagesCardUseCase)
@@ -78,8 +87,7 @@ export class CardsController {
     ) => Promise<string>,
     noCache: boolean = false
   ): Promise<string> {
-    res.header('Content-Type', 'image/svg+xml; charset=utf-8');
-    res.header('X-Content-Type-Options', 'nosniff');
+    this.applySvgSecurityHeaders(res);
     const username = query.username;
     const theme = query.theme;
 
@@ -137,9 +145,7 @@ export class CardsController {
       const svg = await executeUseCase(username, theme as string, overrides, hitContext);
 
       if (noCache) {
-        res
-          .header('Content-Type', 'image/svg+xml; charset=utf-8')
-          .header('X-Content-Type-Options', 'nosniff')
+        this.applySvgSecurityHeaders(res)
           .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
           .header('Pragma', 'no-cache')
           .header('Expires', '0')
@@ -151,11 +157,7 @@ export class CardsController {
         ? 'no-cache, no-store, must-revalidate'
         : 'public, max-age=7200';
 
-      res
-        .header('Content-Type', 'image/svg+xml; charset=utf-8')
-        .header('X-Content-Type-Options', 'nosniff')
-        .header('Cache-Control', cacheHeader)
-        .status(200);
+      this.applySvgSecurityHeaders(res).header('Cache-Control', cacheHeader).status(200);
       return svg;
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al obtener datos';
@@ -164,9 +166,7 @@ export class CardsController {
         username,
         error
       });
-      res
-        .header('Content-Type', 'image/svg+xml; charset=utf-8')
-        .header('X-Content-Type-Options', 'nosniff')
+      this.applySvgSecurityHeaders(res)
         .header(
           'Cache-Control',
           noCache
@@ -327,9 +327,7 @@ export class CardsController {
 
       const svg = renderViewsBadge(viewsCount, cleanLabel, cleanColor, cleanTheme, cleanStyle);
 
-      res
-        .header('Content-Type', 'image/svg+xml; charset=utf-8')
-        .header('X-Content-Type-Options', 'nosniff')
+      this.applySvgSecurityHeaders(res)
         .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
         .header('Pragma', 'no-cache')
         .header('Expires', '0')
@@ -339,9 +337,7 @@ export class CardsController {
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al obtener visitas';
       logger.error(`Error in getProfileViews for user ${username}`, { username, error });
-      res
-        .header('Content-Type', 'image/svg+xml; charset=utf-8')
-        .header('X-Content-Type-Options', 'nosniff')
+      this.applySvgSecurityHeaders(res)
         .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
         .status(500);
       return renderErrorCard(message);
@@ -565,9 +561,7 @@ export class CardsController {
       const safeLabel = escapeXml(label);
       const safeValue = escapeXml(value);
 
-      res
-        .header('Content-Type', 'image/svg+xml; charset=utf-8')
-        .header('X-Content-Type-Options', 'nosniff')
+      this.applySvgSecurityHeaders(res)
         .header('Cache-Control', 'public, max-age=3600, s-maxage=3600')
         .status(200);
 
@@ -575,9 +569,7 @@ export class CardsController {
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al obtener insignia';
       logger.error(`Error in getBadge for user ${username}: ${message}`, { username, error });
-      res
-        .header('Content-Type', 'image/svg+xml; charset=utf-8')
-        .header('X-Content-Type-Options', 'nosniff')
+      this.applySvgSecurityHeaders(res)
         .header('Cache-Control', 'no-cache, no-store, must-revalidate')
         .status(500);
       return renderBadgeSVG({ label: 'gitcard studio', value: 'error', valueColor: '#ef4444' });

@@ -20,7 +20,7 @@
     <a
       href="/help/github-profile"
       class="help-link-btn"
-      style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent-color); font-size: 0.82rem; font-weight: 600; text-decoration: none; padding: 8px 14px; border-radius: 8px; background: rgba(56,189,248,0.08); border: 1px solid var(--glass-border); transition: all 0.2s;"
+      style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent-color); font-size: 0.82rem; font-weight: 600; text-decoration: none; padding: 8px 14px 8px 12px; border-radius: 8px; background: rgba(56,189,248,0.08); border: 1px solid var(--glass-border); transition: background-color 150ms ease-out, border-color 150ms ease-out, scale 150ms ease-out;"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -45,7 +45,7 @@
   <!-- Layout Controls & View Mode Tabs -->
   <div
     class="readme-controls-bar"
-    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--glass-border);"
+    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 12px; border: 1px solid var(--glass-border);"
   >
     <!-- Layout Selector -->
     <div style="display: flex; align-items: center; gap: 6px;">
@@ -59,37 +59,20 @@
         id="btn-readme-layout-vertical"
         class="readme-layout-btn active"
         data-layout="vertical"
-        style="padding: 4px 10px; border-radius: 6px; border: 1px solid var(--glass-border); cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.2s;"
       >
         📱 <span data-i18n="readme_layout_vertical">Vertical</span>
       </button>
-      <button
-        id="btn-readme-layout-grid"
-        class="readme-layout-btn"
-        data-layout="grid"
-        style="padding: 4px 10px; border-radius: 6px; border: 1px solid var(--glass-border); cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.2s;"
-      >
+      <button id="btn-readme-layout-grid" class="readme-layout-btn" data-layout="grid">
         📊 <span data-i18n="readme_layout_grid">Tabla (2 Col)</span>
       </button>
     </div>
 
     <!-- View Mode Tabs (Code vs Live Preview) -->
-    <div
-      class="readme-tabs-wrapper"
-      style="display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.3); padding: 3px; border-radius: 8px; border: 1px solid var(--glass-border);"
-    >
-      <button
-        id="tab-readme-code"
-        class="readme-tab-btn active"
-        style="padding: 4px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.78rem; font-weight: 700; transition: all 0.2s;"
-      >
+    <div class="readme-tabs-wrapper">
+      <button id="tab-readme-code" class="readme-tab-btn active">
         📝 <span data-i18n="tab_readme_code">Código Markdown</span>
       </button>
-      <button
-        id="tab-readme-preview"
-        class="readme-tab-btn"
-        style="padding: 4px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.2s;"
-      >
+      <button id="tab-readme-preview" class="readme-tab-btn">
         👁️ <span data-i18n="tab_readme_preview">Vista Previa Live</span>
       </button>
     </div>

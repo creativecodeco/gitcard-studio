@@ -63,7 +63,10 @@ export class ApiGitHubRepository implements IGitHubRepository {
       throw new Error('Forbidden URL target: Only GitHub API requests are allowed.');
     }
     const mergedHeaders = { ...this.getHeaders(userToken), ...extraHeaders };
-    let response = await fetch(url, { headers: mergedHeaders });
+    const response = await fetch(url, {
+      headers: mergedHeaders,
+      signal: AbortSignal.timeout(20000)
+    });
 
     if (response.status === 401 && (userToken || process.env.GITHUB_TOKEN)) {
       if (parsedUrl.pathname !== '/user/repos') {
@@ -72,7 +75,10 @@ export class ApiGitHubRepository implements IGitHubRepository {
           Accept: 'application/vnd.github.v3+json',
           ...extraHeaders
         };
-        const retryResponse = await fetch(url, { headers: publicHeaders });
+        const retryResponse = await fetch(url, {
+          headers: publicHeaders,
+          signal: AbortSignal.timeout(20000)
+        });
         if (retryResponse.ok) {
           return retryResponse.json();
         }
@@ -174,7 +180,8 @@ export class ApiGitHubRepository implements IGitHubRepository {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ query, variables })
+        body: JSON.stringify({ query, variables }),
+        signal: AbortSignal.timeout(20000)
       });
 
       if (
@@ -190,7 +197,8 @@ export class ApiGitHubRepository implements IGitHubRepository {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
           },
-          body: JSON.stringify({ query, variables })
+          body: JSON.stringify({ query, variables }),
+          signal: AbortSignal.timeout(20000)
         });
       }
 
@@ -1029,7 +1037,8 @@ export class ApiGitHubRepository implements IGitHubRepository {
       headers: {
         'User-Agent': 'gitcard-studio-stats',
         Accept: 'text/html'
-      }
+      },
+      signal: AbortSignal.timeout(8000)
     });
 
     if (!response.ok) {

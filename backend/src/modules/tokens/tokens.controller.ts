@@ -9,8 +9,10 @@ import {
   InternalServerErrorException,
   Ip,
   Post,
+  Res,
   UnauthorizedException
 } from '@nestjs/common';
+import { FastifyReply } from 'fastify';
 import { RegisterUserTokenUseCase } from '@/use-cases/tokens/RegisterUserTokenUseCase';
 import { RevokeUserTokenUseCase } from '@/use-cases/tokens/RevokeUserTokenUseCase';
 import { PurgeUserDataUseCase } from '@/use-cases/users/PurgeUserDataUseCase';
@@ -19,16 +21,23 @@ import {
   UserDataExportResult
 } from '@/use-cases/users/ExportUserDataUseCase';
 import { logger } from '@/infrastructure/logging/logger';
+import {
+  buildClearSessionCookieHeader,
+  buildSessionCookieHeader,
+  extractSessionTokenFromCookie,
+  verifyOAuthSessionToken
+} from '@/infrastructure/security/security';
 import { escapeXml } from '@/utils/escape';
 import { getMessages, resolveLocale } from '@/infrastructure/i18n/backendI18n';
 import { RegisterTokenDto, RevokeTokenDto, PurgeUserDto, ExportUserDto } from './dto/tokens.dto';
-
-import { getDecryptedToken } from '@/infrastructure/security/security';
-import { ITokenRepository } from '@/domain/repositories/ITokenRepository';
 import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
 
-export function extractBearerToken(authHeader?: string, bodyToken?: string): string | undefined {
-  const raw = authHeader ?? bodyToken;
+export function extractBearerToken(
+  authHeader?: string,
+  bodyToken?: string,
+  cookieHeader?: string
+): string | undefined {
+  const raw = authHeader ?? bodyToken ?? extractSessionTokenFromCookie(cookieHeader);
   if (typeof raw !== 'string') return undefined;
   if (raw.startsWith('Bearer ')) return raw.slice(7);
   if (raw.startsWith('token ')) return raw.slice(6);
@@ -42,8 +51,7 @@ export class TokensController {
     @Inject(RevokeUserTokenUseCase) private readonly revokeUseCase: RevokeUserTokenUseCase,
     @Inject(PurgeUserDataUseCase) private readonly purgeUseCase: PurgeUserDataUseCase,
     @Inject(ExportUserDataUseCase) private readonly exportUseCase: ExportUserDataUseCase,
-    @Inject('IGitHubRepository') private readonly githubRepo: IGitHubRepository,
-    @Inject('ITokenRepository') private readonly tokenRepo: ITokenRepository
+    @Inject('IGitHubRepository') private readonly githubRepo: IGitHubRepository
   ) {}
 
   @Post('tokens/register')
@@ -51,7 +59,8 @@ export class TokensController {
     @Body() dto: RegisterTokenDto,
     @Headers('authorization') _authHeader?: string,
     @Headers('user-agent') userAgent?: string,
-    @Ip() clientIp?: string
+    @Ip() clientIp?: string,
+    @Res({ passthrough: true }) reply?: FastifyReply
   ): Promise<Record<string, unknown>> {
     const m = getMessages(resolveLocale(dto.locale));
 
@@ -71,6 +80,9 @@ export class TokensController {
         ip,
         agent
       );
+      if (result && typeof result.sessionToken === 'string') {
+        reply?.header('Set-Cookie', buildSessionCookieHeader(result.sessionToken));
+      }
       await this.githubRepo.clearCache(dto.username);
       logger.info(`Token registered successfully for user ${dto.username}`, {
         username: dto.username
@@ -88,10 +100,12 @@ export class TokensController {
   @Delete('tokens/revoke')
   async revoke(
     @Body() dto: RevokeTokenDto,
-    @Headers('authorization') authHeader?: string
+    @Headers('authorization') authHeader?: string,
+    @Headers('cookie') cookieHeader?: string,
+    @Res({ passthrough: true }) reply?: FastifyReply
   ): Promise<Record<string, unknown>> {
     const m = getMessages(resolveLocale(dto.locale));
-    const providedToken = extractBearerToken(authHeader, dto.token);
+    const providedToken = extractBearerToken(authHeader, dto.token, cookieHeader);
 
     if (!providedToken || providedToken.trim() === '') {
       throw new BadRequestException(m.tokenIdentityRequired);
@@ -99,6 +113,7 @@ export class TokensController {
 
     try {
       const result = await this.revokeUseCase.execute(dto.username, providedToken);
+      reply?.header('Set-Cookie', buildClearSessionCookieHeader());
       await this.githubRepo.clearCache(dto.username);
       logger.info(`Token revoked successfully for user ${dto.username}`, {
         username: dto.username
@@ -116,37 +131,49 @@ export class TokensController {
   @Delete('users/purge')
   async purge(
     @Body() dto: PurgeUserDto,
-    @Headers('authorization') authHeader?: string
+    @Headers('authorization') authHeader?: string,
+    @Headers('cookie') cookieHeader?: string,
+    @Res({ passthrough: true }) reply?: FastifyReply
   ): Promise<{ message: string }> {
     const m = getMessages(resolveLocale(dto.locale));
-    const providedToken = extractBearerToken(authHeader, dto.token);
+    const providedToken = extractBearerToken(authHeader, dto.token, cookieHeader);
 
     if (!providedToken || providedToken.trim() === '') {
       throw new BadRequestException(m.purgeTokenRequired);
     }
 
-    const profileRes = await fetch('https://api.github.com/user', {
-      headers: {
-        'User-Agent': 'gitcard-studio-security',
-        Accept: 'application/vnd.github.v3+json',
-        Authorization: `token ${providedToken}`
+    if (providedToken.startsWith('gcss_')) {
+      if (!verifyOAuthSessionToken(providedToken, dto.username)) {
+        throw new UnauthorizedException(m.tokenExpiredOrInvalid);
       }
-    });
+    } else {
+      const profileRes = await fetch('https://api.github.com/user', {
+        headers: {
+          'User-Agent': 'gitcard-studio-security',
+          Accept: 'application/vnd.github.v3+json',
+          Authorization: `token ${providedToken}`
+        },
+        signal: AbortSignal.timeout(8000)
+      });
 
-    if (!profileRes.ok) {
-      throw new UnauthorizedException(m.tokenExpiredOrInvalid);
-    }
+      if (!profileRes.ok) {
+        throw new UnauthorizedException(m.tokenExpiredOrInvalid);
+      }
 
-    const githubUser = (await profileRes.json()) as { login: string };
-    const tokenOwner = githubUser.login;
+      const githubUser = (await profileRes.json()) as { login: string };
+      const tokenOwner = githubUser.login;
 
-    if (tokenOwner.toLowerCase() !== dto.username.toLowerCase()) {
-      throw new ForbiddenException(m.accessDenied(escapeXml(tokenOwner), escapeXml(dto.username)));
+      if (tokenOwner.toLowerCase() !== dto.username.toLowerCase()) {
+        throw new ForbiddenException(
+          m.accessDenied(escapeXml(tokenOwner), escapeXml(dto.username))
+        );
+      }
     }
 
     try {
       await this.purgeUseCase.execute(dto.username);
       await this.githubRepo.clearCache(dto.username);
+      reply?.header('Set-Cookie', buildClearSessionCookieHeader());
       logger.info(`GDPR data purge completed for user ${dto.username}`, { username: dto.username });
       return { message: m.purgeSuccess };
     } catch (error: unknown) {
@@ -161,36 +188,42 @@ export class TokensController {
   @Post('users/export')
   async exportData(
     @Body() dto: ExportUserDto,
-    @Headers('authorization') authHeader?: string
+    @Headers('authorization') authHeader?: string,
+    @Headers('cookie') cookieHeader?: string
   ): Promise<UserDataExportResult> {
     const m = getMessages(resolveLocale(dto.locale));
-    let providedToken = extractBearerToken(authHeader, dto.token);
-
-    if (!providedToken || providedToken.trim() === '') {
-      providedToken = await getDecryptedToken(dto.username, this.tokenRepo);
-    }
+    const providedToken = extractBearerToken(authHeader, dto.token, cookieHeader);
 
     if (!providedToken || providedToken.trim() === '') {
       throw new BadRequestException(m.exportTokenRequired);
     }
 
-    const profileRes = await fetch('https://api.github.com/user', {
-      headers: {
-        'User-Agent': 'gitcard-studio-security',
-        Accept: 'application/vnd.github.v3+json',
-        Authorization: `token ${providedToken}`
+    if (providedToken.startsWith('gcss_')) {
+      if (!verifyOAuthSessionToken(providedToken, dto.username)) {
+        throw new UnauthorizedException(m.tokenExpiredOrInvalid);
       }
-    });
+    } else {
+      const profileRes = await fetch('https://api.github.com/user', {
+        headers: {
+          'User-Agent': 'gitcard-studio-security',
+          Accept: 'application/vnd.github.v3+json',
+          Authorization: `token ${providedToken}`
+        },
+        signal: AbortSignal.timeout(8000)
+      });
 
-    if (!profileRes.ok) {
-      throw new UnauthorizedException(m.tokenExpiredOrInvalid);
-    }
+      if (!profileRes.ok) {
+        throw new UnauthorizedException(m.tokenExpiredOrInvalid);
+      }
 
-    const githubUser = (await profileRes.json()) as { login: string };
-    const tokenOwner = githubUser.login;
+      const githubUser = (await profileRes.json()) as { login: string };
+      const tokenOwner = githubUser.login;
 
-    if (tokenOwner.toLowerCase() !== dto.username.toLowerCase()) {
-      throw new ForbiddenException(m.accessDenied(escapeXml(tokenOwner), escapeXml(dto.username)));
+      if (tokenOwner.toLowerCase() !== dto.username.toLowerCase()) {
+        throw new ForbiddenException(
+          m.accessDenied(escapeXml(tokenOwner), escapeXml(dto.username))
+        );
+      }
     }
 
     try {

@@ -1,5 +1,6 @@
 export const GITHUB_USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
-export const GITHUB_REPO_REGEX = /^(?:[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}\/)?[a-z\d-_.]{1,100}$/i;
+export const GITHUB_REPO_REGEX =
+  /^(?:[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}\/)?(?!\.{1,2}$)[a-z\d-_.]{1,100}$/i;
 export const BADGE_LABEL_REGEX = /^[a-z\d\s\-_.:/]{1,50}$/i;
 
 export function validateUsername(username: string): void {

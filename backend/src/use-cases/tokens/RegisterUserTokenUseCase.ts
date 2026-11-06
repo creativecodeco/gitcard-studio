@@ -4,7 +4,8 @@ import { ITokenRepository } from '@/domain/repositories/ITokenRepository';
 import {
   encryptToken,
   validateTokenScopes,
-  generateConsentFingerprint
+  generateConsentFingerprint,
+  generateOAuthSessionToken
 } from '@/infrastructure/security/security';
 
 @Injectable()
@@ -20,12 +21,12 @@ export class RegisterUserTokenUseCase {
     consentAccepted: boolean,
     ip: string,
     userAgent: string
-  ): Promise<{ message: string }> {
+  ): Promise<{ message: string; sessionToken: string }> {
     if (consentAccepted !== true) {
       throw new Error('Debes aceptar los términos y condiciones de almacenamiento de datos.');
     }
 
-    const validation = await validateTokenScopes(token);
+    const validation = await validateTokenScopes(token, username);
     if (!validation.valid) {
       throw new Error(validation.reason || 'Token de GitHub inválido o con demasiados permisos.');
     }
@@ -48,7 +49,8 @@ export class RegisterUserTokenUseCase {
 
     return {
       message:
-        'Token registrado exitosamente. Tus estadísticas privadas ahora se incluirán en tus tarjetas.'
+        'Token registrado exitosamente. Tus estadísticas privadas ahora se incluirán en tus tarjetas.',
+      sessionToken: generateOAuthSessionToken(username)
     };
   }
 }

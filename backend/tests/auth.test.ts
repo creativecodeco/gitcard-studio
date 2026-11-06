@@ -94,4 +94,25 @@ describe('AuthController disconnectAccount', () => {
     expect(res.message).toBeDefined();
     expect(mockTokenRepo.deleteToken).not.toHaveBeenCalled();
   });
+
+  it('should verify HMAC OAuth session token on disconnectAccount and reject invalid session token', async () => {
+    const { generateOAuthSessionToken } = await import('@/infrastructure/security/security');
+    (mockTokenRepo.getToken as any).mockResolvedValue({
+      token: 'ghu_secret',
+      token_type: 'app_user',
+      username: 'octocat'
+    });
+
+    await expect(
+      authController.disconnectAccount({ username: 'octocat' }, 'Bearer gcss_invalid.sig')
+    ).rejects.toThrow();
+
+    const validSession = generateOAuthSessionToken('octocat');
+    const res = await authController.disconnectAccount(
+      { username: 'octocat' },
+      `Bearer ${validSession}`
+    );
+    expect(res.message).toBeDefined();
+    expect(mockTokenRepo.deleteToken).toHaveBeenCalledWith('octocat');
+  });
 });

@@ -2,10 +2,12 @@ import { UserStats } from '@/domain/entities/UserStats';
 import {
   getTheme,
   getBackgroundDef,
+  getFontFamily,
   renderBrandHeader,
   renderCardFrame,
   renderGlowFilter,
-  renderAnimationStyles
+  renderAnimationStyles,
+  sanitizeColor
 } from './theme';
 import { getTranslations } from './i18n';
 import { escapeXml } from '@/utils/escape';
@@ -19,11 +21,9 @@ export function renderRankCard(
   const t = getTranslations(overrides?.locale);
   const cardWidth = 495;
   const cardHeight = 195;
-  const widthAttr = overrides?.cardWidth || `${cardWidth}`;
+  const widthAttr = escapeXml(overrides?.cardWidth || `${cardWidth}`);
 
-  const fontFamily = overrides?.font
-    ? `${overrides.font}, 'Segoe UI', Ubuntu, sans-serif`
-    : "'Segoe UI', Ubuntu, sans-serif";
+  const fontFamily = getFontFamily(overrides?.font);
 
   const glow = overrides?.glow === '1' || overrides?.glow === 'true';
   const glowFilterDef = glow ? renderGlowFilter('glow-rank', theme.accent) : '';
@@ -54,7 +54,7 @@ export function renderRankCard(
 
   const borderRadius = overrides?.borderRadius ? Number.parseInt(overrides.borderRadius, 10) : 12;
   const showBorder = overrides?.showBorder !== 'false';
-  const borderColor = overrides?.borderColor;
+  const borderColor = sanitizeColor(overrides?.borderColor);
 
   const cardFrame = renderCardFrame({
     width: cardWidth,

@@ -24,12 +24,18 @@ describe('Logger Module', () => {
     expect(logOutput).toContain('3000');
   });
 
-  it('should redact sensitive keys like token and password', () => {
-    logger.warn('Token operation', { token: 'secret-token-123', username: 'john' });
+  it('should redact sensitive keys like token and password including nested objects', () => {
+    logger.warn('Token operation', {
+      token: 'secret-token-123',
+      username: 'john',
+      nested: { access_token: 'nested-secret-456', safeField: 'visible' }
+    });
     expect(consoleWarnSpy).toHaveBeenCalledOnce();
     const logOutput = consoleWarnSpy.mock.calls[0][0];
     expect(logOutput).toContain('[REDACTED]');
     expect(logOutput).not.toContain('secret-token-123');
+    expect(logOutput).not.toContain('nested-secret-456');
+    expect(logOutput).toContain('visible');
     expect(logOutput).toContain('john');
   });
 

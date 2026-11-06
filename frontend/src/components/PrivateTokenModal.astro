@@ -245,7 +245,8 @@
           target="_blank"
           rel="noopener noreferrer"
           title="Ver guía del modo público"
-          style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(56, 189, 248, 0.18); color: #38bdf8; text-decoration: none; font-size: 0.78rem; font-weight: 800; transition: all 0.2s ease;"
+          class="help-badge-link"
+          style="background: rgba(56, 189, 248, 0.18); color: #38bdf8;"
         >
           ?
         </a>
@@ -294,7 +295,7 @@
             height="14"
             fill="none"
             stroke="currentColor"
-            stroke-width="2.5"
+            stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
             style="margin-right: 4px"
@@ -342,7 +343,8 @@
           target="_blank"
           rel="noopener noreferrer"
           title="Ver guía de seguridad y permisos de la App"
-          style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(74, 222, 128, 0.18); color: #4ade80; text-decoration: none; font-size: 0.78rem; font-weight: 800; transition: all 0.2s ease;"
+          class="help-badge-link"
+          style="background: rgba(74, 222, 128, 0.18); color: #4ade80;"
         >
           ?
         </a>
@@ -381,7 +383,7 @@
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 8px;
           font-weight: 600;
-          transition: all 0.2s ease;
+          transition: transform 150ms ease-out, scale 150ms ease-out, box-shadow 250ms ease-out, background-color 150ms ease-out;
         "
       >
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -410,7 +412,8 @@
           target="_blank"
           rel="noopener noreferrer"
           title="Ver guía para generar un PAT Fine-grained"
-          style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(168, 85, 247, 0.18); color: #a855f7; text-decoration: none; font-size: 0.78rem; font-weight: 800; transition: all 0.2s ease;"
+          class="help-badge-link"
+          style="background: rgba(168, 85, 247, 0.18); color: #a855f7;"
         >
           ?
         </a>
@@ -512,14 +515,16 @@
   ></div>
 </div>
 
-<!-- Purge / Account Deletion Modal -->
+<!-- Purge / Account Deletion Modal (transitions-dev 06-modal) -->
 <div
   id="purge-modal"
-  class="hidden"
-  style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000;"
+  class="hidden t-modal-backdrop"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="purge-modal-title"
 >
   <div
-    class="glass-card"
+    class="glass-card t-modal-card"
     style="width: 90%; max-width: 480px; padding: 28px; border: 1px solid rgba(248, 81, 73, 0.2); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; gap: 20px;"
   >
     <div style="display: flex; gap: 12px; align-items: flex-start; color: var(--error-color);">
@@ -529,7 +534,7 @@
         height="24"
         fill="none"
         stroke="currentColor"
-        stroke-width="2.5"
+        stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
         aria-hidden="true"
@@ -541,6 +546,7 @@
       </svg>
       <div>
         <h3
+          id="purge-modal-title"
           style="font-size: 1.15rem; font-weight: 700; margin: 0; line-height: 1.2;"
           data-i18n="delete_account_modal_title"
         >
@@ -610,9 +616,10 @@
 
 <script>
   import { t } from '../utils/i18n';
+  import { secureStorage } from '../utils/secureStorage';
 
   function getLocale(): string {
-    return document.documentElement.lang || localStorage.getItem('app_locale') || 'es';
+    return document.documentElement.lang || secureStorage.getLocal('app_locale') || 'es';
   }
 
   // Dynamic client script for OAuth status & personal metrics handling
@@ -620,6 +627,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const authSuccess = urlParams.get('auth_success');
     const authUsername = urlParams.get('username');
+    const authSessionToken = urlParams.get('session_token');
 
     const tokenUnregistered = document.getElementById('token-unregistered');
     const tokenRegistered = document.getElementById('token-registered');
@@ -674,19 +682,20 @@
     modeTabApp?.addEventListener('click', () => switchModeTab('app'));
     modeTabPat?.addEventListener('click', () => switchModeTab('pat'));
 
-    let activeUser =
-      authUsername ||
-      localStorage.getItem('gh_active_user') ||
-      localStorage.getItem('registered-github-username') ||
-      '';
+    const authTabsNav = document.getElementById('auth-tabs-nav');
 
     if (authSuccess === '1' && authUsername) {
-      localStorage.setItem('gh_active_user', authUsername);
-      localStorage.setItem('registered-github-username', authUsername);
+      if (authSessionToken) {
+        secureStorage.setLocal('gh_session_token', authSessionToken);
+        secureStorage.setSession('gh_session_token', authSessionToken);
+      }
+      secureStorage.setLocal('gh_active_user', authUsername);
+      secureStorage.setLocal('registered-github-username', authUsername);
 
       const cleanUrl = new URL(window.location.href);
       cleanUrl.searchParams.delete('auth_success');
       cleanUrl.searchParams.delete('username');
+      cleanUrl.searchParams.delete('session_token');
       window.history.replaceState(
         {},
         document.title,
@@ -694,16 +703,44 @@
       );
     }
 
-    const authTabsNav = document.getElementById('auth-tabs-nav');
+    let activeUser =
+      authUsername ||
+      secureStorage.getLocal('gh_active_user') ||
+      secureStorage.getLocal('registered-github-username') ||
+      '';
+
+    secureStorage.installIntegrityGuard(() => {
+      activeUser = '';
+      tokenRegistered?.classList.add('hidden');
+      tokenUnregistered?.classList.remove('hidden');
+      authTabsNav?.classList.remove('hidden');
+      switchModeTab('app');
+    });
+
+    function getStoredAuthToken(): string | null {
+      return (
+        secureStorage.getSession('gh_session_token') ||
+        secureStorage.getLocal('gh_session_token') ||
+        secureStorage.getLocal('registered-github-token') ||
+        secureStorage.getLocal('gh_token')
+      );
+    }
 
     async function loadUserMetrics(username: string) {
       if (!username) return;
       try {
-        const res = await fetch(`/api/users/me/metrics?username=${encodeURIComponent(username)}`);
+        const storedToken = getStoredAuthToken();
+        const reqHeaders: Record<string, string> = {};
+        if (storedToken) {
+          reqHeaders['Authorization'] = `Bearer ${storedToken}`;
+        }
+        const res = await fetch(`/api/users/me/metrics?username=${encodeURIComponent(username)}`, {
+          headers: reqHeaders
+        });
         if (!res.ok) {
           if (res.status === 401 || res.status === 404) {
-            localStorage.removeItem('gh_active_user');
-            localStorage.removeItem('registered-github-username');
+            secureStorage.removeLocal('gh_active_user');
+            secureStorage.removeLocal('registered-github-username');
             activeUser = '';
             tokenRegistered?.classList.add('hidden');
             tokenUnregistered?.classList.remove('hidden');
@@ -713,8 +750,8 @@
         }
         const data = await res.json();
         if (data && data.connected) {
-          localStorage.setItem('gh_active_user', data.username);
-          localStorage.setItem('registered-github-username', data.username);
+          secureStorage.setLocal('gh_active_user', data.username);
+          secureStorage.setLocal('registered-github-username', data.username);
           activeUser = data.username;
 
           tokenRegistered?.classList.remove('hidden');
@@ -842,9 +879,18 @@
           window.dispatchEvent(
             new CustomEvent('app:user-authenticated', { detail: { username: data.username } })
           );
+        } else if (
+          data &&
+          typeof data.authenticatedUsername === 'string' &&
+          data.authenticatedUsername.toLowerCase() !== username.toLowerCase()
+        ) {
+          secureStorage.setLocal('gh_active_user', data.authenticatedUsername);
+          secureStorage.setLocal('registered-github-username', data.authenticatedUsername);
+          activeUser = data.authenticatedUsername;
+          await loadUserMetrics(data.authenticatedUsername);
         } else {
-          localStorage.removeItem('gh_active_user');
-          localStorage.removeItem('registered-github-username');
+          secureStorage.removeLocal('gh_active_user');
+          secureStorage.removeLocal('registered-github-username');
           activeUser = '';
           tokenRegistered?.classList.add('hidden');
           tokenUnregistered?.classList.remove('hidden');
@@ -885,17 +931,24 @@
       const targetUser = (
         activeUser ||
         connectedUsernameDisplay?.textContent?.replace(/^@/, '').trim() ||
-        localStorage.getItem('gh_active_user') ||
-        localStorage.getItem('registered-github-username') ||
+        secureStorage.getLocal('gh_active_user') ||
+        secureStorage.getLocal('registered-github-username') ||
         ''
       ).trim();
 
       if (targetUser) {
         try {
+          const storedToken = getStoredAuthToken();
+          const disconnectHeaders: Record<string, string> = {
+            'Content-Type': 'application/json'
+          };
+          if (storedToken) {
+            disconnectHeaders['Authorization'] = `Bearer ${storedToken}`;
+          }
           await fetch('/api/auth/disconnect', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: targetUser })
+            headers: disconnectHeaders,
+            body: JSON.stringify({ username: targetUser, token: storedToken || undefined })
           });
         } catch (err) {
           console.error('Error disconnecting account:', err);
@@ -957,6 +1010,9 @@
 
     btnOpenPurgeModal?.addEventListener('click', () => {
       purgeModal?.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        purgeModal?.classList.add('is-open');
+      });
       if (purgeUsernameInput) {
         purgeUsernameInput.value = '';
         purgeUsernameInput.focus();
@@ -965,7 +1021,10 @@
     });
 
     btnClosePurge?.addEventListener('click', () => {
-      purgeModal?.classList.add('hidden');
+      purgeModal?.classList.remove('is-open');
+      setTimeout(() => {
+        purgeModal?.classList.add('hidden');
+      }, 150);
     });
 
     function triggerToast(message: string, type: 'success' | 'error' = 'success') {
@@ -977,14 +1036,13 @@
     const btnExportUserData = document.getElementById('btn-export-user-data');
     btnExportUserData?.addEventListener('click', async () => {
       const activeUser =
-        localStorage.getItem('registered-github-username') ||
-        localStorage.getItem('gh_active_user');
+        secureStorage.getLocal('registered-github-username') ||
+        secureStorage.getLocal('gh_active_user');
       if (!activeUser) {
         triggerToast(t('msg_no_active_user_export', getLocale()), 'error');
         return;
       }
-      const storedToken =
-        localStorage.getItem('registered-github-token') || localStorage.getItem('gh_token');
+      const storedToken = getStoredAuthToken();
 
       try {
         const headers: Record<string, string> = {
@@ -1029,12 +1087,19 @@
       const usernameToPurge = purgeUsernameInput?.value.trim().replace(/^@/, '');
       if (!usernameToPurge) return;
       try {
+        const storedToken = getStoredAuthToken();
+        const purgeHeaders: Record<string, string> = {};
+        if (storedToken) {
+          purgeHeaders['Authorization'] = `Bearer ${storedToken}`;
+        }
         const res = await fetch(`/api/users/me?username=${encodeURIComponent(usernameToPurge)}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers: purgeHeaders
         });
         if (res.ok) {
-          localStorage.removeItem('gh_active_user');
-          localStorage.removeItem('registered-github-username');
+          secureStorage.removeLocal('gh_active_user');
+          secureStorage.removeLocal('registered-github-username');
+          secureStorage.removeLocal('gh_session_token');
           sessionStorage.clear();
           purgeModal?.classList.add('hidden');
           tokenRegistered?.classList.add('hidden');

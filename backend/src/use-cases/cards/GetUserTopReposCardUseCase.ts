@@ -2,6 +2,7 @@ import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
 import { ITokenRepository } from '@/domain/repositories/ITokenRepository';
 import { IMetricsRepository } from '@/domain/repositories/IMetricsRepository';
 import { HitContext } from '@/domain/entities/Metrics';
+import { validateUsername } from '@/domain/entities/Validation';
 import { getDecryptedToken } from '@/infrastructure/security/security';
 import { renderTopReposCard } from '@/adapters/presenters/topReposCard';
 
@@ -18,6 +19,7 @@ export class GetUserTopReposCardUseCase {
     overrides: Record<string, string>,
     hitContext?: HitContext
   ): Promise<string> {
+    validateUsername(username);
     if (this.metricsRepo) {
       this.metricsRepo.recordHit('repo', hitContext);
     }

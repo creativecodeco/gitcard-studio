@@ -4,6 +4,7 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { ValidationPipe } from '@nestjs/common';
 import fastifyCors from '@fastify/cors';
 import fastifyHelmet from '@fastify/helmet';
+import fastifyRateLimit from '@fastify/rate-limit';
 import fastifyStatic from '@fastify/static';
 import fastifyCompress from '@fastify/compress';
 import fastifyEtag from '@fastify/etag';
@@ -28,7 +29,8 @@ export async function bootstrap(): Promise<NestFastifyApplication> {
     new FastifyAdapter({
       logger: false,
       keepAliveTimeout: 65000
-    })
+    }),
+    { rawBody: true }
   );
 
   // Register security headers via Fastify Helmet
@@ -36,10 +38,38 @@ export async function bootstrap(): Promise<NestFastifyApplication> {
     contentSecurityPolicy: false // Keep CSP false to allow SVG card rendering inside img tags
   });
 
-  // Register CORS
+  // Register CORS: restrict cross-origin requests when CORS_ORIGIN or PUBLIC_URL is configured
+  const allowedOrigin = process.env.CORS_ORIGIN || process.env.PUBLIC_URL;
   await app.register(fastifyCors, {
-    origin: '*',
+    origin: (origin, cb) => {
+      if (!origin || !allowedOrigin || origin === allowedOrigin) {
+        cb(null, true);
+        return;
+      }
+      cb(null, false);
+    },
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS']
+  });
+
+  // Register tiered rate limiting for /api/ endpoints (OWASP A05 / DoS & brute-force protection)
+  const defaultRateMax = Number(process.env.RATE_LIMIT_MAX || 300);
+  const sensitiveRateMax = Number(process.env.SENSITIVE_RATE_LIMIT_MAX || 30);
+  await app.register(fastifyRateLimit, {
+    max: (req) => {
+      const url = req.url || '';
+      if (
+        url.startsWith('/api/metrics') ||
+        url.startsWith('/api/tokens') ||
+        url.startsWith('/api/auth') ||
+        url.startsWith('/api/users') ||
+        url.startsWith('/api/webhooks')
+      ) {
+        return sensitiveRateMax;
+      }
+      return defaultRateMax;
+    },
+    timeWindow: '1 minute',
+    allowList: (req) => !req.url?.startsWith('/api/')
   });
 
   // Register Fastify compression (brotli & gzip) for high-performance payload delivery

@@ -54,19 +54,21 @@
 </div>
 
 <script>
+  import { secureStorage } from '../utils/secureStorage';
+
   document.addEventListener('DOMContentLoaded', () => {
     const banner = document.getElementById('privacy-consent-banner');
     const btnAccept = document.getElementById('btn-accept-privacy');
 
     if (!banner || !btnAccept) return;
 
-    const accepted = localStorage.getItem('gitcard_privacy_accepted');
-    if (!accepted) {
+    const accepted = secureStorage.getLocal('gitcard_privacy_accepted');
+    if (accepted !== 'true') {
       banner.classList.remove('hidden');
     }
 
     btnAccept.addEventListener('click', () => {
-      localStorage.setItem('gitcard_privacy_accepted', 'true');
+      secureStorage.setLocal('gitcard_privacy_accepted', 'true');
       banner.classList.add('hidden');
     });
   });

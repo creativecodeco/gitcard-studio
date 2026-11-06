@@ -24,7 +24,8 @@ describe('MetricsController', () => {
     getUniqueUsersCount: vi.fn().mockResolvedValue(5),
     getOrIncrementProfileViews: vi.fn(),
     getRendersHistory: vi.fn().mockResolvedValue([{ date: '2026-07-24', count: 10 }]),
-    updateUserReadmeVerification: vi.fn()
+    updateUserReadmeVerification: vi.fn(),
+    getBreakdownMetrics: vi.fn()
   };
 
   const mockVerifyUserReadmeUseCase = {
