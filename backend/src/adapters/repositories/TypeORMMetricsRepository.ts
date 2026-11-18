@@ -60,6 +60,13 @@ const DEFAULT_LOG_RETENTION_DAYS = 90;
 
 export class TypeORMMetricsRepository implements IMetricsRepository {
   private lastPruneTime = 0;
+  private cachedUserCount: number | null = null;
+  private cachedUserCountExpiresAt = 0;
+  private readonly CACHE_TTL_MS = 60_000;
+
+  public invalidateUserCountCache(): void {
+    this.cachedUserCountExpiresAt = 0;
+  }
 
   private pruneOldRequestLogsIfNeeded(): void {
     const now = Date.now();
@@ -135,32 +142,37 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
         .where('metric_key = :key', { key: metricKey })
         .execute();
 
-      // First, insert user row if not exists (using ON CONFLICT DO NOTHING / orIgnore)
-      await transactionalEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into(UserMetric)
-        .values({ username: username.toLowerCase() })
-        .orIgnore()
-        .execute();
+      // First, insert user row if not exists and update metrics (only for valid known usernames)
+      if (username && username.toLowerCase() !== 'unknown') {
+        const userLower = username.toLowerCase();
+        await transactionalEntityManager
+          .createQueryBuilder()
+          .insert()
+          .into(UserMetric)
+          .values({ username: userLower })
+          .orIgnore()
+          .execute();
 
-      // Second, increment the column and update timestamp
-      const updateData: Record<string, unknown> = {
-        [column]: () => `"${column}" + 1`,
-        last_updated: new Date()
-      };
-      if (source === 'github') {
-        updateData.last_github_hit = new Date();
-      } else {
-        updateData.last_web_hit = new Date();
+        // Second, increment the column and update timestamp
+        const updateData: Record<string, unknown> = {
+          [column]: () => `"${column}" + 1`,
+          last_updated: new Date()
+        };
+        if (source === 'github') {
+          updateData.last_github_hit = new Date();
+        } else {
+          updateData.last_web_hit = new Date();
+        }
+
+        await transactionalEntityManager
+          .createQueryBuilder()
+          .update(UserMetric)
+          .set(updateData)
+          .where('username = :username', { username: userLower })
+          .execute();
+
+        this.invalidateUserCountCache();
       }
-
-      await transactionalEntityManager
-        .createQueryBuilder()
-        .update(UserMetric)
-        .set(updateData)
-        .where('username = :username', { username: username.toLowerCase() })
-        .execute();
 
       // 4. Log the request (safely truncated and IP-anonymized to fit DB & GDPR constraints)
       const requestLogRepo = transactionalEntityManager.getRepository(RequestLog);
@@ -274,12 +286,56 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
     }
   }
 
-  async getUniqueUsersCount(): Promise<number> {
+  async getUniqueUsersCount(forceRefresh: boolean = false): Promise<number> {
+    const now = Date.now();
+    if (!forceRefresh && this.cachedUserCount !== null && now < this.cachedUserCountExpiresAt) {
+      return this.cachedUserCount;
+    }
+
     try {
-      const userMetricRepo = AppDataSource.getRepository(UserMetric);
-      return await userMetricRepo.count();
+      const qb = AppDataSource.createQueryBuilder()
+        .select('COUNT(DISTINCT u.username)', 'count')
+        .from(UserMetric, 'u')
+        .leftJoin(RepoMetric, 'r', 'r.username = u.username')
+        .where("u.username != 'unknown'")
+        .andWhere(
+          `(
+            COALESCE(u.stats_web, 0) > 0 OR
+            COALESCE(u.stats_github, 0) > 0 OR
+            COALESCE(u.languages_web, 0) > 0 OR
+            COALESCE(u.languages_github, 0) > 0 OR
+            COALESCE(u.repo_web, 0) > 0 OR
+            COALESCE(u.repo_github, 0) > 0 OR
+            COALESCE(u.rank_web, 0) > 0 OR
+            COALESCE(u.rank_github, 0) > 0 OR
+            COALESCE(u.streak_web, 0) > 0 OR
+            COALESCE(u.streak_github, 0) > 0 OR
+            COALESCE(u.trophies_web, 0) > 0 OR
+            COALESCE(u.trophies_github, 0) > 0 OR
+            COALESCE(u.sponsors_web, 0) > 0 OR
+            COALESCE(u.sponsors_github, 0) > 0 OR
+            COALESCE(u.commit_activity_web, 0) > 0 OR
+            COALESCE(u.commit_activity_github, 0) > 0 OR
+            COALESCE(u.tech_stack_web, 0) > 0 OR
+            COALESCE(u.tech_stack_github, 0) > 0 OR
+            COALESCE(u.profile_views, 0) > 0 OR
+            u.readme_verified = true OR
+            COALESCE(r.repo_views, 0) > 0
+          )`
+        );
+
+      const rawResult = await qb.getRawOne();
+      const count = Number(rawResult?.count || 0);
+
+      this.cachedUserCount = count;
+      this.cachedUserCountExpiresAt = now + this.CACHE_TTL_MS;
+
+      return count;
     } catch (err) {
       logger.error('Error fetching unique users count:', { error: err });
+      if (this.cachedUserCount !== null) {
+        return this.cachedUserCount;
+      }
       return 0;
     }
   }
@@ -293,24 +349,27 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       const userMetricRepo = AppDataSource.getRepository(UserMetric);
       const userLower = username.toLowerCase();
 
-      // Ensure user row exists in user_metrics
-      await AppDataSource.createQueryBuilder()
-        .insert()
-        .into(UserMetric)
-        .values({ username: userLower })
-        .orIgnore()
-        .execute();
+      if (userLower && userLower !== 'unknown') {
+        // Ensure user row exists in user_metrics
+        await AppDataSource.createQueryBuilder()
+          .insert()
+          .into(UserMetric)
+          .values({ username: userLower })
+          .orIgnore()
+          .execute();
 
-      if (increment) {
-        const source = this.determineTrafficSource(
-          context?.userAgent,
-          context?.referer,
-          context?.ref
-        );
-        await this.incrementProfileViewCounters(userLower, source);
+        if (increment) {
+          const source = this.determineTrafficSource(
+            context?.userAgent,
+            context?.referer,
+            context?.ref
+          );
+          await this.incrementProfileViewCounters(userLower, source);
 
-        if (context) {
-          await this.logProfileViewRequest(userLower, context);
+          if (context) {
+            await this.logProfileViewRequest(userLower, context);
+          }
+          this.invalidateUserCountCache();
         }
       }
 
@@ -427,22 +486,26 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
     const cardsString = detectedCards && detectedCards.length > 0 ? detectedCards.join(',') : null;
 
     try {
-      await AppDataSource.createQueryBuilder()
-        .insert()
-        .into(UserMetric)
-        .values({ username: userLower })
-        .orIgnore()
-        .execute();
+      if (userLower && userLower !== 'unknown') {
+        await AppDataSource.createQueryBuilder()
+          .insert()
+          .into(UserMetric)
+          .values({ username: userLower })
+          .orIgnore()
+          .execute();
 
-      await AppDataSource.createQueryBuilder()
-        .update(UserMetric)
-        .set({
-          readme_verified: isVerified,
-          readme_verified_at: new Date(),
-          detected_cards: cardsString
-        })
-        .where('username = :username', { username: userLower })
-        .execute();
+        await AppDataSource.createQueryBuilder()
+          .update(UserMetric)
+          .set({
+            readme_verified: isVerified,
+            readme_verified_at: new Date(),
+            detected_cards: cardsString
+          })
+          .where('username = :username', { username: userLower })
+          .execute();
+
+        this.invalidateUserCountCache();
+      }
     } catch (err) {
       logger.error('Error updating user readme verification:', { username: userLower, error: err });
     }
@@ -536,40 +599,44 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       .where('metric_key = :key', { key: 'repoViewsRenders' })
       .execute();
 
-    await AppDataSource.createQueryBuilder()
-      .insert()
-      .into(UserMetric)
-      .values({ username: userLower })
-      .orIgnore()
-      .execute();
+    if (userLower && userLower !== 'unknown') {
+      await AppDataSource.createQueryBuilder()
+        .insert()
+        .into(UserMetric)
+        .values({ username: userLower })
+        .orIgnore()
+        .execute();
 
-    const now = new Date();
-    const userUpdateData: Record<string, unknown> = {
-      last_updated: now
-    };
-    const updateData: Record<string, unknown> = {
-      repo_views: () => 'repo_views + 1',
-      last_updated: now
-    };
-    if (source === 'github') {
-      updateData.last_github_hit = now;
-      userUpdateData.last_github_hit = now;
-    } else {
-      updateData.last_web_hit = now;
-      userUpdateData.last_web_hit = now;
+      const now = new Date();
+      const userUpdateData: Record<string, unknown> = {
+        last_updated: now
+      };
+      const updateData: Record<string, unknown> = {
+        repo_views: () => 'repo_views + 1',
+        last_updated: now
+      };
+      if (source === 'github') {
+        updateData.last_github_hit = now;
+        userUpdateData.last_github_hit = now;
+      } else {
+        updateData.last_web_hit = now;
+        userUpdateData.last_web_hit = now;
+      }
+
+      await AppDataSource.createQueryBuilder()
+        .update(UserMetric)
+        .set(userUpdateData)
+        .where('username = :username', { username: userLower })
+        .execute();
+
+      await AppDataSource.createQueryBuilder()
+        .update(RepoMetric)
+        .set(updateData)
+        .where('username = :username AND repo = :repo', { username: userLower, repo: repoLower })
+        .execute();
+
+      this.invalidateUserCountCache();
     }
-
-    await AppDataSource.createQueryBuilder()
-      .update(UserMetric)
-      .set(userUpdateData)
-      .where('username = :username', { username: userLower })
-      .execute();
-
-    await AppDataSource.createQueryBuilder()
-      .update(RepoMetric)
-      .set(updateData)
-      .where('username = :username AND repo = :repo', { username: userLower, repo: repoLower })
-      .execute();
   }
 
   private async logProfileViewRequest(

@@ -18,7 +18,7 @@ export interface IMetricsRepository {
   getMetrics(): Promise<Metrics>;
   getUserMetrics(username: string): Promise<any>;
   getAllUserMetrics(): Promise<any[]>;
-  getUniqueUsersCount(): Promise<number>;
+  getUniqueUsersCount(forceRefresh?: boolean): Promise<number>;
   getOrIncrementProfileViews(
     username: string,
     increment: boolean,

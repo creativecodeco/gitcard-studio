@@ -2,6 +2,17 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.23.0] - 2026-11-17
+
+### ⚡ Refinamiento de Métricas de Actividad y Caché de Alto Rendimiento
+
+- **Cálculo Preciso de Usuarios Activos (`getUniqueUsersCount`)**:
+  - Optimizado el cálculo en `TypeORMMetricsRepository.getUniqueUsersCount()` mediante consulta relacional `COUNT(DISTINCT u.username)` que excluye usuarios anónimos o no inicializados (`username != 'unknown'`) y contabiliza exclusivamente perfiles con actividad real comprobada (al menos un render de tarjetas en origen Web o GitHub Camo, visitas de perfil, visitas de repositorio registradas en `repo_metrics` o verificación de README).
+  - Prevenida la creación de usuarios fantasma `'unknown'` en `recordHit()`, `getOrIncrementProfileViews()` e `incrementRepoViewCounters()`.
+- **Capa de Caché en Memoria y Cabeceras HTTP de Rendimiento**:
+  - Implementada caché interna con TTL de 60 segundos en `TypeORMMetricsRepository` con invalidación reactiva ante nuevas inserciones y fallback tolerante a fallos.
+  - Incorporada cabecera HTTP `Cache-Control: public, max-age=60, s-maxage=60, stale-while-revalidate=30` en el endpoint `GET /api/metrics/users/count`.
+
 ## [1.22.0] - 2026-11-17
 
 ### 🧪 Suite de Pruebas de Usuario E2E, Aislamiento de Rate Limiting y Resiliencia de Logs
@@ -854,4 +865,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.22.0
+**Versión actualmente expuesta / en producción:** v1.23.0

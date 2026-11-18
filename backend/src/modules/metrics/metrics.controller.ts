@@ -3,6 +3,7 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  Header,
   Headers,
   HttpException,
   HttpStatus,
@@ -133,6 +134,7 @@ export class MetricsController {
   }
 
   @Get('metrics/users/count')
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=30')
   async getUniqueUsersCount(): Promise<unknown> {
     try {
       return await this.metricsRepo.getUniqueUsersCount();
