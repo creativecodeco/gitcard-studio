@@ -41,7 +41,7 @@ import Footer from '../components/Footer.astro';
     <div class="terms-header">
       <h2>Términos y Condiciones de Servicio</h2>
       <p style="color: var(--text-secondary); margin-top: 10px">
-        Última actualización: 14 de Septiembre, 2026. Condiciones generales de uso de la plataforma.
+        Última actualización: 17 de Noviembre, 2026. Condiciones generales de uso de la plataforma.
       </p>
     </div>
 
@@ -59,13 +59,38 @@ import Footer from '../components/Footer.astro';
     <section class="terms-section">
       <h3>2. Descripción del Servicio</h3>
       <p>
-        GitCard Studio proporciona una suite de generación dinámica de tarjetas y widgets
-        vectoriales SVG para perfiles y repositorios de GitHub (estadísticas generales, lenguajes
-        más usados, matriz semanal 7x24 de hábitos de commit, racha de contribuciones, grado de
-        desarrollador, trofeos de hitos, patrocinadores de GitHub Sponsors, repositorios top y
-        contador de visitas). Las tarjetas son renderizadas al vuelo directamente en formato SVG
-        para su inclusión en documentos Markdown (`README.md`), sitios web o paneles informativos.
+        GitCard Studio proporciona una suite de alto rendimiento para la generación dinámica de
+        tarjetas, mapas de calor, insignias y widgets vectoriales SVG y mapas de bits PNG para
+        perfiles y repositorios de GitHub. La suite incluye:
       </p>
+      <ul>
+        <li>
+          <strong>Tarjetas de Perfil</strong>: Estadísticas generales (`/api/stats`), lenguajes más
+          utilizados (`/api/languages`), racha de contribuciones (`/api/streak`), rango y nivel de
+          desarrollador (`/api/rank`), vitrina de trofeos e hitos (`/api/trophies`), patrocinadores
+          de GitHub Sponsors (`/api/sponsors`) y repositorios más populares (`/api/top-repos`).
+        </li>
+        <li>
+          <strong>Tarjetas de Repositorios y Visitas de Proyecto</strong>: Tarjeta de repositorio
+          destacado (`/api/repo`) y tarjeta de visitas del proyecto con desglose de estrellas y
+          forks (`/api/repo-views` y `/api/views?repo=...`).
+        </li>
+        <li>
+          <strong>Actividad, Tiempo y Ecosistema</strong>: Matriz semanal 7x24 de hábitos de commit
+          (`/api/commit-activity`), matriz de línea de tiempo anual (`/api/timeline-matrix`) y
+          ecosistema tech stack (`/api/tech-stack`).
+        </li>
+        <li>
+          <strong>Insignias y Contadores</strong>: Contador de visitas de perfil (`/api/views`),
+          insignias personalizables tipo Shields (`/api/badge`) e indicador de actividad del día
+          (`/api/today-status`).
+        </li>
+        <li>
+          <strong>Formatos y Enlaces Clicables</strong>: Renderizado nativo en SVG animado o
+          conversión a PNG de alta resolución (`?format=png`), con soporte de enlaces interactivos
+          envolventes hacia el estudio web (`[![Card](url)](generator_url)`).
+        </li>
+      </ul>
     </section>
 
     <!-- Section 3: Uso Aceptable y Restricciones -->
@@ -75,20 +100,28 @@ import Footer from '../components/Footer.astro';
       <ul>
         <li>
           No intentar saturar, realizar ataques de denegación de servicio (DDoS) ni sobrepasar los
-          límites de tasa (rate limits) establecidos.
+          límites de tasa (*rate limits*) por IP establecidos para proteger la infraestructura y el
+          consumo de la API oficial de GitHub.
         </li>
         <li>
-          No utilizar automatizaciones maliciosas o scripts abusivos para sobrecargar el servidor o
-          la API oficial de GitHub.
+          No utilizar scripts automatizados de extracción masiva abusiva (*scraping*) ni vulnerar
+          los mecanismos de seguridad, encabezados o esquemas de cifrado implementados en la
+          plataforma.
         </li>
         <li>
-          Utilizar preferentemente la integración recomendada con GitHub App (OAuth de solo lectura
-          de metadatos) o proporcionar Personal Access Tokens (PAT) Fine-grained configurados con
-          los permisos mínimos necesarios (`read:user`, `repo:status`).
+          No inyectar parámetros maliciosos o vectores de ataque (XSS, manipulación de encabezados,
+          SSRF o alteración de estado en el cliente).
+        </li>
+        <li>
+          Utilizar preferentemente la integración oficial con GitHub App (OAuth de un solo clic con
+          permisos mínimos de solo lectura de metadatos) o custodiar debidamente cualquier Personal
+          Access Token (PAT) registrado, asignándole únicamente los permisos requeridos
+          (`read:user`, `repo:status`).
         </li>
         <li>
           Hacer un uso responsable de las funciones de auditoría y refresco de caché, respetando los
-          límites del servidor y de la infraestructura de GitHub.
+          tiempos de amortiguación para evitar consultas innecesarias a la infraestructura de
+          GitHub.
         </li>
       </ul>
     </section>

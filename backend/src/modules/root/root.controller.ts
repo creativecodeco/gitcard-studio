@@ -124,6 +124,17 @@ export class RootController {
     return this.htmlFileService.getPublicFileOrThrow('privacy.html');
   }
 
+  @Get('terms')
+  @Header('Content-Type', 'text/html; charset=utf-8')
+  @Header('Cache-Control', 'no-cache, must-revalidate')
+  @Header('X-Frame-Options', 'DENY')
+  @Header('X-Content-Type-Options', 'nosniff')
+  @Header('Referrer-Policy', 'strict-origin-when-cross-origin')
+  @Header('Content-Security-Policy', "frame-ancestors 'none'; object-src 'none'; base-uri 'self'")
+  getTerms(): string {
+    return this.htmlFileService.getPublicFileOrThrow('terms.html');
+  }
+
   @Get('help/:slug')
   @Header('Content-Type', 'text/html; charset=utf-8')
   @Header('Cache-Control', 'no-cache, must-revalidate')

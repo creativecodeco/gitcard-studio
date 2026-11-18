@@ -41,8 +41,8 @@ import Footer from '../components/Footer.astro';
     <div class="privacy-header">
       <h2>Política de Privacidad</h2>
       <p style="color: var(--text-secondary); margin-top: 10px">
-        Última actualización: 14 de Septiembre, 2026. Transparencia y control sobre tu huella
-        digital.
+        Última actualización: 17 de Noviembre, 2026. Transparencia, blindaje criptográfico y control
+        sobre tu huella digital.
       </p>
     </div>
 
@@ -76,10 +76,11 @@ import Footer from '../components/Footer.astro';
       <ul>
         <li>
           <strong>Cifrado Autenticado Avanzado</strong>: Los tokens son cifrados mediante el
-          algoritmo estándar de alta seguridad <code>AES-256-GCM</code> con vectores de
+          algoritmo estándar de grado militar <code>AES-256-GCM</code> con vectores de
           inicialización (IV) únicos en el lado del servidor y se almacenan en una base de datos
-          PostgreSQL segura. La llave de descifrado reside únicamente en las variables de entorno
-          aisladas de la ejecución del servidor.
+          PostgreSQL segura. Las sesiones autenticadas emiten tokens de sesión firmados y cifrados
+          con HMAC y AES-GCM con rotación y revocación instantánea. La llave de descifrado reside
+          únicamente en las variables de entorno aisladas de la ejecución del servidor.
         </li>
         <li>
           <strong>Tratamiento y Confidencialidad</strong>: Tus credenciales nunca se exponen al
@@ -121,17 +122,20 @@ import Footer from '../components/Footer.astro';
           User-Agent para trazabilidad y auditoría de seguridad).
         </li>
         <li>
-          <strong>Historial de Estadísticas y Métricas Personales</strong>: Registramos instantáneas
-          de rendimiento (commits, estrellas, Pull Requests, issues y lenguajes utilizados) a
-          intervalos mínimos de 12 horas por usuario, así como contadores personales de visitas al
-          perfil y renders de tarjetas. Este historial se utiliza exclusivamente para mantener los
-          datos de visualización disponibles y cargados ágilmente.
+          <strong>Historial de Estadísticas y Métricas de Proyectos</strong>: Registramos
+          instantáneas de rendimiento (commits, estrellas, Pull Requests, issues y lenguajes
+          utilizados) a intervalos mínimos de 12 horas por usuario, así como contadores personales
+          de visitas al perfil (`profile_views`) y visitas de repositorios (`repo_metrics`), junto
+          con los contadores de renderizado de tarjetas. Este historial se utiliza exclusivamente
+          para mantener los datos de visualización disponibles y cargados ágilmente.
         </li>
         <li>
-          <strong>Métricas de Uso y Logs Técnicos</strong>: Contador de renders para cada tipo de
-          tarjeta para fines estadísticos, así como logs de peticiones HTTP básicos (Dirección IP
-          anonimizada/abreviada, referer y User-Agent) para la prevención de abusos y control de
-          tasa (rate limiting).
+          <strong>Métricas de Uso y Logs Técnicos Anonimizados</strong>: Contador de renders para
+          cada tipo de tarjeta para fines estadísticos, así como logs de peticiones HTTP con
+          direcciones IP estrictamente anonimizadas mediante enmascaramiento criptográfico de
+          octetos (conforme a principios de minimización de datos del RGPD / Ley 1581) y política de
+          purga automática periódica cada 90 días para mitigar cualquier riesgo de correlación de
+          tráfico.
         </li>
       </ul>
     </section>
@@ -248,7 +252,7 @@ import Footer from '../components/Footer.astro';
       </ul>
     </section>
 
-    <!-- Section 6: Cookies y Almacenamiento Local -->
+    <!-- Section 6: Cookies y Almacenamiento Local Cifrado -->
     <section class="privacy-section">
       <h3>
         <svg
@@ -266,15 +270,36 @@ import Footer from '../components/Footer.astro';
           <line x1="12" y1="8" x2="12" y2="12"></line>
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
         </svg>
-        6. Transparencia en Almacenamiento Local (LocalStorage)
+        6. Transparencia en Almacenamiento Local Cifrado (AEAD) y Cookies Seguras
       </h3>
       <p>
-        GitCard Studio no utiliza cookies publicitarias ni de seguimiento de terceros.
-        Exclusivamente se utiliza la memoria local del navegador (<code>localStorage</code>) para
-        recordar configuraciones funcionales elegidas por ti (tales como el tema visual o el nombre
-        de usuario activo), las cuales puedes limpiar borrando el caché de tu navegador en cualquier
-        momento.
+        GitCard Studio no utiliza cookies publicitarias ni herramientas de rastreo invasivo de
+        terceros. La gestión del estado en el navegador implementa las directrices de máxima
+        seguridad y privacidad:
       </p>
+      <ul>
+        <li>
+          <strong>Cifrado Local Autenticado (AEAD)</strong>: Los datos funcionales almacenados en{' '}
+          <code>localStorage</code> y <code>sessionStorage</code> (como preferencias de tema visual,
+          idioma, consentimiento y usuario de trabajo) se almacenan estrictamente cifrados bajo un
+          esquema de Cifrado Autenticado con Datos Asociados (AEAD: flujo CTR SHA-256 + IV aleatorio
+          de 96 bits + firma HMAC-SHA256 en tiempo constante). Ningún dato sensible se expone en
+          texto plano en el almacenamiento del navegador.
+        </li>
+        <li>
+          <strong>Guardián de Integridad Anti-Tampering (DevTools Guard)</strong>: El sistema
+          incluye detección activa de manipulaciones manuales en tiempo real. Si un valor en{' '}
+          <code>localStorage</code> es modificado, inyectado o copiado de forma externa, el sistema
+          lo detecta al instante y purga el registro comprometido para prevenir ataques de
+          manipulación de estado en el cliente.
+        </li>
+        <li>
+          <strong>Cookies Estrictamente Técnicas</strong>: Las cookies emitidas por el servidor (
+          <code>gcs_session</code>) son exclusivamente de naturaleza técnica para la validación de
+          sesión OAuth, configuradas con directivas <code>HttpOnly; SameSite=Lax; Secure</code> para
+          proteger contra secuestro de sesión y ataques XSS.
+        </li>
+      </ul>
     </section>
 
     <!-- Back Button -->

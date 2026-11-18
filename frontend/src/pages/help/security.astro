@@ -46,10 +46,15 @@ import Footer from '../../components/Footer.astro';
     </nav>
 
     <div class="help-header">
-      <h2>¿Cómo se Almacenan y Protegen mis Datos?</h2>
-      <p style="color: var(--text-secondary); margin-top: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 8px;">
+        <h2>¿Cómo se Almacenan y Protegen mis Datos?</h2>
+        <span style="font-size: 0.82rem; color: var(--text-secondary); opacity: 0.85;">
+          Actualizado: 17 de Noviembre, 2026 &bull; v1.23.0
+        </span>
+      </div>
+      <p style="color: var(--text-secondary); margin-top: 6px">
         Tu privacidad y la seguridad de tu cuenta son nuestra máxima prioridad. Conoce la
-        arquitectura de seguridad aplicada en GitCard Studio.
+        arquitectura de seguridad multicapa aplicada en GitCard Studio.
       </p>
     </div>
 
@@ -73,6 +78,37 @@ import Footer from '../../components/Footer.astro';
         </div>
 
         <div class="security-card">
+          <div
+            class="card-badge"
+            style="background: rgba(56, 189, 248, 0.12); color: #38bdf8; border-color: rgba(56, 189, 248, 0.2);"
+          >
+            Seguridad en Cliente
+          </div>
+          <h3>Cifrado AEAD Local & Tamper Guard</h3>
+          <p>
+            Tus preferencias y estado temporal en el navegador se cifran localmente mediante{' '}
+            <strong>Web Crypto API (AEAD)</strong>. Nuestro sistema <em>Tamper Guard</em> verifica
+            la integridad de los datos en tiempo real, bloqueando manipulaciones arbitrarias desde
+            DevTools.
+          </p>
+        </div>
+
+        <div class="security-card">
+          <div
+            class="card-badge"
+            style="background: rgba(168, 85, 247, 0.12); color: #a855f7; border-color: rgba(168, 85, 247, 0.2);"
+          >
+            Sesiones Seguras
+          </div>
+          <h3>Cookies HttpOnly & SameSite=Lax</h3>
+          <p>
+            La autenticación OAuth se custodia en cookies cifradas no accesibles mediante JavaScript
+            (inmunes a ataques XSS), con banderas <code>HttpOnly</code>, <code>Secure</code> y
+            <code>SameSite=Lax</code> para neutralizar ataques CSRF.
+          </p>
+        </div>
+
+        <div class="security-card">
           <div class="card-badge">Aislamiento de Claves</div>
           <h3>Clave Secreta Exclusiva del Servidor</h3>
           <p>
@@ -84,11 +120,11 @@ import Footer from '../../components/Footer.astro';
 
         <div class="security-card">
           <div class="card-badge">Auditoría GDPR</div>
-          <h3>Registro de Consentimiento Explícito</h3>
+          <h3>Retención de 90 Días & Anonimización</h3>
           <p>
-            Registramos que has aceptado explícitamente el almacenamiento junto con una marca de
-            tiempo (timestamp) y una firma hash de auditoría para garantizar el cumplimiento
-            normativo.
+            Conservamos registros de auditoría y telemetría por un máximo de 90 días con
+            enmascaramiento unidireccional de direcciones IP, garantizando el estricto cumplimiento
+            de los principios de minimización del RGPD / GDPR.
           </p>
         </div>
 

@@ -46,10 +46,16 @@ import Footer from '../../components/Footer.astro';
     </nav>
 
     <div class="help-header">
-      <h2>Paso a Paso: Cómo Crear tu Perfil Especial en GitHub (README.md)</h2>
-      <p style="color: var(--text-secondary); margin-top: 10px">
-        Descubre cómo mostrar un panel estético con tus métricas de código en la parte superior de
-        tu perfil público de GitHub.
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 8px;">
+        <h2>Paso a Paso: Cómo Crear tu Perfil Especial en GitHub (README.md)</h2>
+        <span style="font-size: 0.82rem; color: var(--text-secondary); opacity: 0.85;">
+          Actualizado: 17 de Noviembre, 2026 &bull; v1.23.0
+        </span>
+      </div>
+      <p style="color: var(--text-secondary); margin-top: 6px">
+        Descubre cómo mostrar un panel estético con tus métricas de código en tiempo real en la
+        parte superior de tu perfil público de GitHub utilizando las 14 tarjetas temáticas de
+        GitCard Studio.
       </p>
     </div>
 
@@ -128,7 +134,9 @@ import Footer from '../../components/Footer.astro';
           <p>
             Abre el archivo <code>README.md</code> en tu nuevo repositorio, presiona el ícono del
             lápiz (Editar) y pega la plantilla de <strong>README.md de Ejemplo</strong> que copiaste
-            desde GitCard Studio o los códigos Markdown individuales de cada tarjeta.
+            desde GitCard Studio o los códigos Markdown individuales de cada una de las 14 tarjetas
+            disponibles (como <em>Perfil y Actividad</em>, <em>Tech Stack</em>,{' '}
+            <em>Commit Activity</em>, <em>Repo Views</em>, <em>Productividad Horaria</em>, etc.).
           </p>
         </li>
 
@@ -139,16 +147,18 @@ import Footer from '../../components/Footer.astro';
           <p>
             Haz clic en el botón <strong>Commit changes...</strong>. ¡Al visitar tu perfil público
             en <code>github.com/tu-usuario</code> verás tu nuevo perfil estético con métricas
-            actualizadas en caliente!
+            actualizadas automáticamente en caliente!
           </p>
         </li>
       </ol>
 
       <div class="highlight-box">
-        💡 <strong>Consejo Pro:</strong> Puedes usar nuestro botón{' '}
-        <strong>"Copiar README.md Completo"</strong> en el generador de la pantalla principal para
-        copiar con un solo clic una estructura ya organizada con todas las tarjetas que hayas
-        generado.
+        💡 <strong>Consejo Pro:</strong> Puedes activar la opción{' '}
+        <strong>"Hacer tarjetas interactivas (enlazables)"</strong> en el panel de configuración
+        para que al hacer clic sobre cualquier tarjeta en GitHub, los visitantes sean redirigidos
+        directamente a tu perfil o repositorio correspondiente. También puedes utilizar el botón{' '}
+        <strong>"Copiar README.md Completo"</strong> para obtener una estructura estética
+        preconfigurada en un solo clic.
       </div>
     </section>
 

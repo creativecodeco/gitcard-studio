@@ -46,10 +46,15 @@ import Footer from '../../components/Footer.astro';
     </nav>
 
     <div class="help-header">
-      <h2>¿Cómo Puedo Revocar o Eliminar mi Token Almacenado?</h2>
-      <p style="color: var(--text-secondary); margin-top: 10px">
-        Tienes el control absoluto sobre tus datos en todo momento. Ofrecemos tres métodos sencillos
-        para revocar o borrar tus registros.
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 8px;">
+        <h2>¿Cómo Puedo Revocar o Eliminar mi Token Almacenado?</h2>
+        <span style="font-size: 0.82rem; color: var(--text-secondary); opacity: 0.85;">
+          Actualizado: 17 de Noviembre, 2026 &bull; v1.23.0
+        </span>
+      </div>
+      <p style="color: var(--text-secondary); margin-top: 6px">
+        Tienes el control absoluto sobre tus datos en todo momento. Ofrecemos métodos directos y
+        transparentes para revocar o borrar tus registros en un solo clic.
       </p>
     </div>
 
@@ -60,9 +65,11 @@ import Footer from '../../components/Footer.astro';
           <h3>Revocación Rápida desde la Web (Navegador Activo)</h3>
         </div>
         <p>
-          Si estás utilizando el mismo navegador desde el cual registraste tu token, abre la sección
-          de Estadísticas Privadas y simplemente haz clic en el botón <strong>Revocar Token</strong>
-          . El servidor eliminará tu token cifrado de la base de datos de manera inmediata.
+          Si estás utilizando el navegador donde iniciaste sesión o registraste tu token, abre la
+          sección de Estadísticas Privadas y simplemente haz clic en el botón{' '}
+          <strong>Desconectar / Revocar Token</strong>. El servidor invalidará de inmediato tu
+          sesión, eliminará los tokens cifrados de la base de datos y purgará atómicamente el
+          almacenamiento local cifrado de tu navegador.
         </p>
       </div>
 
@@ -95,11 +102,11 @@ import Footer from '../../components/Footer.astro';
           <h3>Desactivación Remota Inmediata desde GitHub</h3>
         </div>
         <p>
-          Puedes invalidar el acceso de forma remota en cualquier momento. Ve a tu lista de tokens
-          en la configuración de GitHub y haz clic en <strong>Revoke</strong> o{' '}
-          <strong>Delete</strong> al lado del token. A partir de ese milisegundo, cualquier consulta
-          enviada a nuestro servidor fallará por parte de GitHub y tus estadísticas privadas dejarán
-          de mostrarse automáticamente.
+          Puedes invalidar el acceso de forma remota en cualquier momento. Ve a tu lista de
+          aplicaciones autorizadas o tokens en la configuración de GitHub y haz clic en{' '}
+          <strong>Revoke</strong> o <strong>Delete</strong>. A partir de ese milisegundo, cualquier
+          consulta enviada a nuestro servidor fallará por parte de GitHub y tus estadísticas
+          privadas dejarán de mostrarse automáticamente.
         </p>
       </div>
 
@@ -109,10 +116,12 @@ import Footer from '../../components/Footer.astro';
           <h3>Eliminación Definitiva y Purga Total de Datos</h3>
         </div>
         <p>
-          Si deseas borrar de forma permanente tu token cifrado, tu historial de estadísticas, tus
-          registros de consumo de métricas y todos los logs asociados de tu usuario, presiona el
-          botón <strong>"Eliminar todos mis datos"</strong> en el modal de la aplicación e introduce
-          tu token para autorizar la purga irreversibles.
+          Si deseas borrar de forma permanente tu usuario, tokens cifrados, historial de
+          estadísticas, registros de consumo de métricas y todos los logs asociados, presiona el
+          botón <strong>"Eliminar todos mis datos"</strong> en el modal de la aplicación. Esto
+          invoca el endpoint <code>DELETE /api/users/me</code> con verificación de identidad,
+          borrando de forma irreversible todos tus registros en cascada y cerrando cualquier sesión
+          activa.
         </p>
       </div>
     </section>

@@ -39,11 +39,16 @@ import Footer from '../../components/Footer.astro';
 
   <main class="help-hub-container">
     <div class="help-hub-header">
-      <span class="hub-badge">Centro de Ayuda</span>
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+        <span class="hub-badge">Centro de Ayuda & Documentación</span>
+        <span style="font-size: 0.82rem; color: var(--text-secondary); opacity: 0.85;">
+          Actualizado: 17 de Noviembre, 2026 &bull; v1.23.0
+        </span>
+      </div>
       <h2>¿En qué te podemos ayudar hoy?</h2>
       <p style="color: var(--text-secondary); margin-top: 10px; font-size: 1.05rem;">
         Explora nuestras guías paso a paso para configurar tu perfil en GitHub y gestionar la
-        seguridad de tus métricas.
+        seguridad de tus métricas con los más altos estándares de cifrado.
       </p>
     </div>
 
@@ -222,6 +227,8 @@ import Footer from '../../components/Footer.astro';
     window.location.replace('/help/security');
   } else if (hash === '#revocation' || hash === '#purge') {
     window.location.replace('/help/revocation');
+  } else if (hash === '#organizations' || hash === '#orgs') {
+    window.location.replace('/help/organizations');
   }
 </script>
 
