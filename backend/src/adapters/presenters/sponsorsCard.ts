@@ -20,7 +20,7 @@ export async function renderSponsorsCard(
 
   const cardWidth = 495;
   const cardHeight = 220;
-  const widthAttr = overrides?.cardWidth || `${cardWidth}`;
+  const widthAttr = escapeXml(overrides?.cardWidth || `${cardWidth}`);
   const backgroundDef = getBackgroundDef(theme, 'bg');
 
   const mainAvatarSvg = avatarBase64

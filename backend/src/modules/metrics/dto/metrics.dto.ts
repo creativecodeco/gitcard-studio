@@ -1,5 +1,17 @@
-import { IsArray, IsBoolean, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Matches,
+  Max,
+  Min
+} from 'class-validator';
 import { Type } from 'class-transformer';
+import { GITHUB_USERNAME_REGEX } from '@/domain/entities/Validation';
 
 export class MetricsHistoryQueryDto {
   @IsOptional()
@@ -30,6 +42,7 @@ export class MetricsKeyQueryDto {
 
 export class VerifyReadmeDto {
   @IsString()
+  @Matches(GITHUB_USERNAME_REGEX, { message: 'Invalid GitHub username format' })
   username!: string;
 
   @IsOptional()
@@ -48,7 +61,9 @@ export class VerifyReadmeDto {
 export class VerifyReadmesBatchDto {
   @IsOptional()
   @IsArray()
+  @ArrayMaxSize(500)
   @IsString({ each: true })
+  @Matches(GITHUB_USERNAME_REGEX, { each: true, message: 'Invalid GitHub username in batch' })
   usernames?: string[];
 
   @IsOptional()

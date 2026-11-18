@@ -1,4 +1,5 @@
 import { StreakStats } from '@/domain/entities/StreakStats';
+import { escapeXml } from '@/utils/escape';
 import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
 import { getTranslations } from './i18n';
 
@@ -30,15 +31,17 @@ export function renderStreakCard(
 
   const cardWidth = 495;
   const cardHeight = 195;
-  const widthAttr = overrides?.cardWidth || `${cardWidth}`;
+  const widthAttr = escapeXml(overrides?.cardWidth || `${cardWidth}`);
 
   // Background gradient definition
   const backgroundDef = getBackgroundDef(theme, 'bg-streak');
 
   // Date range labels
-  const totalRange = stats.firstContributionDate
-    ? `${formatDateFull(stats.firstContributionDate)} - ${t.streak.present}`
-    : 'N/A';
+  const totalRange = escapeXml(
+    stats.firstContributionDate
+      ? `${formatDateFull(stats.firstContributionDate)} - ${t.streak.present}`
+      : 'N/A'
+  );
 
   let currentStreakRange = t.streak.noStreak;
   if (stats.currentStreak > 0) {
@@ -48,6 +51,7 @@ export function renderStreakCard(
       currentStreakRange = `${formatDate(stats.currentStreakStart)} - ${formatDate(stats.currentStreakEnd)}`;
     }
   }
+  currentStreakRange = escapeXml(currentStreakRange);
 
   let longestStreakRange = 'N/A';
   if (stats.longestStreak > 0) {
@@ -57,6 +61,7 @@ export function renderStreakCard(
       longestStreakRange = `${formatDateFull(stats.longestStreakStart)} - ${formatDateFull(stats.longestStreakEnd)}`;
     }
   }
+  longestStreakRange = escapeXml(longestStreakRange);
 
   // Column x centers
   const col1 = 82;

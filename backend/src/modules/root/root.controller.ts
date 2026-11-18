@@ -13,16 +13,46 @@ import { GITHUB_USERNAME_REGEX } from '@/domain/entities/Validation';
 import { HtmlFileService } from './html-file.service';
 
 const THEME_REGEX = /^[a-z\d_]{1,50}$/i;
-const HOST_CLEAN_REGEX = /[^a-zA-Z0-9.\-:]/g;
+const VALID_HOST_REGEX =
+  /^(?:localhost|127\.0\.0\.1|[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+)(?::\d{1,5})?$/;
 const SLUG_CLEAN_REGEX = /[^a-z0-9-]/gi;
+const DEFAULT_BASE_URL = 'https://gitcard-studio.creativecode.com.co';
 
 @Controller()
 export class RootController {
   constructor(@Inject(HtmlFileService) private readonly htmlFileService: HtmlFileService) {}
 
+  private resolveSafeBaseUrl(hostHeader?: string, forwardedProto?: string): string {
+    const configuredPublicUrl = process.env.PUBLIC_URL?.trim().replace(/\/+$/, '');
+    if (configuredPublicUrl && /^https?:\/\//i.test(configuredPublicUrl)) {
+      return configuredPublicUrl;
+    }
+
+    const rawHost = typeof hostHeader === 'string' ? hostHeader.trim() : '';
+    if (!rawHost || !VALID_HOST_REGEX.test(rawHost)) {
+      return DEFAULT_BASE_URL;
+    }
+
+    const isLocalHost = rawHost.startsWith('localhost') || rawHost.startsWith('127.0.0.1');
+    if (process.env.NODE_ENV === 'production' && !isLocalHost) {
+      const allowedHost = new URL(DEFAULT_BASE_URL).host;
+      if (rawHost.toLowerCase() !== allowedHost.toLowerCase()) {
+        return DEFAULT_BASE_URL;
+      }
+    }
+
+    const protocol = forwardedProto === 'https' || !isLocalHost ? 'https' : 'http';
+    return `${protocol}://${rawHost}`;
+  }
+
   @Get()
   @Header('Content-Type', 'text/html; charset=utf-8')
   @Header('Cache-Control', 'no-cache, must-revalidate')
+  @Header('X-Frame-Options', 'DENY')
+  @Header('X-Content-Type-Options', 'nosniff')
+  @Header('Referrer-Policy', 'strict-origin-when-cross-origin')
+  @Header('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()')
+  @Header('Content-Security-Policy', "frame-ancestors 'none'; object-src 'none'; base-uri 'self'")
   getRoot(
     @Query('user') userQueryParam?: string,
     @Query('username') usernameQueryParam?: string,
@@ -33,7 +63,7 @@ export class RootController {
     const userQuery = this.resolveUsernameQuery(userQueryParam, usernameQueryParam);
     const themeQuery = typeof themeQueryParam === 'string' ? themeQueryParam : '';
 
-    let html = this.htmlFileService.getPublicFileOrThrow(
+    const html = this.htmlFileService.getPublicFileOrThrow(
       'index.html',
       'index.html not found. Please build the frontend first.'
     );
@@ -45,10 +75,7 @@ export class RootController {
       return html;
     }
 
-    const rawHost = hostHeader ?? 'gitcard-studio.creativecode.com.co';
-    const safeHost = rawHost.replace(HOST_CLEAN_REGEX, '');
-    const protocol = forwardedProto === 'https' ? 'https' : 'http';
-    const baseUrl = `${protocol}://${safeHost}`;
+    const baseUrl = this.resolveSafeBaseUrl(hostHeader, forwardedProto);
 
     return this.injectSocialMetaTags(html, targetUsername, targetTheme, baseUrl);
   }
@@ -57,7 +84,7 @@ export class RootController {
   getHealth(): { status: string; version: string; uptime: number; environment: string } {
     return {
       status: 'ok',
-      version: process.env.npm_package_version ?? '1.13.0',
+      version: process.env.npm_package_version ?? '1.22.0',
       uptime: Math.floor(process.uptime()),
       environment: process.env.NODE_ENV ?? 'development'
     };
@@ -66,6 +93,11 @@ export class RootController {
   @Get('admin/metrics')
   @Header('Content-Type', 'text/html; charset=utf-8')
   @Header('Cache-Control', 'no-cache, must-revalidate')
+  @Header('X-Frame-Options', 'DENY')
+  @Header('X-Content-Type-Options', 'nosniff')
+  @Header('Referrer-Policy', 'strict-origin-when-cross-origin')
+  @Header('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()')
+  @Header('Content-Security-Policy', "frame-ancestors 'none'; object-src 'none'; base-uri 'self'")
   getAdminMetrics(): string {
     return this.htmlFileService.getPublicFileOrThrow('admin/metrics.html');
   }
@@ -73,6 +105,10 @@ export class RootController {
   @Get('help')
   @Header('Content-Type', 'text/html; charset=utf-8')
   @Header('Cache-Control', 'no-cache, must-revalidate')
+  @Header('X-Frame-Options', 'DENY')
+  @Header('X-Content-Type-Options', 'nosniff')
+  @Header('Referrer-Policy', 'strict-origin-when-cross-origin')
+  @Header('Content-Security-Policy', "frame-ancestors 'none'; object-src 'none'; base-uri 'self'")
   getHelp(): string {
     return this.htmlFileService.getPublicFileOrThrow('help.html');
   }
@@ -80,6 +116,10 @@ export class RootController {
   @Get('privacy')
   @Header('Content-Type', 'text/html; charset=utf-8')
   @Header('Cache-Control', 'no-cache, must-revalidate')
+  @Header('X-Frame-Options', 'DENY')
+  @Header('X-Content-Type-Options', 'nosniff')
+  @Header('Referrer-Policy', 'strict-origin-when-cross-origin')
+  @Header('Content-Security-Policy', "frame-ancestors 'none'; object-src 'none'; base-uri 'self'")
   getPrivacy(): string {
     return this.htmlFileService.getPublicFileOrThrow('privacy.html');
   }
@@ -87,6 +127,10 @@ export class RootController {
   @Get('help/:slug')
   @Header('Content-Type', 'text/html; charset=utf-8')
   @Header('Cache-Control', 'no-cache, must-revalidate')
+  @Header('X-Frame-Options', 'DENY')
+  @Header('X-Content-Type-Options', 'nosniff')
+  @Header('Referrer-Policy', 'strict-origin-when-cross-origin')
+  @Header('Content-Security-Policy', "frame-ancestors 'none'; object-src 'none'; base-uri 'self'")
   getHelpSubPage(@Param('slug') slug: string): string {
     const safeSlug = slug.replace(SLUG_CLEAN_REGEX, '');
     if (!safeSlug) {

@@ -15,7 +15,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const req = ctx.getRequest<FastifyRequest>();
 
     const isHttpException = exception instanceof HttpException;
-    const status = isHttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    const rawStatusCode =
+      !isHttpException &&
+      typeof exception === 'object' &&
+      exception !== null &&
+      'statusCode' in exception &&
+      typeof (exception as { statusCode?: unknown }).statusCode === 'number'
+        ? (exception as { statusCode: number }).statusCode
+        : undefined;
+    const status = isHttpException
+      ? exception.getStatus()
+      : (rawStatusCode ?? HttpStatus.INTERNAL_SERVER_ERROR);
     const isClientError = status >= 400 && status < 500;
 
     if (!isClientError) {
@@ -28,9 +38,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
       });
     }
 
-    const message = isHttpException
-      ? (exception.getResponse() as Record<string, unknown>)
-      : { statusCode: status, message: 'Internal server error' };
+    let message: Record<string, unknown>;
+    if (isHttpException) {
+      message = exception.getResponse() as Record<string, unknown>;
+    } else if (isClientError && exception instanceof Error) {
+      message = { statusCode: status, message: exception.message };
+    } else {
+      message = { statusCode: status, message: 'Internal server error' };
+    }
 
     res.status(status).send(message);
   }

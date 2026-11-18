@@ -28,13 +28,35 @@ import { logger } from '@/infrastructure/logging/logger';
 import { sanitizeColor } from '@/adapters/presenters/theme';
 import { extractThemeOverrides, extractCardWidth } from './card-query.helpers';
 import { escapeXml } from '@/utils/escape';
+import { convertSvgToFormat } from '@/adapters/converters/imageConverter';
 
 import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
 
 const SVG_CSP_HEADER = "default-src 'none'; img-src data:; style-src 'unsafe-inline'";
+const CACHE_BYPASS_COOLDOWN_MS = 15_000;
+const MAX_BYPASS_COOLDOWN_ENTRIES = 2000;
 
 @Controller('api')
 export class CardsController {
+  private readonly lastCacheBypassByUser = new Map<string, number>();
+
+  private shouldAllowCacheBypass(username: string): boolean {
+    const key = username.trim().toLowerCase();
+    const now = Date.now();
+    const lastBypass = this.lastCacheBypassByUser.get(key);
+    if (lastBypass !== undefined && now - lastBypass < CACHE_BYPASS_COOLDOWN_MS) {
+      return false;
+    }
+    if (this.lastCacheBypassByUser.size >= MAX_BYPASS_COOLDOWN_ENTRIES) {
+      const oldestKey = this.lastCacheBypassByUser.keys().next().value;
+      if (oldestKey !== undefined) {
+        this.lastCacheBypassByUser.delete(oldestKey);
+      }
+    }
+    this.lastCacheBypassByUser.set(key, now);
+    return true;
+  }
+
   private applySvgSecurityHeaders(res: FastifyReply): FastifyReply {
     return res
       .header('Content-Type', 'image/svg+xml; charset=utf-8')
@@ -86,7 +108,7 @@ export class CardsController {
       hitContext?: HitContext
     ) => Promise<string>,
     noCache: boolean = false
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     this.applySvgSecurityHeaders(res);
     const username = query.username;
     const theme = query.theme;
@@ -113,7 +135,7 @@ export class CardsController {
       query.cache_seconds === '0' ||
       query.cache_bust !== undefined;
 
-    if (isCacheBypass) {
+    if (isCacheBypass && this.shouldAllowCacheBypass(username)) {
       await this.githubRepo.clearCache(username);
     }
 
@@ -143,8 +165,20 @@ export class CardsController {
       };
 
       const svg = await executeUseCase(username, theme as string, overrides, hitContext);
+      const isPng = typeof query.format === 'string' && query.format.toLowerCase().trim() === 'png';
 
       if (noCache) {
+        if (isPng) {
+          const converted = await convertSvgToFormat(svg, 'png');
+          res
+            .header('Content-Type', converted.contentType)
+            .header('X-Content-Type-Options', 'nosniff')
+            .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
+            .header('Pragma', 'no-cache')
+            .header('Expires', '0')
+            .status(200);
+          return converted.buffer;
+        }
         this.applySvgSecurityHeaders(res)
           .header('Cache-Control', 'max-age=0, s-maxage=0, no-cache, no-store, must-revalidate')
           .header('Pragma', 'no-cache')
@@ -156,6 +190,16 @@ export class CardsController {
       const cacheHeader = isCacheBypass
         ? 'no-cache, no-store, must-revalidate'
         : 'public, max-age=7200';
+
+      if (isPng) {
+        const converted = await convertSvgToFormat(svg, 'png');
+        res
+          .header('Content-Type', converted.contentType)
+          .header('X-Content-Type-Options', 'nosniff')
+          .header('Cache-Control', cacheHeader)
+          .status(200);
+        return converted.buffer;
+      }
 
       this.applySvgSecurityHeaders(res).header('Cache-Control', cacheHeader).status(200);
       return svg;
@@ -185,7 +229,7 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     return this.handleCardRequest(query, userAgent, referer, ip, res, 'Stats', (u, t, o, h) =>
       this.statsCardUseCase.execute(u, t, o, h)
     );
@@ -198,7 +242,7 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     return this.handleCardRequest(query, userAgent, referer, ip, res, 'Languages', (u, t, o, h) =>
       this.languagesCardUseCase.execute(u, t, o, h)
     );
@@ -211,9 +255,8 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
-    res.header('Content-Type', 'image/svg+xml; charset=utf-8');
-    res.header('X-Content-Type-Options', 'nosniff');
+  ): Promise<string | Buffer> {
+    this.applySvgSecurityHeaders(res);
     const repo = query.repo;
 
     if (repo && (typeof repo !== 'string' || !GITHUB_REPO_REGEX.test(repo))) {
@@ -233,7 +276,7 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     return this.handleCardRequest(query, userAgent, referer, ip, res, 'Rank', (u, t, o, h) =>
       this.rankCardUseCase.execute(u, t, o, h)
     );
@@ -246,7 +289,7 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     return this.handleCardRequest(query, userAgent, referer, ip, res, 'Streak', (u, t, o, h) =>
       this.streakCardUseCase.execute(u, t, o, h)
     );
@@ -259,7 +302,7 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     return this.handleCardRequest(query, userAgent, referer, ip, res, 'Trophies', (u, t, o, h) =>
       this.trophiesCardUseCase.execute(u, t, o, h)
     );
@@ -273,8 +316,7 @@ export class CardsController {
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
   ): Promise<string> {
-    res.header('Content-Type', 'image/svg+xml; charset=utf-8');
-    res.header('X-Content-Type-Options', 'nosniff');
+    this.applySvgSecurityHeaders(res);
     const { username, repo, theme, color, label, style, preview } = query;
 
     if (!username || typeof username !== 'string' || !GITHUB_USERNAME_REGEX.test(username)) {
@@ -351,9 +393,8 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
-    res.header('Content-Type', 'image/svg+xml; charset=utf-8');
-    res.header('X-Content-Type-Options', 'nosniff');
+  ): Promise<string | Buffer> {
+    this.applySvgSecurityHeaders(res);
     const repo = query.repo;
 
     if (
@@ -400,7 +441,7 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     return this.handleCardRequest(query, userAgent, referer, ip, res, 'TopRepos', (u, t, o) =>
       this.topReposCardUseCase.execute(u, t, o)
     );
@@ -413,7 +454,7 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     return this.handleCardRequest(query, userAgent, referer, ip, res, 'Sponsors', (u, t, o, h) =>
       this.sponsorsCardUseCase.execute(u, t, o, h)
     );
@@ -426,7 +467,7 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     const cardWidth = extractCardWidth(query);
     return this.handleCardRequest(
       query,
@@ -446,7 +487,7 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     return this.handleCardRequest(
       query,
       userAgent,
@@ -469,7 +510,7 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     const cardWidth = extractCardWidth(query);
     return this.handleCardRequest(
       query,
@@ -513,8 +554,7 @@ export class CardsController {
     @Query() query: Record<string, unknown>,
     @Res({ passthrough: true }) res: FastifyReply
   ): Promise<string> {
-    res.header('Content-Type', 'image/svg+xml; charset=utf-8');
-    res.header('X-Content-Type-Options', 'nosniff');
+    this.applySvgSecurityHeaders(res);
 
     const rawUsername = query.username;
     if (
@@ -583,7 +623,7 @@ export class CardsController {
     @Headers('referer') referer: string | undefined,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: FastifyReply
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     return this.handleCardRequest(query, userAgent, referer, ip, res, 'TechStack', (u, t, o, h) =>
       this.techStackCardUseCase.execute(u, t, o, h)
     );

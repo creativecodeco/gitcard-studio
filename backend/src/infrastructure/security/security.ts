@@ -38,6 +38,24 @@ function getEncryptionKey(): Buffer {
 
 export const SESSION_COOKIE_NAME = 'gcs_session';
 
+const revokedSessionFloorByUser = new Map<string, number>();
+
+/**
+ * Immediately invalidate all session tokens issued prior to now for a specific user
+ */
+export function revokeUserSessions(username: string): void {
+  if (!username || typeof username !== 'string') return;
+  const normalizedUser = username.trim().toLowerCase();
+  if (!normalizedUser) return;
+  if (revokedSessionFloorByUser.size >= 5000) {
+    const oldest = revokedSessionFloorByUser.keys().next().value;
+    if (oldest !== undefined) {
+      revokedSessionFloorByUser.delete(oldest);
+    }
+  }
+  revokedSessionFloorByUser.set(normalizedUser, Date.now());
+}
+
 /**
  * Generate a stateless AES-256-GCM encrypted and authenticated session token for an authenticated user
  */
@@ -46,9 +64,11 @@ export function generateOAuthSessionToken(
   ttlMs: number = 30 * 24 * 60 * 60 * 1000
 ): string {
   const normalizedUser = username.trim().toLowerCase();
-  const expiresAt = Date.now() + ttlMs;
+  const issuedAt = Date.now();
+  const expiresAt = issuedAt + ttlMs;
   const payload = JSON.stringify({
     u: normalizedUser,
+    iat: issuedAt,
     exp: expiresAt,
     n: crypto.randomBytes(8).toString('hex')
   });
@@ -101,7 +121,7 @@ export function decryptOAuthSessionToken(
     let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
 
-    const parsed = JSON.parse(decrypted) as { u?: string; exp?: number };
+    const parsed = JSON.parse(decrypted) as { u?: string; iat?: number; exp?: number };
     if (
       !parsed ||
       typeof parsed.u !== 'string' ||
@@ -113,8 +133,17 @@ export function decryptOAuthSessionToken(
       return null;
     }
 
+    const normalizedUser = parsed.u.trim().toLowerCase();
+    const revocationFloor = revokedSessionFloorByUser.get(normalizedUser);
+    if (
+      revocationFloor !== undefined &&
+      (typeof parsed.iat !== 'number' || parsed.iat <= revocationFloor)
+    ) {
+      return null;
+    }
+
     return {
-      username: parsed.u.trim().toLowerCase(),
+      username: normalizedUser,
       expiresAt: parsed.exp
     };
   } catch {

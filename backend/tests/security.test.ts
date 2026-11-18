@@ -8,9 +8,11 @@ import {
   extractSessionTokenFromCookie,
   generateConsentFingerprint,
   generateOAuthSessionToken,
+  revokeUserSessions,
   verifyOAuthSessionToken,
   validateTokenScopes
 } from '@/infrastructure/security/security';
+import { anonymizeIpAddress } from '@/adapters/repositories/TypeORMMetricsRepository';
 import { sanitizeColor } from '@/adapters/presenters/theme';
 import { extractCardWidth } from '@/modules/cards/card-query.helpers';
 import { GITHUB_REPO_REGEX, sanitizeBadgeLabel } from '@/domain/entities/Validation';
@@ -64,6 +66,17 @@ describe('security.ts tests', () => {
     // Expired token should fail
     const expiredToken = generateOAuthSessionToken('octocat', -1000);
     expect(verifyOAuthSessionToken(expiredToken, 'octocat')).toBe(false);
+
+    // Revoked session should fail immediately
+    revokeUserSessions('octocat');
+    expect(verifyOAuthSessionToken(token, 'octocat')).toBe(false);
+  });
+
+  it('should anonymize IPv4 and IPv6 addresses for GDPR compliance', () => {
+    expect(anonymizeIpAddress('203.0.113.45')).toBe('203.0.113.0');
+    expect(anonymizeIpAddress('2001:db8:85a3:0:0:8a2e:370:7334')).toBe('2001:db8:85a3::');
+    expect(anonymizeIpAddress('127.0.0.1')).toBe('127.0.0.1');
+    expect(anonymizeIpAddress('::1')).toBe('::1');
   });
 
   it('should generate consent fingerprint consistently', () => {

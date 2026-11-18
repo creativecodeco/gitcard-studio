@@ -9,6 +9,14 @@ export interface CardItem {
 
 export type ReadmeLayout = 'vertical' | 'grid';
 
+function sanitizeSafeUrl(rawUrl: string): string {
+  const trimmed = (rawUrl || '').trim();
+  if (/^(?:https?:\/\/|\/)/i.test(trimmed)) {
+    return escapeHtml(trimmed);
+  }
+  return '#';
+}
+
 export function generateSampleReadme(
   username: string,
   activeCards: CardItem[],
@@ -53,16 +61,21 @@ export function generateSampleReadme(
 
 function formatGridCards(activeCards: CardItem[], linkUrl?: string): string {
   const rows: string[] = [];
+  const safeLinkUrl = linkUrl ? sanitizeSafeUrl(linkUrl) : undefined;
   for (let i = 0; i < activeCards.length; i += 2) {
     const card1 = activeCards[i];
     const card2 = activeCards[i + 1];
 
-    const img1 = `<img src="${card1.url}" alt="${card1.title}" width="100%" />`;
-    const content1 = linkUrl ? `<a href="${linkUrl}">${img1}</a>` : img1;
+    const safeUrl1 = sanitizeSafeUrl(card1.url);
+    const safeTitle1 = escapeHtml(card1.title);
+    const img1 = `<img src="${safeUrl1}" alt="${safeTitle1}" width="100%" />`;
+    const content1 = safeLinkUrl ? `<a href="${safeLinkUrl}">${img1}</a>` : img1;
 
     if (card2) {
-      const img2 = `<img src="${card2.url}" alt="${card2.title}" width="100%" />`;
-      const content2 = linkUrl ? `<a href="${linkUrl}">${img2}</a>` : img2;
+      const safeUrl2 = sanitizeSafeUrl(card2.url);
+      const safeTitle2 = escapeHtml(card2.title);
+      const img2 = `<img src="${safeUrl2}" alt="${safeTitle2}" width="100%" />`;
+      const content2 = safeLinkUrl ? `<a href="${safeLinkUrl}">${img2}</a>` : img2;
       rows.push(`  <tr>
     <td valign="top" width="50%">
       ${content1}
@@ -72,8 +85,8 @@ function formatGridCards(activeCards: CardItem[], linkUrl?: string): string {
     </td>
   </tr>`);
     } else {
-      const singleImg = `<img src="${card1.url}" alt="${card1.title}" />`;
-      const singleContent = linkUrl ? `<a href="${linkUrl}">${singleImg}</a>` : singleImg;
+      const singleImg = `<img src="${safeUrl1}" alt="${safeTitle1}" />`;
+      const singleContent = safeLinkUrl ? `<a href="${safeLinkUrl}">${singleImg}</a>` : singleImg;
       rows.push(`  <tr>
     <td valign="top" colspan="2" align="center">
       ${singleContent}
@@ -94,7 +107,7 @@ export function renderLiveReadmeHtml(
 ): string {
   const cleanUser = escapeHtml(username.trim() || 'username');
   const rawPageUrl = generatorUrl || (typeof window !== 'undefined' ? window.location.href : '');
-  const safePageUrl = escapeHtml(rawPageUrl);
+  const safePageUrl = sanitizeSafeUrl(rawPageUrl);
 
   if (activeCards.length === 0) {
     return `<h1 style="font-size: 1.4rem; color: #fff; border-bottom: 1px solid #30363d; padding-bottom: 8px; margin-top: 0;">${t('readme_preview_greeting', locale, { username: cleanUser })}</h1>
@@ -112,10 +125,10 @@ export function renderLiveReadmeHtml(
     for (let i = 0; i < activeCards.length; i += 2) {
       const c1 = activeCards[i];
       const c2 = activeCards[i + 1];
-      const url1 = escapeHtml(c1.url);
+      const url1 = sanitizeSafeUrl(c1.url);
       const title1 = escapeHtml(c1.title);
       if (c2) {
-        const url2 = escapeHtml(c2.url);
+        const url2 = sanitizeSafeUrl(c2.url);
         const title2 = escapeHtml(c2.title);
         rows.push(`<tr>
           <td valign="top" style="padding: 6px; width: 50%;">
@@ -139,7 +152,7 @@ export function renderLiveReadmeHtml(
     cardsHtml = activeCards
       .map(
         (c) => `<div style="margin-bottom: 12px;">
-        <img src="${escapeHtml(c.url)}" alt="${escapeHtml(c.title)}" style="max-width: 100%; border-radius: 6px; display: block;" />
+        <img src="${sanitizeSafeUrl(c.url)}" alt="${escapeHtml(c.title)}" style="max-width: 100%; border-radius: 6px; display: block;" />
       </div>`
       )
       .join('');

@@ -4,20 +4,20 @@
 
 ---
 
-## Estado actual: 2026-11-05 (v1.21.0)
+## Estado actual: 2026-11-17 (v1.22.0)
 
 ### Stack
 
-| Capa | Tecnología | Versión |
-|---|---|---|
-| Runtime | Node.js | 24 |
-| Backend | NestJS + Fastify + TypeScript | 12.2.0 / 5.12.7 / 7.0.2 |
-| Frontend | Astro (SSG estático) | 7.4.2 |
-| Base de datos | PostgreSQL + TypeORM | 8.23.1 / 1.1.2 |
-| Package Manager | pnpm (monorepo) | 12.15.0 |
-| Contenedor | Docker multi-stage, node:24-alpine | — |
-| CSS | Vanilla CSS (global.css) | — |
-| Tests | Vitest | 5.0.5 |
+| Capa            | Tecnología                         | Versión                 |
+| --------------- | ---------------------------------- | ----------------------- |
+| Runtime         | Node.js                            | 24                      |
+| Backend         | NestJS + Fastify + TypeScript      | 12.5.1 / 5.12.8 / 7.0.2 |
+| Frontend        | Astro (SSG estático)               | 7.4.12                  |
+| Base de datos   | PostgreSQL + TypeORM               | 8.23.1 / 1.1.3          |
+| Package Manager | pnpm (monorepo)                    | 12.21.0                 |
+| Contenedor      | Docker multi-stage, node:24-alpine | —                       |
+| CSS             | Vanilla CSS (global.css)           | —                       |
+| Tests           | Vitest                             | 5.1.0                   |
 
 ---
 
@@ -76,74 +76,74 @@ gitcard-studio/
 
 ## Rutas API (NestJS Fastify Controllers)
 
-| Método | Ruta | Handler | Autenticación / Propósito |
-|--------|------|---------|---------------------------|
-| GET | `/api/stats` | `CardsController.getStats` | Pública, CORS `*`, SVG |
-| GET | `/api/languages` | `CardsController.getLanguages` | Pública, CORS `*`, SVG |
-| GET | `/api/repo` | `CardsController.getRepo` | Pública, CORS `*`, SVG |
-| GET | `/api/repo-views` | `CardsController.getRepoViews` | Pública, `no-cache`, SVG de visitas por proyecto |
-| GET | `/api/rank` | `CardsController.getRank` | Pública, CORS `*`, SVG |
-| GET | `/api/streak` | `CardsController.getStreak` | Pública, SVG |
-| GET | `/api/trophies` | `CardsController.getTrophies` | Pública, SVG |
-| GET | `/api/commit-activity` | `CardsController.getCommitActivity` | Pública, SVG |
-| GET | `/api/sponsors` | `CardsController.getSponsors` | Pública, SVG |
-| GET | `/api/today-status` | `CardsController.getTodayStatus` | Pública, SVG |
-| GET | `/api/timeline-matrix` | `CardsController.getTimelineMatrix` | Pública, SVG |
-| GET | `/api/badge` | `CardsController.getBadge` | Pública, SVG estilo Shields.io |
-| GET | `/api/views` | `CardsController.getProfileViews` | Pública, `no-cache`, SVG |
-| GET | `/api/top-repos` | `CardsController.getTopRepos` | Pública, CORS `*`, SVG |
-| GET | `/api/v1/user/stats` | `ApiV1Controller.getUserStatsJson` | Pública, JSON agregado |
-| GET | `/api/auth/github` | `AuthController.initiateGitHubAuth` | Redirección OAuth GitHub App |
-| GET | `/api/auth/github/callback` | `AuthController.handleGitHubCallback` | Callback OAuth GitHub App |
-| GET | `/api/users/me/metrics` | `AuthController.getUserMetrics` | Métricas personales del usuario y desglose por repositorio |
-| GET | `/api/users/repos` | `AuthController.getUserRepositories` | Lista de repositorios accesibles por el usuario |
-| DELETE | `/api/users/me` | `AuthController.deleteUserAccount` | Purga autoverificada de datos |
-| POST | `/api/auth/disconnect` | `AuthController.disconnectAccount` | Desconexión de cuenta GitHub |
-| POST | `/api/tokens/register` | `TokensController.register` | Validado via DTO (PAT) |
-| DELETE | `/api/tokens/revoke` | `TokensController.revoke` | Validado via DTO |
-| DELETE | `/api/users/purge` | `TokensController.purge` | Validado via DTO (GDPR) |
-| POST | `/api/users/export` | `TokensController.exportData` | Validado via DTO (GDPR export) |
-| POST | `/api/webhooks/github` | `WebhooksController.handleGitHubWebhook` | HMAC SHA-256 opcional |
-| GET | `/api/metrics` | `MetricsController.getMetrics` | `METRICS_KEY` requerida |
-| GET | `/api/metrics/history` | `MetricsController.getRendersHistory` | `METRICS_KEY` requerida |
-| GET | `/api/metrics/users` | `MetricsController.getUserMetrics` | `METRICS_KEY` requerida |
-| GET | `/api/metrics/users/count` | `MetricsController.getUniqueUsersCount` | Pública |
-| POST | `/api/metrics/verify-readme` | `MetricsController.verifyReadme` | `METRICS_KEY` requerida |
-| POST | `/api/metrics/verify-readmes-batch` | `MetricsController.verifyReadmesBatch` | `METRICS_KEY` requerida |
-| GET | `/api/config` | `MetricsController.getConfig` | Pública |
-| GET | `/health` | `RootController.getHealth` | Pública |
-| GET | `/admin/metrics` | `RootController.getAdminMetrics` | UI de administración de métricas |
-| GET | `/help` | `RootController.getHelp` | UI de ayuda y documentación |
-| GET | `/help/:slug` | `RootController.getHelpSubPage` | UI de subpáginas de ayuda |
-| GET | `/privacy` | `RootController.getPrivacy` | UI de política de privacidad |
-| GET | `/` | `RootController.getRoot` | Servido dinámicamente con SEO sanitizado |
+| Método | Ruta                                | Handler                                  | Autenticación / Propósito                                  |
+| ------ | ----------------------------------- | ---------------------------------------- | ---------------------------------------------------------- |
+| GET    | `/api/stats`                        | `CardsController.getStats`               | Pública, CORS `*`, SVG                                     |
+| GET    | `/api/languages`                    | `CardsController.getLanguages`           | Pública, CORS `*`, SVG                                     |
+| GET    | `/api/repo`                         | `CardsController.getRepo`                | Pública, CORS `*`, SVG                                     |
+| GET    | `/api/repo-views`                   | `CardsController.getRepoViews`           | Pública, `no-cache`, SVG de visitas por proyecto           |
+| GET    | `/api/rank`                         | `CardsController.getRank`                | Pública, CORS `*`, SVG                                     |
+| GET    | `/api/streak`                       | `CardsController.getStreak`              | Pública, SVG                                               |
+| GET    | `/api/trophies`                     | `CardsController.getTrophies`            | Pública, SVG                                               |
+| GET    | `/api/commit-activity`              | `CardsController.getCommitActivity`      | Pública, SVG                                               |
+| GET    | `/api/sponsors`                     | `CardsController.getSponsors`            | Pública, SVG                                               |
+| GET    | `/api/today-status`                 | `CardsController.getTodayStatus`         | Pública, SVG                                               |
+| GET    | `/api/timeline-matrix`              | `CardsController.getTimelineMatrix`      | Pública, SVG                                               |
+| GET    | `/api/badge`                        | `CardsController.getBadge`               | Pública, SVG estilo Shields.io                             |
+| GET    | `/api/views`                        | `CardsController.getProfileViews`        | Pública, `no-cache`, SVG                                   |
+| GET    | `/api/top-repos`                    | `CardsController.getTopRepos`            | Pública, CORS `*`, SVG                                     |
+| GET    | `/api/v1/user/stats`                | `ApiV1Controller.getUserStatsJson`       | Pública, JSON agregado                                     |
+| GET    | `/api/auth/github`                  | `AuthController.initiateGitHubAuth`      | Redirección OAuth GitHub App                               |
+| GET    | `/api/auth/github/callback`         | `AuthController.handleGitHubCallback`    | Callback OAuth GitHub App                                  |
+| GET    | `/api/users/me/metrics`             | `AuthController.getUserMetrics`          | Métricas personales del usuario y desglose por repositorio |
+| GET    | `/api/users/repos`                  | `AuthController.getUserRepositories`     | Lista de repositorios accesibles por el usuario            |
+| DELETE | `/api/users/me`                     | `AuthController.deleteUserAccount`       | Purga autoverificada de datos                              |
+| POST   | `/api/auth/disconnect`              | `AuthController.disconnectAccount`       | Desconexión de cuenta GitHub                               |
+| POST   | `/api/tokens/register`              | `TokensController.register`              | Validado via DTO (PAT)                                     |
+| DELETE | `/api/tokens/revoke`                | `TokensController.revoke`                | Validado via DTO                                           |
+| DELETE | `/api/users/purge`                  | `TokensController.purge`                 | Validado via DTO (GDPR)                                    |
+| POST   | `/api/users/export`                 | `TokensController.exportData`            | Validado via DTO (GDPR export)                             |
+| POST   | `/api/webhooks/github`              | `WebhooksController.handleGitHubWebhook` | HMAC SHA-256 opcional                                      |
+| GET    | `/api/metrics`                      | `MetricsController.getMetrics`           | `METRICS_KEY` requerida                                    |
+| GET    | `/api/metrics/history`              | `MetricsController.getRendersHistory`    | `METRICS_KEY` requerida                                    |
+| GET    | `/api/metrics/users`                | `MetricsController.getUserMetrics`       | `METRICS_KEY` requerida                                    |
+| GET    | `/api/metrics/users/count`          | `MetricsController.getUniqueUsersCount`  | Pública                                                    |
+| POST   | `/api/metrics/verify-readme`        | `MetricsController.verifyReadme`         | `METRICS_KEY` requerida                                    |
+| POST   | `/api/metrics/verify-readmes-batch` | `MetricsController.verifyReadmesBatch`   | `METRICS_KEY` requerida                                    |
+| GET    | `/api/config`                       | `MetricsController.getConfig`            | Pública                                                    |
+| GET    | `/health`                           | `RootController.getHealth`               | Pública                                                    |
+| GET    | `/admin/metrics`                    | `RootController.getAdminMetrics`         | UI de administración de métricas                           |
+| GET    | `/help`                             | `RootController.getHelp`                 | UI de ayuda y documentación                                |
+| GET    | `/help/:slug`                       | `RootController.getHelpSubPage`          | UI de subpáginas de ayuda                                  |
+| GET    | `/privacy`                          | `RootController.getPrivacy`              | UI de política de privacidad                               |
+| GET    | `/`                                 | `RootController.getRoot`                 | Servido dinámicamente con SEO sanitizado                   |
 
 ---
 
 ## Variables de Entorno
 
-| Variable | Requerida | Propósito |
-|---|---|---|
-| `DATABASE_URL` | Opcional | Cadena de conexión PostgreSQL (prioritaria si se define) |
-| `DB_HOST` | ✅ Sí* | Host del servidor PostgreSQL (*si no se usa `DATABASE_URL`) |
-| `DB_PORT` | ✅ Sí* | Puerto PostgreSQL (default: `5432`) |
-| `DB_DATABASE` | ✅ Sí* | Nombre de la base de datos PostgreSQL |
-| `DB_USERNAME` | ✅ Sí* | Usuario de PostgreSQL |
-| `DB_PASSWORD` | ✅ Sí* | Contraseña de PostgreSQL |
-| `DB_SSL` | ✅ Sí | `true`/`false` para habilitar SSL en PostgreSQL |
-| `DB_SYNCHRONIZE` | ✅ Sí | `true`/`false` para sincronización de esquema TypeORM |
-| `ENCRYPTION_KEY` | ✅ Sí | 64 caracteres hex para cifrado AES-256-GCM de tokens |
-| `METRICS_KEY` | ✅ Sí | Clave secreta para endpoints `/api/metrics` (403 si falta) |
-| `GITHUB_TOKEN` | ✅ Sí | PAT de GitHub para tasa elevada en API pública (5.000 req/h) |
-| `GITHUB_CLIENT_ID` | No | Client ID para autenticación OAuth de GitHub App |
-| `GITHUB_CLIENT_SECRET` | No | Client Secret para autenticación OAuth de GitHub App |
-| `GITHUB_CALLBACK_URL` | No | URL de callback OAuth de GitHub App |
-| `GITHUB_WEBHOOK_SECRET` | No | Secreto HMAC para validar webhooks de GitHub |
-| `STATS_HISTORY_FREQUENCY_HOURS` | No | Horas mínimas entre snapshots de estadísticas (default: `12`) |
-| `REDIS_HOST` / `REDIS_URL` | No | Host o URL de conexión para caché Redis distribuida |
-| `REDIS_PORT` / `REDIS_PASSWORD` / `REDIS_DB` | No | Parámetros adicionales de conexión a Redis |
-| `PORT` | No | Puerto de escucha del servidor (default: `3000`) |
-| `NODE_ENV` | No | Entorno de ejecución (`production` / `development`) |
+| Variable                                     | Requerida | Propósito                                                     |
+| -------------------------------------------- | --------- | ------------------------------------------------------------- |
+| `DATABASE_URL`                               | Opcional  | Cadena de conexión PostgreSQL (prioritaria si se define)      |
+| `DB_HOST`                                    | ✅ Sí*    | Host del servidor PostgreSQL (*si no se usa `DATABASE_URL`)   |
+| `DB_PORT`                                    | ✅ Sí*    | Puerto PostgreSQL (default: `5432`)                           |
+| `DB_DATABASE`                                | ✅ Sí*    | Nombre de la base de datos PostgreSQL                         |
+| `DB_USERNAME`                                | ✅ Sí*    | Usuario de PostgreSQL                                         |
+| `DB_PASSWORD`                                | ✅ Sí*    | Contraseña de PostgreSQL                                      |
+| `DB_SSL`                                     | ✅ Sí     | `true`/`false` para habilitar SSL en PostgreSQL               |
+| `DB_SYNCHRONIZE`                             | ✅ Sí     | `true`/`false` para sincronización de esquema TypeORM         |
+| `ENCRYPTION_KEY`                             | ✅ Sí     | 64 caracteres hex para cifrado AES-256-GCM de tokens          |
+| `METRICS_KEY`                                | ✅ Sí     | Clave secreta para endpoints `/api/metrics` (403 si falta)    |
+| `GITHUB_TOKEN`                               | ✅ Sí     | PAT de GitHub para tasa elevada en API pública (5.000 req/h)  |
+| `GITHUB_CLIENT_ID`                           | No        | Client ID para autenticación OAuth de GitHub App              |
+| `GITHUB_CLIENT_SECRET`                       | No        | Client Secret para autenticación OAuth de GitHub App          |
+| `GITHUB_CALLBACK_URL`                        | No        | URL de callback OAuth de GitHub App                           |
+| `GITHUB_WEBHOOK_SECRET`                      | No        | Secreto HMAC para validar webhooks de GitHub                  |
+| `STATS_HISTORY_FREQUENCY_HOURS`              | No        | Horas mínimas entre snapshots de estadísticas (default: `12`) |
+| `REDIS_HOST` / `REDIS_URL`                   | No        | Host o URL de conexión para caché Redis distribuida           |
+| `REDIS_PORT` / `REDIS_PASSWORD` / `REDIS_DB` | No        | Parámetros adicionales de conexión a Redis                    |
+| `PORT`                                       | No        | Puerto de escucha del servidor (default: `3000`)              |
+| `NODE_ENV`                                   | No        | Entorno de ejecución (`production` / `development`)           |
 
 ---
 

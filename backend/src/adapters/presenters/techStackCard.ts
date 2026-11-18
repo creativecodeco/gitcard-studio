@@ -146,7 +146,7 @@ export function renderTechStackCard(
   const isCompact = overrides?.layout === 'compact';
   const cardWidth = 495;
   const cardHeight = isCompact ? 130 : 195;
-  const widthAttr = overrides?.cardWidth || `${cardWidth}`;
+  const widthAttr = escapeXml(overrides?.cardWidth || `${cardWidth}`);
 
   const borderRadius = overrides?.borderRadius ? Number.parseInt(overrides.borderRadius, 10) : 12;
   const showBorder = overrides?.showBorder !== 'false';

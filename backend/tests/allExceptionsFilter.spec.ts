@@ -62,4 +62,37 @@ describe('AllExceptionsFilter', () => {
       message: 'Internal server error'
     });
   });
+
+  it('should preserve 429 statusCode from Fastify rate-limit errors without returning 500', () => {
+    const filter = new AllExceptionsFilter();
+
+    const mockResponse = {
+      status: vi.fn().mockReturnThis(),
+      send: vi.fn().mockReturnThis()
+    };
+
+    const mockRequest = {
+      method: 'GET',
+      url: '/api/metrics/users/count'
+    };
+
+    const mockHost = {
+      switchToHttp: () => ({
+        getResponse: () => mockResponse,
+        getRequest: () => mockRequest
+      })
+    } as unknown as ArgumentsHost;
+
+    const rateLimitError = Object.assign(new Error('Rate limit exceeded, retry in 26 seconds'), {
+      statusCode: 429
+    });
+
+    filter.catch(rateLimitError, mockHost);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(429);
+    expect(mockResponse.send).toHaveBeenCalledWith({
+      statusCode: 429,
+      message: 'Rate limit exceeded, retry in 26 seconds'
+    });
+  });
 });

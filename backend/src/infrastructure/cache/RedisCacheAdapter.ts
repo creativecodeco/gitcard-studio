@@ -47,17 +47,29 @@ export class MemoryCacheAdapter implements CacheStore {
   }
 
   async flushPattern(pattern: string): Promise<void> {
-    const cleanPattern = pattern.replaceAll('*', '');
+    const cleanPattern = pattern.replaceAll('*', '').trim().toLowerCase();
+    if (!cleanPattern) return;
+
     for (const k of this.store.keys()) {
-      if (k.includes(cleanPattern)) {
+      const lowerKey = k.toLowerCase();
+      if (
+        lowerKey === cleanPattern ||
+        lowerKey.includes(`:${cleanPattern}:`) ||
+        lowerKey.endsWith(`:${cleanPattern}`)
+      ) {
         this.store.delete(k);
       }
     }
   }
 }
 
+const sharedFallbackStore = new MemoryCacheAdapter();
+let sharedRedisClient: Redis | null = null;
+let sharedRedisSignature = '';
+let sharedRedisConnected = false;
+
 export class RedisCacheAdapter implements CacheStore {
-  private readonly fallback = new MemoryCacheAdapter();
+  private readonly fallback = sharedFallbackStore;
   private readonly client: Redis | null = null;
   private isConnected = false;
 
@@ -66,6 +78,13 @@ export class RedisCacheAdapter implements CacheStore {
     const redisUrl = process.env.REDIS_URL;
 
     if (redisHost || redisUrl) {
+      const signature = `${redisUrl || ''}|${redisHost || ''}|${process.env.REDIS_PORT || ''}|${process.env.REDIS_DB || ''}`;
+      if (sharedRedisClient && sharedRedisSignature === signature) {
+        this.client = sharedRedisClient;
+        this.isConnected = sharedRedisConnected;
+        return;
+      }
+
       try {
         const options: RedisOptions = {
           lazyConnect: true,
@@ -90,9 +109,12 @@ export class RedisCacheAdapter implements CacheStore {
         this.client = redisUrl
           ? new Redis(redisUrl, options)
           : new Redis(redisHost ?? 'localhost', options);
+        sharedRedisClient = this.client;
+        sharedRedisSignature = signature;
 
         this.client.on('connect', () => {
           this.isConnected = true;
+          sharedRedisConnected = true;
           logger.info('Connected to Redis cache server successfully.');
         });
 
@@ -101,6 +123,7 @@ export class RedisCacheAdapter implements CacheStore {
             logger.warn(`Redis connection error, falling back to memory cache: ${err.message}`);
           }
           this.isConnected = false;
+          sharedRedisConnected = false;
         });
 
         // Attempt non-blocking initial connection
@@ -108,6 +131,7 @@ export class RedisCacheAdapter implements CacheStore {
       } catch (err) {
         this.client = null;
         this.isConnected = false;
+        sharedRedisConnected = false;
         logger.warn(
           `Failed to initialize Redis client, defaulting to memory cache: ${(err as Error).message}`
         );
@@ -163,19 +187,43 @@ export class RedisCacheAdapter implements CacheStore {
   }
 
   async flushPattern(pattern: string): Promise<void> {
-    await this.fallback.flushPattern(pattern);
+    const cleanPattern = pattern.replaceAll('*', '').trim().toLowerCase();
+    if (!cleanPattern) return;
+
+    await this.fallback.flushPattern(cleanPattern);
 
     if (this.client && this.isConnected) {
       try {
-        const searchPattern = pattern.includes('*') ? pattern : `*${pattern}*`;
-        const keys = await this.client.keys(searchPattern);
-        if (keys.length > 0) {
-          await this.client.del(...keys);
+        const searchPattern = `*:${cleanPattern}*`;
+        if (typeof this.client.scan === 'function') {
+          let cursor = '0';
+          do {
+            const [nextCursor, keys] = await this.client.scan(
+              cursor,
+              'MATCH',
+              searchPattern,
+              'COUNT',
+              100
+            );
+            cursor = nextCursor;
+            if (keys.length > 0) {
+              if (typeof this.client.unlink === 'function') {
+                await this.client.unlink(...keys);
+              } else {
+                await this.client.del(...keys);
+              }
+            }
+          } while (cursor !== '0');
+        } else {
+          const keys = await this.client.keys(searchPattern);
+          if (keys.length > 0) {
+            await this.client.del(...keys);
+          }
         }
       } catch {
         this.isConnected = false;
       }
     }
-    logger.info(`Invalidated cache pattern: ${pattern}`, { pattern });
+    logger.info(`Invalidated cache pattern: ${cleanPattern}`, { pattern: cleanPattern });
   }
 }

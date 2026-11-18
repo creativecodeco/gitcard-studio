@@ -2,9 +2,27 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
+## [1.22.0] - 2026-11-17
+
+### 🧪 Suite de Pruebas de Usuario E2E, Aislamiento de Rate Limiting y Resiliencia de Logs
+
+- **Suite Completa de Pruebas de Usuario E2E con Playwright (`frontend/tests-e2e/app.spec.ts`)**:
+  - Implementada una suite de 9 pruebas de usuario End-to-End con ejecución en Chromium headless shell y guardián estricto de integridad de registros (`attachZeroErrorLogGuards`).
+  - Monitoreo en tiempo real de `console.error`, excepciones no capturadas de página (`pageerror`) y respuestas del servidor con estado HTTP `>= 500` o `429`.
+  - Cobertura integral de flujos: carga inicial, aceptación de privacidad, alternancia de modo oscuro/claro, renderizado de las 14 tarjetas, filtrado por categorías (`stats`, `activity`, `repos`, `badges`, `all`), selección dinámica de repositorios (`owner/repo`), cambio de formato (`SVG`/`PNG`), enlace Markdown (`linked`/`raw`), selector de ancho (`card_width`), paleta personalizada `Custom 🎨`, conmutación entre los 7 idiomas (`es`, `en`, `fr`, `de`, `pt`, `ja`, `zh`), generador de README (layouts vertical y tabla 2 columnas) con vista previa HTML en vivo y notificación Toast de portapapeles.
+  - Pruebas E2E de seguridad de sesión OAuth, purga automática por detección de manipulación manual en DevTools (`Tamper Guard`), modal GDPR de borrado de datos y desconexión de cuenta.
+  - Pruebas E2E de analítica administrativa en `/admin/metrics` con autenticación por cabecera `X-API-Key`, paginación, búsqueda reactiva, visualización de KPIs y auditoría de perfiles en bloque.
+  - Prueba de estrés con ráfagas concurrentes contra el backend real de Fastify/NestJS (`/api/metrics/users/count`, `/api/config`, `/api/badge`, `/health`) confirmando cero bloqueos o errores de tasa no esperados.
+- **Aislamiento de Buckets de Rate Limiting y Preservación de Códigos HTTP**:
+  - Separación de claves de rate limiting en `main.ts` entre rutas sensibles (`sensitive:${ip}`, 10 req/min) y rutas generales (`general:${ip}`, 100 req/min), previniendo inanición de cuota en el contador global de usuarios `/api/metrics/users/count`.
+  - Ajuste en `AllExceptionsFilter` para preservar códigos de estado nativos de Fastify (`.statusCode`), reportando errores `429 Too Many Requests` como advertencias y evitando transformaciones a `500 Internal Server Error`.
+- **Configuración y Optimización de Vitest en Backend**:
+  - Actualizado `backend/vitest.config.mts` con filtro explícito `include: ['tests/**/*.{test,spec}.ts']` para prevenir ejecuciones redundantes en artefactos compilados de `dist/`.
+
 ## [1.21.0] - 2026-11-05
 
 ### 🔒 Blindaje Criptográfico Integral, Cifrado de Almacenamiento Local/Cookies y Remediación OWASP Top 10
+
 - **Almacenamiento Cifrado e Inmune a Modificación Manual (`Cookies`, `localStorage` y `sessionStorage`)**:
   - Implementado [`secureStorage.ts`](frontend/src/utils/secureStorage.ts) en el frontend con **Cifrado Autenticado con Datos Asociados (AEAD: flujo CTR SHA-256 + IV aleatorio de 96 bits vía `crypto.getRandomValues` + etiqueta HMAC-SHA256 de 128 bits en tiempo constante)** (`gcs_enc_v1.<ivHex>.<cipherHex>.<macHex>`).
   - Ninguna preferencia, usuario o clave de administración (`gh_active_user`, `registered-github-username`, `gh_session_token`, `gitcard-studio-metrics-key`, `theme`, `gitcard_privacy_accepted`, `app_locale`) se almacena en texto plano en `localStorage` ni `sessionStorage`.
@@ -21,15 +39,22 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
   - Sanitización estricta de fuentes (`getFontFamily` whitelist), colores (`sanitizeColor`), atributos `width` y etiquetas `<title>`/`<desc>` en `rankCard.ts`, `trophiesCard.ts`, `repoCard.ts`, `languagesCard.ts` y `topReposCard.ts`.
   - Añadidas cabeceras de seguridad `Content-Security-Policy: default-src 'none'; img-src data:; style-src 'unsafe-inline'` y `X-Content-Type-Options: nosniff` en todas las respuestas SVG de `CardsController`.
   - Validación anti-SSRF (`validateAvatarUrl`), bloqueo de redirecciones (`redirect: 'error'`), validación de MIME `image/*` y límite de 5 MB en `avatar.ts`.
-  - Límite de entrada SVG (512 KB) y caché LRU acotada por SHA-256 en el conversor PNG (`imageConverter.ts`), además de *rate-limiting* escalonado en `main.ts` (`30 req/min` en rutas sensibles y `300 req/min` en tarjetas).
+  - Límite de entrada SVG (512 KB) y caché LRU acotada por SHA-256 en el conversor PNG (`imageConverter.ts`), además de _rate-limiting_ escalonado en `main.ts` (`30 req/min` en rutas sensibles y `300 req/min` en tarjetas).
 - **Resiliencia en Renovación de Tokens OAuth, Persistencia de Métricas y Calidad de Código**:
   - Implementado mutex por usuario (`inFlightTokenRefreshes`) en `refreshGitHubAppToken` (`security.ts`) para evitar condiciones de carrera cuando múltiples tarjetas solicitan simultáneamente la renovación de un `refresh_token` de un solo uso.
   - Añadidas las columnas `tech_stack_web` y `tech_stack_github` en `UserMetric.ts` y migración automática en `database.ts`, eliminando los ternarios anidados en `TypeORMMetricsRepository.ts` y `webhooks.controller.ts`.
   - Optimizada la carga inicial de tarjetas en `CardPreview.astro` e `index.astro` para evitar bloqueos del overlay `#global-loading` en imágenes con `display: none`.
+- **Actualización y Sincronización de Dependencias Monorepo (`package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `Dockerfile`)**:
+  - **Gestor de Paquetes**: Actualizado `pnpm` a **`12.21.0`** en `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` y `Dockerfile`.
+  - **Root (`package.json`)**: `@typescript-eslint/eslint-plugin` y `@typescript-eslint/parser` (`8.73.0`), `eslint` (`10.15.0`) y `prettier` (`3.10.1`).
+  - **Backend (`backend/package.json`)**: `@nestjs/common`, `@nestjs/core`, `@nestjs/platform-fastify` y `@nestjs/testing` (`12.5.1`), `@fastify/cors` (`11.4.3`), `@fastify/static` (`10.1.11`), `@fastify/compress` (`9.3.0`), `@fastify/etag` (`6.2.2`), `@fastify/rate-limit` (`11.2.2`), `fastify` (`5.12.8`), `typeorm` (`1.1.3`), `dotenv` (`18.0.10`), `@types/node` (`26.6.6`), `tsc-alias` (`1.9.10`) y `vitest` (`5.1.0`).
+  - **Frontend (`frontend/package.json`)**: `astro` (`7.4.12`), `@playwright/test` (`1.65.1`) y `vitest` (`5.1.0`).
+  - **Workspace (`pnpm-workspace.yaml`)**: Sincronizado `overrides.fastify` a `5.12.8`, añadido `peerDependencyRules.allowedVersions` para `ioredis` (`6.0.0`) y `typescript` (`7.0.2`), y actualizado `minimumReleaseAgeExclude`.
 
 ## [1.20.0] - 2026-10-27
 
 ### ✨ Nuevas Características
+
 - **Tarjeta SVG de Visitas del Proyecto (`GET /api/repo-views`) y Contador por Proyecto (`GET /api/views?repo=...`)**:
   - Implementado el presentador SVG [`repoViewsCard.ts`](backend/src/adapters/presenters/repoViewsCard.ts) y el caso de uso [`GetRepoViewsCardUseCase.ts`](backend/src/use-cases/cards/GetRepoViewsCardUseCase.ts) que generan una tarjeta estilizada por repositorio mostrando metadatos del proyecto (propietario, nombre, descripción, lenguaje principal, estrellas y forks) junto con una insignia destacada de visitas en tiempo real.
   - Extendido el endpoint `GET /api/views` y el caso de uso [`RecordRepoViewUseCase.ts`](backend/src/use-cases/metrics/RecordRepoViewUseCase.ts) para soportar el parámetro opcional `repo`, permitiendo llevar contadores independientes por repositorio sin incrementar ni contaminar las visitas globales del perfil.
@@ -47,6 +72,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.19.1] - 2026-10-26
 
 ### 🔒 Auditoría de Seguridad, Sincronización y Actualización de Dependencias Monorepo
+
 - **Remediación de Vulnerabilidades (`pnpm audit` — 0 vulnerabilidades)**:
   - Actualizado `happy-dom` a **`21.0.4`** (y fijado en `overrides` de `pnpm-workspace.yaml`) para corregir la vulnerabilidad High `GHSA-834v-8h66-3h79` (`CVE-2026-33943`).
   - Actualizado `fastify` a **`5.12.7`** (y fijado en `overrides` de `pnpm-workspace.yaml`) para corregir la vulnerabilidad Low `GHSA-389g-gv7q-r4x8`.
@@ -60,12 +86,13 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.19.0] - 2026-10-13
 
 ### 🚀 Vitrina Visual de Tarjetas y Enlaces Clicables de Adquisición
+
 - **Vitrina Visual en Vivo en README (`README.md`)**:
   - Incorporada una galería visual responsiva en tablas con previsualizaciones reales generadas por la API en producción en diversos temas (`dark`, `tokyonight`, `neon`, `radical`, `glassmorphism`, `solarized`).
-  - Añadida una matriz comparativa detallada (*Why GitCard Studio?*) contrastando el proyecto frente a alternativas tradicionales en resiliencia de límites de tasa, soporte de repositorios privados, compatibilidad con proxy Camo de GitHub, matriz de hábitos de commit 7x24 y cumplimiento OWASP Top 10.
+  - Añadida una matriz comparativa detallada (_Why GitCard Studio?_) contrastando el proyecto frente a alternativas tradicionales en resiliencia de límites de tasa, soporte de repositorios privados, compatibilidad con proxy Camo de GitHub, matriz de hábitos de commit 7x24 y cumplimiento OWASP Top 10.
   - Sincronizada la documentación completa en inglés y español con insignias interactivas.
 - **Formato de Enlace Markdown en el Panel de Control (`ControlPanel.astro` & `index.astro`)**:
-  - Añadido el control *Enlace en Markdown* (`link-style-select`) con modos *Tarjeta Clicable (Recomendado)* y *Solo Imagen*.
+  - Añadido el control _Enlace en Markdown_ (`link-style-select`) con modos _Tarjeta Clicable (Recomendado)_ y _Solo Imagen_.
   - Actualizada la generación dinámica para envolver el código copiado de cada tarjeta individual y el `README.md de Ejemplo` con enlaces clicables hacia el estudio web interactivo (`[![Título](url)](generator_url)`).
 - **Utilidad de Generación de README (`readmeGenerator.ts`)**:
   - Añadido el parámetro opcional `linkCards` para envolver tarjetas en enlaces clicables preservando retrocompatibilidad total.
@@ -78,6 +105,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.18.1] - 2026-10-07
 
 ### 🧹 Correcciones de SonarCloud & Calidad de Código
+
 - **Corrección de Code Smells & Advertencias de SonarCloud**:
   - Extraído el inicializador de conexión asíncrono de Redis fuera del constructor en `RedisCacheAdapter.ts` mediante `initRedisConnection()`.
   - Simplificada la expresión regular de limpieza de URLs en `errorCard.ts` (`\S+`) para prevenir el cálculo de tiempo super-lineal debido a backtracking.
@@ -91,6 +119,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.18.0] - 2026-10-07
 
 ### 🌐 Arquitectura Modular de i18n, Cobertura del 100% y Corrección en Métricas
+
 - **Arquitectura Modular de i18n (`frontend/src/utils/i18n/`)**:
   - Refactorizado el diccionario de internacionalización anteriormente monolítico en 7 archivos independientes dentro de `frontend/src/utils/i18n/locales/` (`es.ts`, `en.ts`, `fr.ts`, `de.ts`, `pt.ts`, `ja.ts`, `zh.ts`).
   - Definido `LocaleDictionary = Record<TranslationKey, string>` en `types.ts` para garantizar a nivel de compilación en TypeScript que cualquier clave añadida en Español debe existir obligatoriamente en los demás 6 idiomas.
@@ -108,6 +137,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.17.0] - 2026-10-07
 
 ### 🚫 Manejo de Usuarios Inexistentes, Cancelación de Peticiones y Notificaciones Toast
+
 - **Cancelación Activa de Peticiones (`AbortController`)**:
   - Implementado un `AbortController` global (`activeCardFetchController`) en la vista del frontend (`index.astro`) para abortar de inmediato las peticiones HTTP y descargas de tarjetas en vuelo al consultar un usuario o cambiar de búsqueda.
 - **Detección Temprana y Toast de Error (`msg_user_not_found`)**:
@@ -118,6 +148,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.16.0] - 2026-10-07
 
 ### 📦 Actualización de Versión, Documentación e Integridad Monorepo
+
 - **Gestión Estricta de Versiones Monorepo**:
   - Incrementada la versión del proyecto a **`v1.16.0`** de forma sincronizada en los paquetes raíz (`gitcard-studio`), backend (`gitcard-studio-backend`) y frontend (`gitcard-studio-frontend`).
   - Sincronización y actualización de dependencias monorepo (`@typescript-eslint/*` 8.71.1, `dotenv` 18.0.6, `nanoid` 3.3.20, `postcss` 8.5.29, `vite` 8.3.3, `@playwright/test` 1.64.0) alineadas con la configuración del proyecto.
@@ -127,6 +158,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.15.0] - 2026-10-04
 
 ### 📦 Sincronización y Estabilización de Dependencias Monorepo
+
 - **Gestión Estricta de Dependencias**:
   - Actualizadas dependencias del monorepo a versiones fijas estables (`@eslint/js` 10.0.1, `@typescript-eslint/*` 8.71.0, `eslint` 10.12.0, `eslint-config-prettier` 10.1.8, `globals` 17.13.0, `prettier` 3.9.9, `pnpm` 12.9.1).
   - Verificación y alineación del 100% de las dependencias exactas y compartidas entre raíz, `backend` y `frontend`.
@@ -136,6 +168,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.14.0] - 2026-09-24
 
 ### 📈 Desglose Analítico de Métricas (Formato, Idioma y Temas)
+
 - **Persistencia de Contexto Extendido en Base de Datos (`RequestLog`)**:
   - Incorporadas columnas `theme`, `format` (SVG / PNG) y `locale` (ES / EN) en las entidades TypeORM e interfaces de dominio `HitContext`.
   - Agregación eficiente en la base de datos PostgreSQL utilizando `COALESCE` para garantizar el conteo retrocompatible con registros históricos.
@@ -147,6 +180,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.13.0] - 2026-09-24
 
 ### ✨ Selección Multi-formato (SVG / PNG) y Generador de Temas Personalizados
+
 - **Selector de Formato de Salida en UI (`ControlPanel.astro`)**:
   - Incorporado menú desplegable interactivo para alternar entre el formato vectorial animado (`SVG`) y la renderización en alta resolución (`PNG`) generada en backend mediante `@resvg/resvg-js`.
 - **Panel de Personalización Dinámica de Colores (Custom Theme Colors)**:
@@ -159,6 +193,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.12.2] - 2026-09-14
 
 ### 📜 Actualización y Sincronización Integral de Términos y Privacidad
+
 - **Política de Privacidad (`privacy.astro`)**:
   - Actualizada la especificación criptográfica para reflejar el cifrado autenticado de alta seguridad **`AES-256-GCM`** con vectores de inicialización (IV) únicos y base de datos PostgreSQL, sustituyendo referencias legadas.
   - Documentada formalmente la integración dual: conexión 1-clic con **GitHub App** (OAuth de solo lectura de metadatos con tokens resguardados exclusivamente en backend) y **Personal Access Tokens (PAT)** Fine-grained con alcance mínimo.
@@ -177,6 +212,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.12.1] - 2026-09-14
 
 ### 🔄 Corrección del Flujo de Desconexión y Restauración de UI OAuth
+
 - **Restauración Inmediata del Botón de Conexión (`PrivateTokenModal.astro`)**:
   - Corregido el problema donde `#token-unregistered` retenía la clase CSS `hidden` tras desconectar la cuenta, impidiendo que el botón `[ 🐙 Conectar con GitHub App ]` reapareciera.
   - Al pulsar "Desconectar", la interfaz ahora activa de forma directa la pestaña de GitHub App (`switchModeTab('app')`) y remueve la clase `hidden`, garantizando que el usuario visualice inmediatamente el botón de reconexión.
@@ -191,6 +227,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.12.0] - 2026-09-14
 
 ### 🔍 Auditoría de READMEs en GitHub & Detección en Tiempo Real
+
 - **Verificación de Uso de GitCard Studio en Perfiles**: Implementado el caso de uso `VerifyUserReadmeUseCase` para auditar el contenido de los READMEs de perfil en GitHub (`https://github.com/{username}/{username}`), detectando de forma automatizada tarjetas incrustadas (`stats`, `languages`, `repo`, `streak`, `rank`, `views`, etc.) o menciones de marca.
 - **Auditoría Masiva de Perfiles (`POST /api/metrics/verify-readmes-batch`)**: Nuevo endpoint administrativo protegido con `METRICS_KEY` que ejecuta auditorías en paralelo controlado (concurrencia de 4 peticiones) sobre la totalidad de los usuarios registrados en `user_metrics`, deduplicando usuarios y actualizando métricas globales.
 - **Auditoría Individual (`POST /api/metrics/verify-readme`)**: Endpoint para auditar y validar individualmente perfiles con feedback instantáneo.
@@ -200,6 +237,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
   - El resultado de la auditoría expone indicadores `cacheRefreshed` y `cacheValidated`.
 
 ### 📊 Panel de Administración de Métricas (`/admin/metrics`)
+
 - **Botón "Auditar Todos"**: Añadido control interactivo con indicador visual de progreso y animación para auditar en lote todos los perfiles de la base de datos.
 - **Toggle de Refresco de Caché**: Checkbox "Actualizar Caché" para controlar si la auditoría consulta en vivo GitHub o lee de caché.
 - **Insignia Dinámica de Estado**: Badge contextual (`#audit-status-badge`) con mensajes en tiempo real sobre el progreso de auditoría y validación de caché.
@@ -207,12 +245,14 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 - **Diferenciación de Origen de Tráfico**: Distinción clara en la tabla de usuarios entre peticiones reales desde GitHub Camo (`last_github_hit`), previsualizaciones directas de la web (`last_web_hit`) y estado de verificación del README.
 
 ### 🗄️ Base de Datos & Migración Automática
+
 - **Ampliación de `UserMetric`**: Agregadas las columnas `readme_verified` (boolean), `readme_verified_at` (timestamp), `detected_cards` (varchar), `last_github_hit` (timestamp) y `last_web_hit` (timestamp).
 - **Migración Idempotente**: Incorporada sentencia `ALTER TABLE user_metrics ADD COLUMN IF NOT EXISTS ...` en `database.ts` para despliegues fluidos sin pérdida de datos.
 
 ## [1.11.0] - 2026-09-07
 
 ### 🛡️ Mitigación de Alertas de Seguridad CodeQL (OWASP & CWE)
+
 - **Validación Estricta de URLs de la API de GitHub (Alerta #83, CWE-20)**: Reemplazada la comprobación de subcadenas `url.includes('https://api.github.com/user/repos')` por parseo seguro mediante `new URL(url)` en `ApiGitHubRepository.ts`, validando estrictamente que el origen coincida con `https://api.github.com` y comprobando directamente la propiedad `pathname !== '/user/repos'` para prevenir falsificaciones o bypasses de subcadenas.
 - **Prevención Integral de Reflected XSS en Insignias SVG (Alerta #82, CWE-79)**:
   - **Barrera de Reemplazo en `sanitizeBadgeLabel`**: Actualizada la función para aplicar una expresión regular global con clase de caracteres invertida (`trimmed.replace(/[^a-z\d\s\-_.:/]/gi, '')`), garantizando una barrera formal de sanitización reconocida por CodeQL.
@@ -221,10 +261,12 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
   - **Blindaje Universal en `escapeXml`**: Asegurado que todas las rutas de ejecución en `escape.ts` ejecuten el reemplazo global de entidades XML (`&lt;`, `&gt;`, `&amp;`, `&apos;`, `&quot;`) para cualquier tipo de dato de entrada.
 
 ### 🤖 Agente Especializado de Dependencias (`dependency-agent`)
+
 - **Nuevo Agente de Auditoría de Dependencias**: Creadas las directivas `.agents/rules/dependency-agent.md`, la habilidad `.agents/skills/dependency-agent/SKILL.md` y el script de escaneo `.agents/skills/dependency-agent/scripts/dependency-scan.js`.
 - **Integración en la Suite de Escaneo**: Añadido el comando `pnpm deps:scan` e integrado en `pnpm scan:all` para auditar automáticamente que todas las dependencias usen versiones exactas (sin `^` o `~`), estén sincronizadas entre `package.json`, `backend/package.json` y `frontend/package.json`, y mantengan alineado el lockfile.
 
 ### 🚀 Rendimiento HTTP, Compresión y Optimización Global
+
 - **Compresión y ETags Nivel Servidor (`@fastify/compress` & `@fastify/etag`)**: Registrados los módulos `@fastify/compress@9.2.0` (Brotli/Gzip) y `@fastify/etag@6.2.0` en `main.ts`, reduciendo entre 60% y 80% el tamaño del payload y permitiendo respuestas `304 Not Modified`.
 - **Ajuste de Conexiones Fastify (Keep-Alive & Timeouts)**: Configurado `keepAliveTimeout: 65000` y `headersTimeout: 66000` en `FastifyAdapter` para optimizar la estabilidad en proxies inversos (Cloudflare/Nginx/Traefik).
 - **Pool de Conexiones TypeORM (PostgreSQL)**: Configurado el pool de conexiones con `max: 20`, `idleTimeoutMillis: 30000` y `connectionTimeoutMillis: 3000` en `database.ts`.
@@ -233,12 +275,14 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 - **Minificación de Marcado SVG (`minifySvg`)**: Creada la función `minifySvg` en `escape.ts` para eliminar indentaciones redundantes y espacios entre etiquetas XML en la generación de tarjetas SVG.
 
 ### 📦 Actualización de Dependencias
+
 - **Actualización de Paquetes en Monorepo**: Actualizados `@typescript-eslint/eslint-plugin` y `@typescript-eslint/parser` a `8.70.0` en `package.json`, y `@types/node` a `26.5.0` en `backend/package.json` (manteniendo `fastify@5.12.1` alineado con `@nestjs/platform-fastify@12.0.1`).
 - **Sincronización de pnpm (12.3.4)**: Actualizado el gestor de paquetes a `pnpm@12.3.4` en el `Dockerfile` (etapas `builder` y `runner`), alineado con `packageManager` en `package.json` y la documentación del proyecto (`.agents/ARCHITECTURE.md`).
 
 ## [1.10.5] - 2026-09-04
 
 ### 📦 Optimización y Saneamiento del Árbol de Dependencias
+
 - **Eliminación Total de `overrides` Obsoletos**: Removidos los bloques de anulación de versiones en `package.json`, `backend/package.json` y `pnpm-workspace.yaml`.
 - **Desbloqueo de `find-my-way` (9.7.0 → 9.9.0)**: Eliminada la anulación que forzaba el downgrade a 9.7.0, resolviendo naturalmente a la versión `9.9.0` requerida por NestJS 12 y compartida sin conflictos con Fastify.
 - **Limpieza de `brace-expansion`**: Eliminada la anulación a 5.0.9 al ser resuelta de manera nativa y segura por `minimatch@10.2.6 (^5.0.8)` sin vulnerabilidades detectadas.
@@ -253,6 +297,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.10.4] - 2026-08-29
 
 ### 🧪 Expansión de Cobertura de Pruebas Unitarias
+
 - **Pruebas Unitarias de Controladores (`cards.controller.spec.ts`)**: Integradas 7 pruebas unitarias para el `CardsController` verificando la renderización de tarjetas, cabeceras HTTP `Content-Type: image/svg+xml`, purga explícita de caché (`cache=false`, `refresh=true`) y gestión de contadores de visitas de perfil.
 - **Validación y Parseo de Parámetros (`cardQueryHelpers.spec.ts`)**: Agregadas pruebas para `extractThemeOverrides` y `extractCardWidth` validando alias de color (`bg_color`, `icon_color`, `lang`), sanitización estricta y rechazo de payloads XSS.
 - **Utilidades de Escape e Infraestructura (`escape.spec.ts` & `allExceptionsFilter.spec.ts`)**: Creadas suites de prueba para sanitización de caracteres especiales XML en `escapeXml` y captura de excepciones globales con `AllExceptionsFilter` (400 Bad Request y 500 Internal Server Error).
@@ -261,26 +306,31 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.10.3] - 2026-08-29
 
 ### 🛡️ Depuración Automática de Tokens Inválidos & Fallback de Endpoints GitHub API
+
 - **Manejo de Errores de Refresco (`bad_refresh_token`)**: Actualizado `security.ts` para eliminar automáticamente registros de tokens obsoletos o revocados (`tokenRepo.deleteToken(username)`) cuando la llamada a la API de GitHub OAuth retorna `bad_refresh_token` o la fecha `expires_at` haya vencido y el refresco falle.
-- **Prevención de Errores 401 en Tarjetas**: Actualizado `getDecryptedToken` para retornar `undefined` si un token expirado no se puede refrescar, permitiendo que las tarjetas (*Stats*, *Rank*, *Trophies*, *Sponsors*) realicen el fallback automático al endpoint público `/users/${username}` sin generar errores 401 en los registros del servidor.
+- **Prevención de Errores 401 en Tarjetas**: Actualizado `getDecryptedToken` para retornar `undefined` si un token expirado no se puede refrescar, permitiendo que las tarjetas (_Stats_, _Rank_, _Trophies_, _Sponsors_) realicen el fallback automático al endpoint público `/users/${username}` sin generar errores 401 en los registros del servidor.
 - **Reintento de Consulta GraphQL (`fetchGraphQL`)**: Implementada la reintención automática con `process.env.GITHUB_TOKEN` si el token provisto por el usuario responde con `401 Unauthorized` en las consultas GraphQL.
 
 ## [1.10.2] - 2026-08-27
 
 ### 📊 Ordenación Interactiva en Panel de Métricas (`/admin/metrics`)
+
 - **Ordenación por Columnas en Tabla (`metrics.astro`)**: Implementada la ordenación dinámica bidireccional por cualquiera de las 4 columnas de la tabla de perfiles activos (`Usuario`, `Total Renders`, `Vistas de Perfil` y `Última Actividad`), incluyendo indicadores visuales de dirección (`▲` / `▼`) y resaltado del encabezado activo.
 
 ### 👁️ Precisión del Conteo de Visitas de Perfil (`profile_views`)
+
 - **Previsualizaciones en Vivo (`cardUrls.ts` & `index.astro`)**: Configurado el parámetro `&preview=true` de forma transparente en las tarjetas de previsualización en vivo del constructor web UI para evitar incrementos accidentales en las estadísticas reales del perfil del usuario, garantizando que solo las solicitudes provenientes del `README.md` en GitHub incrementen el contador.
 
 ## [1.10.1] - 2026-08-27
 
 ### ⚡ Refresco e Invalidación Dinámica de Caché
+
 - **Refresco Forzado por Parámetro (`CardsController.ts`)**: Implementados los parámetros `refresh=true`, `cache=false`, `cache_seconds=0` y `cache_bust` para invalidar y purgar instantáneamente las tarjetas cacheadas en Redis/memoria y consultar datos en vivo directamente a GitHub.
-- **Acción Unificada en Frontend (`index.astro`)**: Unificada la purga y recarga de caché en el botón principal *"Refrescar Tarjetas"* / *"Generar Tarjetas"* (`#btn-generate` y `#btn-generate-auth`), eliminando botones sobrantes por tarjeta y notificando al usuario mediante avisos flotantes (*toasts*).
+- **Acción Unificada en Frontend (`index.astro`)**: Unificada la purga y recarga de caché en el botón principal _"Refrescar Tarjetas"_ / _"Generar Tarjetas"_ (`#btn-generate` y `#btn-generate-auth`), eliminando botones sobrantes por tarjeta y notificando al usuario mediante avisos flotantes (_toasts_).
 - **Auto-Purga en Gestión de Tokens (`TokensController.ts`)**: Añadida la llamada automática a `githubRepo.clearCache(username)` al registrar, revocar o purgar un token de usuario.
 
 ### 🛡️ Exportación de Datos de Usuario Robusta (GDPR / Habeas Data)
+
 - **Resolución Automática de Tokens (`TokensController.ts`)**: Integrada la búsqueda y descifrado automático de tokens de usuario desde PostgreSQL (`getDecryptedToken`) en el endpoint `@Post('users/export')`, resolviendo errores `400 Bad Request` en usuarios autenticados con GitHub App.
 - **Transmisión de Credenciales (`PrivateTokenModal.astro`)**: Actualizado el botón de exportación para transmitir encabezados de autenticación `Authorization: Bearer <token>` cuando existen credenciales guardadas en la sesión.
 
@@ -804,4 +854,4 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 ---
 
-**Versión actualmente expuesta / en producción:** v1.21.0
+**Versión actualmente expuesta / en producción:** v1.22.0

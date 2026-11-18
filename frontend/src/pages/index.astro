@@ -2302,11 +2302,12 @@ import Footer from '@/components/Footer.astro';
     const container = document.getElementById('toast-container');
     if (!container) return;
 
+    const safeType = type === 'error' ? 'error' : 'success';
     const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
+    toast.className = `toast ${safeType}`;
 
     const iconSvg =
-      type === 'success'
+      safeType === 'success'
         ? `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
          </svg>`
@@ -2316,11 +2317,19 @@ import Footer from '@/components/Footer.astro';
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
          </svg>`;
 
-    toast.innerHTML = `
-      <span class="toast-icon">${iconSvg}</span>
-      <span>${message}</span>
-      <div class="toast-progress"></div>
-    `;
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'toast-icon';
+    iconSpan.innerHTML = iconSvg;
+
+    const msgSpan = document.createElement('span');
+    msgSpan.textContent = message;
+
+    const progressDiv = document.createElement('div');
+    progressDiv.className = 'toast-progress';
+
+    toast.appendChild(iconSpan);
+    toast.appendChild(msgSpan);
+    toast.appendChild(progressDiv);
 
     container.appendChild(toast);
 

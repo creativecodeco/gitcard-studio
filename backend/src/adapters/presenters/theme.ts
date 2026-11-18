@@ -274,6 +274,7 @@ const COLOR_MATCH_REGEX =
   /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}(?:\s*,\s*[\d.]+)?\s*\)|hsla?\(\s*\d{1,3}\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%(?:\s*,\s*[\d.]+)?\s*\)/gi;
 
 export function getBackgroundDef(theme: Theme, gradientId: string = 'bg'): string {
+  const safeId = escapeXml(gradientId);
   if (theme.bgGradient) {
     const colorMatches = theme.bgGradient.match(COLOR_MATCH_REGEX);
     if (colorMatches && colorMatches.length >= 2) {
@@ -281,12 +282,12 @@ export function getBackgroundDef(theme: Theme, gradientId: string = 'bg'): strin
         const offset = Math.round((idx / (colorMatches.length - 1)) * 100);
         return `<stop offset="${offset}%" stop-color="${color}" />`;
       });
-      return `<linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+      return `<linearGradient id="${safeId}" x1="0%" y1="0%" x2="100%" y2="100%">
         ${stops.join('\n        ')}
       </linearGradient>`;
     }
   }
-  return `<linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+  return `<linearGradient id="${safeId}" x1="0%" y1="0%" x2="100%" y2="100%">
        <stop offset="0%" stop-color="${theme.bg}" />
        <stop offset="100%" stop-color="${theme.bg}" />
      </linearGradient>`;
@@ -296,8 +297,9 @@ export function getBackgroundDef(theme: Theme, gradientId: string = 'bg'): strin
  * Renders an SVG glow filter element.
  */
 export function renderGlowFilter(id: string = 'glow', color?: string): string {
-  const filterColor = color || '#38bdf8';
-  return `<filter id="${id}" x="-20%" y="-20%" width="140%" height="140%">
+  const safeId = escapeXml(id);
+  const filterColor = sanitizeColor(color) || '#38bdf8';
+  return `<filter id="${safeId}" x="-20%" y="-20%" width="140%" height="140%">
     <feGaussianBlur stdDeviation="2.5" result="blur" />
     <feFlood flood-color="${filterColor}" flood-opacity="0.5" result="color" />
     <feComposite in="color" in2="blur" operator="in" result="glow" />
@@ -332,9 +334,10 @@ export function renderCardFrame(options: CardFrameOptions): string {
     borderColor
   } = options;
   const rx = Math.min(24, Math.max(0, borderRadius));
-  const border = borderColor || theme.border;
+  const safeGradientId = escapeXml(gradientId);
+  const border = sanitizeColor(borderColor) || theme.border;
   const strokeAttr = showBorder ? `stroke="${border}" stroke-width="1.5"` : '';
-  return `<rect width="${width}" height="${height}" rx="${rx}" fill="url(#${gradientId})" ${strokeAttr} />`;
+  return `<rect width="${width}" height="${height}" rx="${rx}" fill="url(#${safeGradientId})" ${strokeAttr} />`;
 }
 
 /**

@@ -8,6 +8,7 @@ export default defineConfig({
     }
   },
   test: {
+    include: ['tests/**/*.{test,spec}.ts'],
     fileParallelism: false
   }
 });

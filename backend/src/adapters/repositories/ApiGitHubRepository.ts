@@ -504,7 +504,7 @@ export class ApiGitHubRepository implements IGitHubRepository {
           try {
             const ownerLogin = repo.owner?.login || username;
             const repoLangs = await this.fetchGitHub(
-              `https://api.github.com/repos/${ownerLogin}/${repo.name}/languages`,
+              `https://api.github.com/repos/${encodeURIComponent(ownerLogin)}/${encodeURIComponent(repo.name)}/languages`,
               userToken
             );
             for (const [lang, bytes] of Object.entries(repoLangs)) {
@@ -785,11 +785,13 @@ export class ApiGitHubRepository implements IGitHubRepository {
     const hasExplicitOwner = Boolean(repoName && repoName.includes('/'));
     const [explicitOwner, explicitRepo] =
       hasExplicitOwner && repoName ? repoName.split('/') : [username, repoName];
+    const encodedOwner = encodeURIComponent(explicitOwner || username);
+    const encodedRepo = explicitRepo ? encodeURIComponent(explicitRepo) : '';
 
     try {
       repoData = repoName
         ? await this.fetchGitHub(
-            `https://api.github.com/repos/${explicitOwner}/${explicitRepo}`,
+            `https://api.github.com/repos/${encodedOwner}/${encodedRepo}`,
             userToken
           )
         : await this.findBestRepo(username, userToken);
@@ -799,7 +801,7 @@ export class ApiGitHubRepository implements IGitHubRepository {
           `User token for ${username} returned 401 in getFeaturedRepo. Retrying without userToken.`
         );
         repoData = repoName
-          ? await this.fetchGitHub(`https://api.github.com/repos/${explicitOwner}/${explicitRepo}`)
+          ? await this.fetchGitHub(`https://api.github.com/repos/${encodedOwner}/${encodedRepo}`)
           : await this.findBestRepo(username);
       } else if (repoName && !hasExplicitOwner && err.message?.includes('404')) {
         const accessibleMatch = await this.findRepoByNameInAccessibleRepos(
@@ -1503,6 +1505,7 @@ export class ApiGitHubRepository implements IGitHubRepository {
     }
 
     // 2. Fallback to raw.githubusercontent.com for default branches
+    const MAX_README_BYTES = 512 * 1024; // 512 KB limit
     for (const branch of ['main', 'master']) {
       try {
         const rawUrl = `https://raw.githubusercontent.com/${safeUser}/${safeUser}/${branch}/README.md`;
@@ -1512,10 +1515,17 @@ export class ApiGitHubRepository implements IGitHubRepository {
         }
 
         const response = await fetch(rawUrl, {
-          headers: { 'User-Agent': 'gitcard-studio-stats' }
+          headers: { 'User-Agent': 'gitcard-studio-stats' },
+          redirect: 'error',
+          signal: AbortSignal.timeout(8000)
         });
         if (response.ok) {
-          return await response.text();
+          const contentLength = Number(response.headers?.get?.('content-length') || 0);
+          if (contentLength > MAX_README_BYTES) {
+            return null;
+          }
+          const text = await response.text();
+          return text.length > MAX_README_BYTES ? text.slice(0, MAX_README_BYTES) : text;
         }
       } catch {
         // Continue to next branch

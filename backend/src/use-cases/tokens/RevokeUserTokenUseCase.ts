@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IGitHubRepository } from '@/domain/repositories/IGitHubRepository';
 import { ITokenRepository } from '@/domain/repositories/ITokenRepository';
+import { verifyOAuthSessionToken } from '@/infrastructure/security/security';
 
 @Injectable()
 export class RevokeUserTokenUseCase {
@@ -10,27 +11,34 @@ export class RevokeUserTokenUseCase {
   ) {}
 
   async execute(username: string, providedToken: string): Promise<{ message: string }> {
-    // 1. Verify who owns the provided token
-    const profileRes = await fetch('https://api.github.com/user', {
-      headers: {
-        'User-Agent': 'gitcard-studio-security',
-        Accept: 'application/vnd.github.v3+json',
-        Authorization: `token ${providedToken}`
+    if (providedToken.startsWith('gcss_')) {
+      if (!verifyOAuthSessionToken(providedToken, username)) {
+        throw new Error('El token provisto no es válido. No se puede verificar tu identidad.');
       }
-    });
+    } else {
+      // 1. Verify who owns the provided token
+      const profileRes = await fetch('https://api.github.com/user', {
+        headers: {
+          'User-Agent': 'gitcard-studio-security',
+          Accept: 'application/vnd.github.v3+json',
+          Authorization: `token ${providedToken}`
+        },
+        signal: AbortSignal.timeout(8000)
+      });
 
-    if (!profileRes.ok) {
-      throw new Error('El token provisto no es válido. No se puede verificar tu identidad.');
-    }
+      if (!profileRes.ok) {
+        throw new Error('El token provisto no es válido. No se puede verificar tu identidad.');
+      }
 
-    const githubUser = await profileRes.json();
-    const tokenOwner = githubUser.login;
+      const githubUser = (await profileRes.json()) as { login?: string };
+      const tokenOwner = typeof githubUser?.login === 'string' ? githubUser.login : '';
 
-    // 2. Enforce ownership: only the owner of the GitHub username can delete its token
-    if (tokenOwner.toLowerCase() !== username.toLowerCase()) {
-      throw new Error(
-        `Acceso denegado. El token proporcionado pertenece al usuario de GitHub '${tokenOwner}', pero estás intentando revocar el token de '${username}'.`
-      );
+      // 2. Enforce ownership: only the owner of the GitHub username can delete its token
+      if (!tokenOwner || tokenOwner.toLowerCase() !== username.toLowerCase()) {
+        throw new Error(
+          `Acceso denegado. El token proporcionado pertenece al usuario de GitHub '${tokenOwner}', pero estás intentando revocar el token de '${username}'.`
+        );
+      }
     }
 
     // 3. Check if token exists

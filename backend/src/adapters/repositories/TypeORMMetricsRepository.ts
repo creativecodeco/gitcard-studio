@@ -7,7 +7,84 @@ import { RepoMetric } from '@/infrastructure/database/entities/RepoMetric';
 import { RequestLog } from '@/infrastructure/database/entities/RequestLog';
 import { logger } from '@/infrastructure/logging/logger';
 
+const ALLOWED_USER_METRIC_COLUMNS = new Set<string>([
+  'profile_views',
+  'stats_web',
+  'stats_github',
+  'languages_web',
+  'languages_github',
+  'repo_web',
+  'repo_github',
+  'rank_web',
+  'rank_github',
+  'streak_web',
+  'streak_github',
+  'trophies_web',
+  'trophies_github',
+  'sponsors_web',
+  'sponsors_github',
+  'commit_activity_web',
+  'commit_activity_github',
+  'today_status_web',
+  'today_status_github',
+  'timeline_matrix_web',
+  'timeline_matrix_github',
+  'top_repos_web',
+  'top_repos_github',
+  'tech_stack_web',
+  'tech_stack_github'
+]);
+
+export function anonymizeIpAddress(rawIp: string): string {
+  const trimmed = (rawIp || '').trim();
+  if (!trimmed || trimmed === 'unknown') return 'unknown';
+  if (trimmed === '127.0.0.1' || trimmed === '::1') return trimmed;
+
+  // IPv4: mask last octet (e.g. 203.0.113.45 -> 203.0.113.0)
+  const ipv4Parts = trimmed.split('.');
+  if (ipv4Parts.length === 4 && ipv4Parts.every((p) => /^\d{1,3}$/.test(p))) {
+    return `${ipv4Parts[0]}.${ipv4Parts[1]}.${ipv4Parts[2]}.0`;
+  }
+
+  // IPv6: keep first 3 hextets and mask remainder
+  if (trimmed.includes(':')) {
+    const hextets = trimmed.split(':').slice(0, 3);
+    return `${hextets.join(':')}::`;
+  }
+
+  return 'unknown';
+}
+
+const LOG_PRUNE_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
+const DEFAULT_LOG_RETENTION_DAYS = 90;
+
 export class TypeORMMetricsRepository implements IMetricsRepository {
+  private lastPruneTime = 0;
+
+  private pruneOldRequestLogsIfNeeded(): void {
+    const now = Date.now();
+    if (now - this.lastPruneTime < LOG_PRUNE_INTERVAL_MS) {
+      return;
+    }
+    this.lastPruneTime = now;
+
+    const retentionDays = Math.max(
+      7,
+      Number.parseInt(process.env.LOG_RETENTION_DAYS || String(DEFAULT_LOG_RETENTION_DAYS), 10) ||
+        DEFAULT_LOG_RETENTION_DAYS
+    );
+    const cutoffDate = new Date(now - retentionDays * 24 * 60 * 60 * 1000);
+
+    void AppDataSource.createQueryBuilder()
+      .delete()
+      .from(RequestLog)
+      .where('created_at < :cutoffDate', { cutoffDate })
+      .execute()
+      .catch((err) => {
+        logger.warn('Could not prune old request_logs entries', { error: err });
+      });
+  }
+
   recordHit(
     type:
       | 'stats'
@@ -46,6 +123,9 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       };
       const metricKey = metricKeyMap[type] ?? `${type}Renders`;
       const column = type === 'views' ? 'profile_views' : `${normalizedType}_${source}`;
+      if (!ALLOWED_USER_METRIC_COLUMNS.has(column)) {
+        return;
+      }
 
       // 2. Increment specific card type renders
       await transactionalEntityManager
@@ -82,7 +162,7 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
         .where('username = :username', { username: username.toLowerCase() })
         .execute();
 
-      // 4. Log the request (safely truncated to fit DB column constraints)
+      // 4. Log the request (safely truncated and IP-anonymized to fit DB & GDPR constraints)
       const requestLogRepo = transactionalEntityManager.getRepository(RequestLog);
       const log = new RequestLog();
       log.username = username.toLowerCase().slice(0, 39);
@@ -90,11 +170,12 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
       log.source = source;
       log.user_agent = userAgent.slice(0, 500);
       log.referer = referer.slice(0, 500);
-      log.ip_address = ip.slice(0, 45);
+      log.ip_address = anonymizeIpAddress(ip).slice(0, 45);
       log.theme = context?.theme ? context.theme.slice(0, 30) : null;
       log.format = context?.format ? context.format.slice(0, 10) : 'svg';
       log.locale = context?.locale ? context.locale.slice(0, 10) : 'es';
       await requestLogRepo.save(log);
+      this.pruneOldRequestLogsIfNeeded();
     }).catch((err) => {
       logger.error('Failed to record metrics hit in TypeORM:', { error: err });
     });
@@ -508,7 +589,7 @@ export class TypeORMMetricsRepository implements IMetricsRepository {
     log.source = source;
     log.user_agent = userAgent.slice(0, 500);
     log.referer = referer.slice(0, 500);
-    log.ip_address = ip.slice(0, 45);
+    log.ip_address = anonymizeIpAddress(ip).slice(0, 45);
 
     await requestLogRepo.save(log).catch((err) => {
       logger.error('Error saving request log for profile views:', { error: err });

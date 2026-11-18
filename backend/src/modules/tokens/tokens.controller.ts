@@ -25,6 +25,7 @@ import {
   buildClearSessionCookieHeader,
   buildSessionCookieHeader,
   extractSessionTokenFromCookie,
+  revokeUserSessions,
   verifyOAuthSessionToken
 } from '@/infrastructure/security/security';
 import { escapeXml } from '@/utils/escape';
@@ -113,6 +114,7 @@ export class TokensController {
 
     try {
       const result = await this.revokeUseCase.execute(dto.username, providedToken);
+      revokeUserSessions(dto.username);
       reply?.header('Set-Cookie', buildClearSessionCookieHeader());
       await this.githubRepo.clearCache(dto.username);
       logger.info(`Token revoked successfully for user ${dto.username}`, {
@@ -173,6 +175,7 @@ export class TokensController {
     try {
       await this.purgeUseCase.execute(dto.username);
       await this.githubRepo.clearCache(dto.username);
+      revokeUserSessions(dto.username);
       reply?.header('Set-Cookie', buildClearSessionCookieHeader());
       logger.info(`GDPR data purge completed for user ${dto.username}`, { username: dto.username });
       return { message: m.purgeSuccess };

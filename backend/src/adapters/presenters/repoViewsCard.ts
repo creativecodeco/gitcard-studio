@@ -1,6 +1,6 @@
 import { RepoStats } from '@/domain/entities/RepoStats';
 import { escapeXml, minifySvg } from '@/utils/escape';
-import { getTheme, getBackgroundDef, renderBrandHeader } from './theme';
+import { getTheme, getBackgroundDef, renderBrandHeader, sanitizeColor } from './theme';
 
 const ICONS = {
   repo: `<path d="M3 2.75A2.75 2.75 0 0 1 5.75 0h14.5a.75.75 0 0 1 .75.75v20.5a.75.75 0 0 1-.75.75h-6a.75.75 0 0 1 0-1.5h5.25v-4H5.75A2.75 2.75 0 0 1 3 14.25v-11.5zm1.5 0v11.5c0 .69.56 1.25 1.25 1.25H20v-9.5H5.75a2.75 2.75 0 0 1-2.75-2.75c0-.69.56-1.25 1.25-1.25h12.75a.75.75 0 0 1 0 1.5H4.5z"/>`,
@@ -87,7 +87,7 @@ export function renderRepoViewsCard(
   const safeName = escapeXml(repo.name);
   const safeOwner = escapeXml(repo.owner);
   const safeLanguage = escapeXml(repo.language || '');
-  const safeLanguageColor = escapeXml(repo.languageColor || '#858585');
+  const safeLanguageColor = escapeXml(sanitizeColor(repo.languageColor) || '#858585');
   const safeStars = escapeXml(String(Number(repo.stars) || 0));
   const safeForks = escapeXml(String(Number(repo.forks) || 0));
   const safeDescription = escapeXml(truncateText(repo.description || i18nText.liveTracking, 42));

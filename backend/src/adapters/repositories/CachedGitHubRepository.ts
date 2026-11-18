@@ -8,36 +8,50 @@ import { CacheStore, RedisCacheAdapter } from '@/infrastructure/cache/RedisCache
 
 export class CachedGitHubRepository implements IGitHubRepository {
   private readonly CACHE_TTL_SECONDS = 2 * 60 * 60; // 2 hours in seconds
+  private readonly inFlightRequests = new Map<string, Promise<unknown>>();
 
   constructor(
     private readonly delegate: IGitHubRepository,
     private readonly cacheStore: CacheStore = new RedisCacheAdapter()
   ) {}
 
-  async getUserStats(username: string, userToken?: string): Promise<UserStats> {
-    const cacheKey = `stats:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    const cached = await this.cacheStore.get<UserStats>(cacheKey);
-
-    if (cached) {
+  private async getOrFetch<T>(
+    cacheKey: string,
+    fetcher: () => Promise<T>,
+    cacheNull: boolean = true
+  ): Promise<T> {
+    const cached = await this.cacheStore.get<T>(cacheKey);
+    if (cached !== null && cached !== undefined) {
       return cached;
     }
 
-    const data = await this.delegate.getUserStats(username, userToken);
-    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
-    return data;
+    const existingPromise = this.inFlightRequests.get(cacheKey) as Promise<T> | undefined;
+    if (existingPromise) {
+      return existingPromise;
+    }
+
+    const fetchPromise = (async (): Promise<T> => {
+      const data = await fetcher();
+      if (cacheNull || (data !== null && data !== undefined)) {
+        await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
+      }
+      return data;
+    })().finally(() => {
+      this.inFlightRequests.delete(cacheKey);
+    });
+
+    this.inFlightRequests.set(cacheKey, fetchPromise);
+    return fetchPromise;
+  }
+
+  async getUserStats(username: string, userToken?: string): Promise<UserStats> {
+    const cacheKey = `stats:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
+    return this.getOrFetch(cacheKey, () => this.delegate.getUserStats(username, userToken));
   }
 
   async getUserLanguages(username: string, userToken?: string): Promise<LanguageStat[]> {
     const cacheKey = `langs:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    const cached = await this.cacheStore.get<LanguageStat[]>(cacheKey);
-
-    if (cached) {
-      return cached;
-    }
-
-    const data = await this.delegate.getUserLanguages(username, userToken);
-    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
-    return data;
+    return this.getOrFetch(cacheKey, () => this.delegate.getUserLanguages(username, userToken));
   }
 
   async getFeaturedRepo(
@@ -46,15 +60,9 @@ export class CachedGitHubRepository implements IGitHubRepository {
     userToken?: string
   ): Promise<RepoStats> {
     const cacheKey = `repo:${username.toLowerCase()}:${(repoName || '').toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    const cached = await this.cacheStore.get<RepoStats>(cacheKey);
-
-    if (cached) {
-      return cached;
-    }
-
-    const data = await this.delegate.getFeaturedRepo(username, repoName, userToken);
-    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
-    return data;
+    return this.getOrFetch(cacheKey, () =>
+      this.delegate.getFeaturedRepo(username, repoName, userToken)
+    );
   }
 
   async getUserTopRepos(
@@ -63,41 +71,19 @@ export class CachedGitHubRepository implements IGitHubRepository {
     userToken?: string
   ): Promise<RepoStats[]> {
     const cacheKey = `toprepos:${username.toLowerCase()}:${limit}:${userToken ? 'private' : 'public'}`;
-    const cached = await this.cacheStore.get<RepoStats[]>(cacheKey);
-
-    if (cached) {
-      return cached;
-    }
-
-    const data = await this.delegate.getUserTopRepos(username, limit, userToken);
-    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
-    return data;
+    return this.getOrFetch(cacheKey, () =>
+      this.delegate.getUserTopRepos(username, limit, userToken)
+    );
   }
 
   async getUserStreak(username: string, userToken?: string): Promise<StreakStats> {
     const cacheKey = `streak:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    const cached = await this.cacheStore.get<StreakStats>(cacheKey);
-
-    if (cached) {
-      return cached;
-    }
-
-    const data = await this.delegate.getUserStreak(username, userToken);
-    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
-    return data;
+    return this.getOrFetch(cacheKey, () => this.delegate.getUserStreak(username, userToken));
   }
 
   async getUserSponsors(username: string, userToken?: string): Promise<SponsorStats> {
     const cacheKey = `sponsors:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    const cached = await this.cacheStore.get<SponsorStats>(cacheKey);
-
-    if (cached) {
-      return cached;
-    }
-
-    const data = await this.delegate.getUserSponsors(username, userToken);
-    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
-    return data;
+    return this.getOrFetch(cacheKey, () => this.delegate.getUserSponsors(username, userToken));
   }
 
   async getUserCommitActivity(
@@ -110,36 +96,14 @@ export class CachedGitHubRepository implements IGitHubRepository {
     hourlyMatrix: number[][];
   }> {
     const cacheKey = `activity:${username.toLowerCase()}:${userToken ? 'private' : 'public'}`;
-    type ActivityData = {
-      username: string;
-      totalCommitsThisYear: number;
-      commitsToday: number;
-      hourlyMatrix: number[][];
-    };
-    const cached = await this.cacheStore.get<ActivityData>(cacheKey);
-
-    if (cached) {
-      return cached;
-    }
-
-    const data = await this.delegate.getUserCommitActivity(username, userToken);
-    await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
-    return data;
+    return this.getOrFetch(cacheKey, () =>
+      this.delegate.getUserCommitActivity(username, userToken)
+    );
   }
 
   async getProfileReadme(username: string): Promise<string | null> {
     const cacheKey = `readme:${username.toLowerCase()}`;
-    const cached = await this.cacheStore.get<string | null>(cacheKey);
-
-    if (cached !== undefined && cached !== null) {
-      return cached;
-    }
-
-    const data = await this.delegate.getProfileReadme(username);
-    if (data !== null) {
-      await this.cacheStore.set(cacheKey, data, this.CACHE_TTL_SECONDS);
-    }
-    return data;
+    return this.getOrFetch(cacheKey, () => this.delegate.getProfileReadme(username), false);
   }
 
   async isReadmeCached(username: string): Promise<boolean> {

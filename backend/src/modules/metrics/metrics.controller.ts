@@ -4,6 +4,8 @@ import {
   ForbiddenException,
   Get,
   Headers,
+  HttpException,
+  HttpStatus,
   Inject,
   InternalServerErrorException,
   Optional,
@@ -23,8 +25,14 @@ import {
 } from './dto/metrics.dto';
 import { VerifyUserReadmeUseCase } from '@/use-cases/metrics/VerifyUserReadmeUseCase';
 
+const MAX_FAILED_METRICS_ATTEMPTS = 5;
+const METRICS_LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+
 @Controller('api')
 export class MetricsController {
+  private failedAttempts = 0;
+  private lockoutUntil = 0;
+
   constructor(
     @Inject('IMetricsRepository') private readonly metricsRepo: IMetricsRepository,
     @Optional()
@@ -44,11 +52,29 @@ export class MetricsController {
       throw new ForbiddenException(m.metricsDisabled);
     }
 
+    if (Date.now() < this.lockoutUntil) {
+      throw new HttpException(
+        'Demasiados intentos de autenticación fallidos. Intenta de nuevo en 15 minutos.',
+        HttpStatus.TOO_MANY_REQUESTS
+      );
+    }
+
     const providedKey = headerKey ?? queryKey;
 
     if (typeof providedKey !== 'string' || !safeTimingEqual(providedKey, expectedKey)) {
+      this.failedAttempts += 1;
+      if (this.failedAttempts >= MAX_FAILED_METRICS_ATTEMPTS) {
+        this.lockoutUntil = Date.now() + METRICS_LOCKOUT_DURATION_MS;
+        this.failedAttempts = 0;
+        logger.warn(
+          'Admin metrics endpoint locked for 15 minutes due to 5 consecutive failed authentication attempts'
+        );
+      }
       throw new UnauthorizedException(m.metricsUnauthorized);
     }
+
+    this.failedAttempts = 0;
+    this.lockoutUntil = 0;
   }
 
   @Get('metrics')

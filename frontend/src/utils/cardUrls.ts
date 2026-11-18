@@ -48,26 +48,28 @@ export function buildCardUrls(options: CardUrlOptions): CardUrls {
     viewsStyle
   } = options;
 
+  const safeUser = encodeURIComponent(username);
+  const safeTheme = encodeURIComponent(theme);
   const widthParam = cardWidth ? `&card_width=${encodeURIComponent(cardWidth)}` : '';
   const localeParam = locale ? `&locale=${encodeURIComponent(locale)}` : '';
   const formatParam = format && format !== 'svg' ? `&format=${encodeURIComponent(format)}` : '';
   const custom = customColors;
   const tagParam = options.isPreview ? '&preview=true' : '&ref=readme';
 
-  const statsUrl = `${origin}/api/stats?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
-  const languagesUrl = `${origin}/api/languages?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
-  const rankUrl = `${origin}/api/rank?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
-  const streakUrl = `${origin}/api/streak?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
-  const trophiesUrl = `${origin}/api/trophies?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
-  const topReposUrl = `${origin}/api/top-repos?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
-  const sponsorsUrl = `${origin}/api/sponsors?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
-  const commitActivityUrl = `${origin}/api/commit-activity?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
-  const todayStatusUrl = `${origin}/api/today-status?username=${username}&theme=${theme}${localeParam}${formatParam}${custom}${tagParam}`;
-  const timelineMatrixUrl = `${origin}/api/timeline-matrix?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
-  const techStackUrl = `${origin}/api/tech-stack?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const statsUrl = `${origin}/api/stats?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const languagesUrl = `${origin}/api/languages?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const rankUrl = `${origin}/api/rank?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const streakUrl = `${origin}/api/streak?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const trophiesUrl = `${origin}/api/trophies?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const topReposUrl = `${origin}/api/top-repos?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const sponsorsUrl = `${origin}/api/sponsors?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const commitActivityUrl = `${origin}/api/commit-activity?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const todayStatusUrl = `${origin}/api/today-status?username=${safeUser}&theme=${safeTheme}${localeParam}${formatParam}${custom}${tagParam}`;
+  const timelineMatrixUrl = `${origin}/api/timeline-matrix?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  const techStackUrl = `${origin}/api/tech-stack?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
 
-  let repoUrl = `${origin}/api/repo?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
-  let repoViewsUrl = `${origin}/api/repo-views?username=${username}&theme=${theme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  let repoUrl = `${origin}/api/repo?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
+  let repoViewsUrl = `${origin}/api/repo-views?username=${safeUser}&theme=${safeTheme}${widthParam}${localeParam}${formatParam}${custom}${tagParam}`;
   if (repo) {
     repoUrl += `&repo=${encodeURIComponent(repo)}`;
     repoViewsUrl += `&repo=${encodeURIComponent(repo)}`;
@@ -77,7 +79,7 @@ export function buildCardUrls(options: CardUrlOptions): CardUrls {
   const colorVal = viewsColor ? viewsColor.trim() : '';
   const styleVal = viewsStyle || '';
 
-  let viewsUrl = `${origin}/api/views?username=${username}&theme=${theme}${tagParam}`;
+  let viewsUrl = `${origin}/api/views?username=${safeUser}&theme=${safeTheme}${tagParam}`;
   if (repo) viewsUrl += `&repo=${encodeURIComponent(repo)}`;
   if (labelVal) viewsUrl += `&label=${encodeURIComponent(labelVal)}`;
   if (colorVal) viewsUrl += `&color=${encodeURIComponent(colorVal)}`;

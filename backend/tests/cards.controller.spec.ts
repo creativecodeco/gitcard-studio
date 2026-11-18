@@ -100,7 +100,7 @@ describe('CardsController', () => {
     expect(result).toContain('Usuario de GitHub inválido');
   });
 
-  it('should clear cache when cache=false parameter is passed', async () => {
+  it('should clear cache when cache=false parameter is passed and throttle repeated bypass calls within cooldown', async () => {
     await controller.getStats(
       { username: 'octocat', cache: 'false' },
       undefined,
@@ -109,6 +109,15 @@ describe('CardsController', () => {
       mockRes as FastifyReply
     );
 
+    await controller.getStats(
+      { username: 'octocat', cache: 'false' },
+      undefined,
+      undefined,
+      '127.0.0.1',
+      mockRes as FastifyReply
+    );
+
+    expect(mockGithubRepo.clearCache).toHaveBeenCalledTimes(1);
     expect(mockGithubRepo.clearCache).toHaveBeenCalledWith('octocat');
   });
 

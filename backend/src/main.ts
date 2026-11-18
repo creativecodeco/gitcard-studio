@@ -28,7 +28,8 @@ export async function bootstrap(): Promise<NestFastifyApplication> {
     AppModule,
     new FastifyAdapter({
       logger: false,
-      keepAliveTimeout: 65000
+      keepAliveTimeout: 65000,
+      bodyLimit: 64 * 1024 // 64 KB max JSON/raw request body size
     }),
     { rawBody: true }
   );
@@ -52,22 +53,30 @@ export async function bootstrap(): Promise<NestFastifyApplication> {
   });
 
   // Register tiered rate limiting for /api/ endpoints (OWASP A05 / DoS & brute-force protection)
+  // Uses separate key buckets so high-volume SVG card renders never starve auth/metrics endpoints
   const defaultRateMax = Number(process.env.RATE_LIMIT_MAX || 300);
-  const sensitiveRateMax = Number(process.env.SENSITIVE_RATE_LIMIT_MAX || 30);
+  const sensitiveRateMax = Number(process.env.SENSITIVE_RATE_LIMIT_MAX || 60);
+  const isSensitiveEndpoint = (rawUrl?: string): boolean => {
+    const url = rawUrl || '';
+    if (url.startsWith('/api/metrics/users/count')) {
+      return false;
+    }
+    return (
+      url.startsWith('/api/metrics') ||
+      url.startsWith('/api/tokens') ||
+      url.startsWith('/api/auth') ||
+      url.startsWith('/api/users/purge') ||
+      url.startsWith('/api/users/export') ||
+      url.startsWith('/api/webhooks')
+    );
+  };
+
   await app.register(fastifyRateLimit, {
-    max: (req) => {
-      const url = req.url || '';
-      if (
-        url.startsWith('/api/metrics') ||
-        url.startsWith('/api/tokens') ||
-        url.startsWith('/api/auth') ||
-        url.startsWith('/api/users') ||
-        url.startsWith('/api/webhooks')
-      ) {
-        return sensitiveRateMax;
-      }
-      return defaultRateMax;
+    keyGenerator: (req) => {
+      const bucket = isSensitiveEndpoint(req.url) ? 'sensitive' : 'general';
+      return `${bucket}:${req.ip}`;
     },
+    max: (req) => (isSensitiveEndpoint(req.url) ? sensitiveRateMax : defaultRateMax),
     timeWindow: '1 minute',
     allowList: (req) => !req.url?.startsWith('/api/')
   });
@@ -103,6 +112,14 @@ export async function bootstrap(): Promise<NestFastifyApplication> {
         setHeader('Cache-Control', 'public, max-age=31536000, immutable');
       } else if (filePath.endsWith('.html')) {
         setHeader('Cache-Control', 'no-cache, must-revalidate');
+        setHeader('X-Frame-Options', 'DENY');
+        setHeader('X-Content-Type-Options', 'nosniff');
+        setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+        setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+        setHeader(
+          'Content-Security-Policy',
+          "frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
+        );
       }
     }
   });
@@ -118,6 +135,8 @@ export async function bootstrap(): Promise<NestFastifyApplication> {
       forbidNonWhitelisted: true
     })
   );
+
+  app.enableShutdownHooks();
 
   await app.listen(PORT, '0.0.0.0');
   logger.info(`🚀 NestJS Fastify server running on http://localhost:${PORT}`, {

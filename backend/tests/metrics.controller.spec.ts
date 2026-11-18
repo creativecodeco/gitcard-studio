@@ -92,6 +92,17 @@ describe('MetricsController', () => {
       await expect(controller.getMetrics(query)).rejects.toThrow(UnauthorizedException);
     });
 
+    it('should lock out after 5 consecutive failed attempts with 429 Too Many Requests', async () => {
+      const query: MetricsKeyQueryDto = { key: 'wrong-key' };
+      for (let i = 0; i < 5; i++) {
+        await expect(controller.getMetrics(query)).rejects.toThrow(UnauthorizedException);
+      }
+
+      await expect(controller.getMetrics({ key: VALID_KEY })).rejects.toThrow(
+        'Demasiados intentos de autenticación fallidos'
+      );
+    });
+
     it('should accept key from x-api-key header', async () => {
       const query: MetricsKeyQueryDto = {};
 

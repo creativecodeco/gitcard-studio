@@ -30,6 +30,7 @@ import {
   decryptOAuthSessionToken,
   generateOAuthSessionToken,
   getDecryptedToken,
+  revokeUserSessions,
   safeTimingEqual,
   verifyOAuthSessionToken
 } from '@/infrastructure/security/security';
@@ -412,6 +413,7 @@ export class AuthController {
     try {
       await this.purgeUseCase.execute(username);
       await this.githubRepo.clearCache(username);
+      revokeUserSessions(username);
       reply?.header('Set-Cookie', buildClearSessionCookieHeader());
       logger.info(`User account ${query.username} purged self successfully via UI`, {
         username: query.username
@@ -441,6 +443,7 @@ export class AuthController {
 
     const existingToken = await this.tokenRepo.getToken(username);
     if (!existingToken) {
+      revokeUserSessions(username);
       reply?.header('Set-Cookie', buildClearSessionCookieHeader());
       return { message: m.accountDisconnectSuccess };
     }
@@ -457,6 +460,7 @@ export class AuthController {
     try {
       await this.tokenRepo.deleteToken(username);
       await this.githubRepo.clearCache(username);
+      revokeUserSessions(username);
       reply?.header('Set-Cookie', buildClearSessionCookieHeader());
       logger.info(`Disconnected GitHub account for user ${dto.username}`, {
         username: dto.username
