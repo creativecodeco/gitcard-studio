@@ -35,7 +35,7 @@
     "typeorm",
     "typescript"
   ],
-  "packageManager": "pnpm@12.21.0",
+  "packageManager": "pnpm@12.23.0",
   "scripts": {
     "build": "pnpm --filter gitcard-studio-frontend build && pnpm --filter gitcard-studio-backend build",
     "start": "pnpm --filter gitcard-studio-backend start",
@@ -59,8 +59,8 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@typescript-eslint/eslint-plugin": "8.73.0",
-    "@typescript-eslint/parser": "8.73.0",
+    "@typescript-eslint/eslint-plugin": "8.74.0",
+    "@typescript-eslint/parser": "8.74.0",
     "astro-eslint-parser": "3.2.0",
     "eslint": "10.15.0",
     "eslint-config-prettier": "10.1.8",

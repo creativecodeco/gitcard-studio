@@ -11,13 +11,13 @@
 | Capa            | Tecnología                         | Versión                 |
 | --------------- | ---------------------------------- | ----------------------- |
 | Runtime         | Node.js                            | 24                      |
-| Backend         | NestJS + Fastify + TypeScript      | 12.5.1 / 5.12.8 / 7.0.2 |
-| Frontend        | Astro (SSG estático)               | 7.4.12                  |
+| Backend         | NestJS + Fastify + TypeScript      | 12.6.0 / 5.12.8 / 7.0.2 |
+| Frontend        | Astro (SSG estático)               | 7.4.13                  |
 | Base de datos   | PostgreSQL + TypeORM               | 8.23.1 / 1.1.3          |
-| Package Manager | pnpm (monorepo)                    | 12.21.0                 |
+| Package Manager | pnpm (monorepo)                    | 12.23.0                 |
 | Contenedor      | Docker multi-stage, node:24-alpine | —                       |
 | CSS             | Vanilla CSS (global.css)           | —                       |
-| Tests           | Vitest                             | 5.1.0                   |
+| Tests           | Vitest                             | 5.1.1                   |
 
 ---
 
@@ -54,7 +54,7 @@ gitcard-studio/
 │   │   ├── app.module.ts         # NestJS Root Module
 │   │   ├── main.ts               # NestJS Fastify bootstrap con compresión, ETags y Helmet
 │   │   └── server.ts             # Punto de entrada de inicio de servidor
-│   └── tests/                    # Vitest unit tests backend (35 archivos, 187 tests pasados)
+│   └── tests/                    # Vitest unit tests backend (35 archivos, 188 tests pasados)
 ├── frontend/                     # Astro 7 — cliente web estático interactivo
 │   ├── astro.config.mjs          # outDir: ../public, format: file, compressHTML: true
 │   ├── src/
@@ -62,7 +62,7 @@ gitcard-studio/
 │   │   ├── components/               # CardPreview, ThemeToggle, PrivateTokenModal, Footer
 │   │   ├── pages/                    # index.astro, help.astro, privacy.astro, sitemap.xml.ts
 │   │   └── styles/global.css
-│   └── tests/                    # Vitest tests frontend (3 archivos, 10 tests pasados)
+│   └── tests/                    # Vitest tests frontend (4 archivos, 15 tests pasados)
 ├── Dockerfile                    # Multi-stage: builder + runner (non-root node user)
 ├── pnpm-workspace.yaml           # Config monorepo + allowBuilds + minimumReleaseAgeExclude
 └── .agents/

@@ -15,12 +15,12 @@
   },
   "dependencies": {
     "@astrojs/check": "0.9.12",
-    "astro": "7.4.12",
+    "astro": "7.4.13",
     "typescript": "7.0.2"
   },
   "devDependencies": {
     "@playwright/test": "1.65.1",
     "happy-dom": "21.0.4",
-    "vitest": "5.1.0"
+    "vitest": "5.1.1"
   }
 }

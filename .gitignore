@@ -40,7 +40,7 @@ coverage/
 .nyc_output/
 
 # Agents Customization Skills
-.agents/skills/
+.agents/skills/*
 design-system/
 skills-lock.json
 

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { renderSponsorsCard } from '@/adapters/presenters/sponsorsCard';
 import { SponsorStats } from '@/domain/entities/SponsorStats';
 import { THEMES } from '@/adapters/presenters/theme';
@@ -56,6 +56,20 @@ const emptySponsorsStats: SponsorStats = {
 };
 
 describe('sponsorsCard presenter', () => {
+  beforeAll(() => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        headers: { get: () => 'image/png' },
+        arrayBuffer: async () => Buffer.from('mock-avatar')
+      })
+    );
+  });
+
+  afterAll(() => {
+    vi.unstubAllGlobals();
+  });
   it('should render valid SVG with correct structure and stats', async () => {
     const svg = await renderSponsorsCard(mockSponsorsStats, 'dark');
     expect(svg).toContain('<svg');
